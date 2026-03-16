@@ -45,7 +45,7 @@ function preload() {
 this.load.image("Phaser_tuilesdejeu", "src/assets/tuilesJeu.png");
 
 // chargement de la carte
-this.load.tilemapTiledJSON("carte", "src/assets/map.json");  
+this.load.tilemapTiledJSON("carte", "src/assets/laboratory.json");  
 }
 
 /***********************************************************************/
