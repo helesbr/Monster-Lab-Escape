@@ -47,7 +47,8 @@ this.load.image("Phaser_tuilesdejeu", "src/assets/tuilesJeu.png");
 // chargement de la carte
 this.load.tilemapTiledJSON("carte", "src/assets/laboratory.json");  
 }
-
+// chargement des sons 
+this.load.audio;
 /***********************************************************************/
 /** FONCTION CREATE 
 /***********************************************************************/
@@ -60,16 +61,9 @@ this.load.tilemapTiledJSON("carte", "src/assets/laboratory.json");
  */
 function create() {
   this.add.image(400, 300, "img_ciel");
-  groupe_plateformes = this.physics.add.staticGroup();
-  groupe_plateformes.create(200, 584, "img_plateforme");
-  groupe_plateformes.create(600, 584, "img_plateforme");
-  groupe_plateformes.create(50, 300, "img_plateforme");
-  groupe_plateformes.create(600, 450, "img_plateforme");
-  groupe_plateformes.create(750, 270, "img_plateforme");
   player = this.physics.add.sprite(100, 450, 'img_perso');
   player.setCollideWorldBounds(true);
   this.physics.add.collider(player, groupe_plateformes);
-  player.setBounce(0.2);
   clavier = this.input.keyboard.createCursorKeys();
 
   this.anims.create({
@@ -92,27 +86,23 @@ function create() {
     frameRate: 20
   });
 
-  //On rajoute un groupe d'étoiles, vide pour l'instant
-  groupe_etoiles = this.physics.add.group();
-  // on rajoute 10 étoiles avec une boucle for :
-  // on répartit les ajouts d'étoiles tous les 70 pixels sur l'axe des x
+  //On rajoute un groupe monstre, vide pour l'instant
+  groupe_monstres = this.physics.add.group();
+
   for (var i = 0; i < 10; i++) {
     var coordX = 70 + 70 * i;
-    groupe_etoiles.create(coordX, 10, "img_etoile");
+    groupe_monstres.create(coordX, 10, "img_monstre");
   }
 
-  this.physics.add.collider(groupe_etoiles, groupe_plateformes);
-  groupe_etoiles.children.iterate(function iterateur(etoile_i) {
+  groupe_monstres.children.iterate(function iterateur(monstre_i) {
     // On tire un coefficient aléatoire de rebond : valeur entre 0.4 et 0.8
     var coef_rebond = Phaser.Math.FloatBetween(0.4, 0.8);
-    etoile_i.setBounceY(coef_rebond); // on attribut le coefficient de rebond à l'étoile etoile_i
+    monstre_i.setBounceY(coef_rebond); // on attribut le coefficient de rebond à l'étoile etoile_i
   });
-  this.physics.add.overlap(player, groupe_etoiles, ramasserEtoile, null, this);
 
   zone_texte_score = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
   groupe_bombes = this.physics.add.group();
-  this.physics.add.collider(groupe_bombes, groupe_plateformes);
-  this.physics.add.collider(player, groupe_bombes, chocAvecBombe, null, this);
+
   // chargement de la carte
 const carteDuNiveau = this.add.tilemap("carte");
 
