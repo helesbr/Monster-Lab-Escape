@@ -42,7 +42,7 @@ function preload() {
     frameHeight: 48
   });
   // chargement tuiles de jeu
-this.load.image("Phaser_tuilesdejeu", "src/assets/tuilesJeu.png");
+this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
 
 // chargement de la carte
 this.load.tilemapTiledJSON("carte", "src/assets/laboratory.json");  
