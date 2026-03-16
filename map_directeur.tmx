@@ -1,12 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="5" nextobjectid="1">
+ <editorsettings>
+  <export target="map_directeur.tmj" format="json"/>
+ </editorsettings>
  <tileset firstgid="1" name="floor" tilewidth="32" tileheight="32" tilecount="64" columns="8">
   <image source="../../../../../Downloads/trak2_plate2b.tga" width="256" height="256"/>
  </tileset>
  <tileset firstgid="65" name="desk" tilewidth="32" tileheight="32" tilecount="512" columns="16">
+  <properties>
+   <property name="estSolide" type="bool" value="false"/>
+  </properties>
   <image source="../../../../../Downloads/dark-wood.png" width="512" height="1024"/>
  </tileset>
  <tileset firstgid="577" name="exit" tilewidth="32" tileheight="32" tilecount="4" columns="2">
+  <properties>
+   <property name="estSolide" type="bool" value="true"/>
+  </properties>
   <image source="../../../../../Downloads/tile050.png" width="64" height="64"/>
  </tileset>
  <tileset firstgid="581" name="carpet" tilewidth="32" tileheight="32" tilecount="24" columns="8">
@@ -16,12 +25,18 @@
   <image source="../../../../../Downloads/wall.png" width="32" height="576"/>
  </tileset>
  <tileset firstgid="623" name="rack" tilewidth="32" tileheight="32" tilecount="1536" columns="5">
+  <properties>
+   <property name="estSolide" type="bool" value="true"/>
+  </properties>
   <image source="../../../../../Downloads/ChatGPT Image 16 mars 2026, 16_08_52.png" width="160" height="160"/>
  </tileset>
  <tileset firstgid="2159" name="tapis" tilewidth="32" tileheight="32" tilecount="1536" columns="10">
   <image source="../../../../../Downloads/ChatGPT Image 16 mars 2026, 15_58_17.png" width="320" height="320"/>
  </tileset>
  <tileset firstgid="3695" name="bench" tilewidth="32" tileheight="32" tilecount="100" columns="10">
+  <properties>
+   <property name="estSolide" type="bool" value="true"/>
+  </properties>
   <image source="../../../../../Downloads/BANC.png" width="320" height="320"/>
  </tileset>
  <tileset firstgid="3795" name="yellow" tilewidth="32" tileheight="32" tilecount="5076" columns="54">
@@ -62,6 +77,9 @@
 </data>
  </layer>
  <layer id="3" name="carpet" width="30" height="30">
+  <properties>
+   <property name="estSolide" type="bool" value="true"/>
+  </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

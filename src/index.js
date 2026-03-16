@@ -7,16 +7,12 @@
 // configuration générale du jeu
 var config = {
   type: Phaser.AUTO,
-  width: 800, // largeur en pixels
-  height: 600, // hauteur en pixels
+  width: 960, // largeur en pixels
+  height: 960, // hauteur en pixels
   physics: {
     // définition des parametres physiques
     default: "arcade", // mode arcade : le plus simple : des rectangles pour gérer les collisions. Pas de pentes
     arcade: {
-      // parametres du mode arcade
-      gravity: {
-        y: 300 // gravité verticale : acceleration ddes corps en pixels par seconde
-      },
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
@@ -41,14 +37,10 @@ new Phaser.Game(config);
  * On y trouve surtout le chargement des assets (images, son ..)
  */
 function preload() {
-  this.load.image("img_ciel", "src/assets/sky.png");
-  this.load.image("img_plateforme", "src/assets/platform.png");
   this.load.spritesheet("img_perso", "src/assets/dude.png", {
     frameWidth: 32,
     frameHeight: 48
   });
-  this.load.image("img_etoile", "src/assets/star.png");
-  this.load.image("img_bombe", "src/assets/bomb.png");
   // chargement tuiles de jeu
 this.load.image("Phaser_tuilesdejeu", "src/assets/tuilesJeu.png");
 
