@@ -59,10 +59,8 @@ this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");
  * ainsi que toutes les instructions permettant de planifier des evenements
  */
 function create() {
-  this.add.image(400, 300, "img_ciel");
   player = this.physics.add.sprite(100, 450, 'img_perso');
   player.setCollideWorldBounds(true);
-  this.physics.add.collider(player, groupe_plateformes);
   clavier = this.input.keyboard.createCursorKeys();
 
   this.anims.create({
@@ -88,10 +86,6 @@ function create() {
   //On rajoute un groupe monstre, vide pour l'instant
   groupe_monstres = this.physics.add.group();
 
-  for (var i = 0; i < 10; i++) {
-    var coordX = 70 + 70 * i;
-    groupe_monstres.create(coordX, 10, "img_monstre");
-  }
 
   groupe_monstres.children.iterate(function iterateur(monstre_i) {
     // On tire un coefficient aléatoire de rebond : valeur entre 0.4 et 0.8
@@ -110,8 +104,12 @@ const tileset = carteDuNiveau.addTilesetImage(
     "all_tilset",  // ← nom du tileset dans Tiled
     "allTiles"        // ← clé utilisée dans this.load.image()
 )
-// création des calques (mets les vrais noms de tes calques Tiled)
-const solLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
+
+// Après (les 4 calques)
+const fondLayer   = carteDuNiveau.createLayer("Fond",   tileset, 0, 0);
+const floorLayer  = carteDuNiveau.createLayer("Floor",  tileset, 0, 0);
+const murLayer    = carteDuNiveau.createLayer("Mur",    tileset, 0, 0);
+const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 }
 /***********************************************************************/
 /** FONCTION UPDATE 
@@ -192,4 +190,4 @@ function chocAvecBombe(un_player, une_bombe) {
 }
 
 var nbSauts = 0;
-var SAUT_MAX = 2; 
+var SAUT_MAX = 2;
