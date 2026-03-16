@@ -44,6 +44,88 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
+         "id":4,
+         "name":"monstres",
+         "objects":[
+                {
+                 "height":0,
+                 "id":1,
+                 "name":"monstres",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":200.425053131641,
+                 "y":344.443055381923
+                }, 
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"monstres",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":759.694961870234,
+                 "y":536.467058382298
+                }, 
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"monstres",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":676.884610576322,
+                 "y":789.698712339042
+                }, 
+                {
+                 "height":0,
+                 "id":4,
+                 "name":"monstres",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":164.420552569071,
+                 "y":594.07425928241
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":5,
+         "name":"Arme",
+         "objects":[
+                {
+                 "height":0,
+                 "id":5,
+                 "name":"Arme",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":892.911613951744,
+                 "y":889.311163895487
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 604, 605, 606, 607, 608, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 641, 642, 643, 644, 645, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 279, 280, 0, 0,
@@ -125,8 +207,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":4,
- "nextobjectid":1,
+ "nextlayerid":6,
+ "nextobjectid":6,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -134,19 +216,19 @@
  "tilesets":[
         {
          "firstgid":1,
-         "source":"..\/..\/..\/tilesFloor32.tsx"
+         "source":"..\/..\/tilesFloor32.tsx"
         }, 
         {
          "firstgid":199,
-         "source":"..\/..\/..\/spriteSheet_tiledLiquids_32x32.tsx"
+         "source":"..\/..\/spriteSheet_tiledLiquids_32x32.tsx"
         }, 
         {
          "firstgid":247,
-         "source":"..\/..\/..\/tilesWalls.tsx"
+         "source":"..\/..\/tilesWalls.tsx"
         }, 
         {
          "firstgid":439,
-         "source":"..\/..\/..\/tilesStuff.tsx"
+         "source":"..\/..\/tilesStuff.tsx"
         }],
  "tilewidth":32,
  "type":"map",
