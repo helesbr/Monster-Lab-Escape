@@ -37,7 +37,7 @@ new Phaser.Game(config);
  * On y trouve surtout le chargement des assets (images, son ..)
  */
 function preload() {
-  this.load.spritesheet("img_perso", "src/assets/dude.png", {
+  this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
     frameWidth: 32,
     frameHeight: 48
   });
@@ -45,10 +45,9 @@ function preload() {
 this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
 
 // chargement de la carte
-this.load.tilemapTiledJSON("carte", "src/assets/laboratory.json");  
+this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");  
 }
-// chargement des sons 
-this.load.audio;
+
 /***********************************************************************/
 /** FONCTION CREATE 
 /***********************************************************************/
@@ -104,13 +103,15 @@ function create() {
   groupe_bombes = this.physics.add.group();
 
   // chargement de la carte
-const carteDuNiveau = this.add.tilemap("carte");
+const carteDuNiveau = this.make.tilemap({ key: "carte" });
 
 // chargement du jeu de tuiles
 const tileset = carteDuNiveau.addTilesetImage(
-          "tuiles_de_jeu",
-          "Phaser_tuilesdejeu"
-        ); 
+    "all_tilset",  // ← nom du tileset dans Tiled
+    "allTiles"        // ← clé utilisée dans this.load.image()
+)
+// création des calques (mets les vrais noms de tes calques Tiled)
+const solLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
 }
 /***********************************************************************/
 /** FONCTION UPDATE 
