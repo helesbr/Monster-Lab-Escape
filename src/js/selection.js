@@ -14,7 +14,7 @@ export default class selection extends Phaser.Scene {
 
   preload() {
     this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
-      frameWidth: 32,
+      frameWidth: 44,
       frameHeight: 48
     });
     // chargement tuiles de jeu
@@ -32,7 +32,7 @@ export default class selection extends Phaser.Scene {
 
     // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
-    const tileset = carteDuNiveau.addTilesetImage("all_tilesets", "allTiles");
+    const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
 
     // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
     const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
@@ -65,16 +65,6 @@ this.cameras.main.setBounds(0, 0, 960, 960);
 
   // Ancrage de la caméra sur le joueur
   this.cameras.main.startFollow(player);
-    /***********************************************************************/
-    /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
-    /***********************************************************************/
-    player = this.physics.add.sprite(200, 200, 'img_perso');
-    player.setCollideWorldBounds(true);
-    player.setDepth(100); // Force le joueur au-dessus de la map
-    player.body.setGravityY(-this.physics.world.gravity.y);
-
-    // Ajout de la collision entre le joueur et les murs
-    this.physics.add.collider(player, murLayer);
 
     /***********************************************************************/
     /** 3. ENTRÉES CLAVIER ET ANIMATIONS
