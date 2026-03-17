@@ -6,7 +6,7 @@ export default class menu extends Phaser.Scene {
     //on charge les images
     preload() {
         this.load.image("menu_fond", "src/assets/images/menu_fond.png");
-        this.load.image("imageBoutonPlay", "src/assets/images/bouton_play.png");
+        this.load.image("title", "src/assets/images/title.png");
     }
 
     create() {
@@ -19,6 +19,13 @@ export default class menu extends Phaser.Scene {
             .setDisplaySize(480, 480)  // Redimensionner au 480x480 du canvas
             .setOrigin(0.5)  // Centrer l'image
             .setDepth(0);
+
+        // Titre en haut au milieu
+        this.add
+            .image(240, 80, "title")
+            .setDisplaySize(350, 220)  // Proportion mieux équilibrée
+            .setOrigin(0.5)
+            .setDepth(1);
 
         // Bouton de démarrage
         const boutonJouer = this.add.rectangle(240, 150, 200, 60, 0x00aa00);
