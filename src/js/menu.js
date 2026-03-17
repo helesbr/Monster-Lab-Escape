@@ -20,30 +20,26 @@ export default class menu extends Phaser.Scene {
             .setOrigin(0.5)  // Centrer l'image
             .setDepth(0);
 
-        // on ajoute un bouton de clic, nommé bouton_play
-        var bouton_play = this.add.image(240, 360, "imageBoutonPlay")
-            .setDisplaySize(120, 60)  // Redimensionner le bouton
-            .setDepth(1);
-
-        // on rend le bouton interactif
-        bouton_play.setInteractive();
-
-        // Cas ou la souris passe sur le bouton play
-        bouton_play.on("pointerover", () => {
-            bouton_play.setScale(1.1); // Agrandir légèrement
-            bouton_play.setTint(0xcccccc); // Changer la couleur
+        // Bouton de démarrage
+        const boutonJouer = this.add.rectangle(240, 240, 200, 60, 0x00aa00);
+        boutonJouer.setInteractive();
+        boutonJouer.on('pointerover', () => {
+            boutonJouer.setFillStyle(0x00ff00);
+        });
+        boutonJouer.on('pointerout', () => {
+            boutonJouer.setFillStyle(0x00aa00);
         });
 
-        // Cas ou la souris ne passe plus sur le bouton play
-        bouton_play.on("pointerout", () => {
-            bouton_play.setScale(1); // Taille normale
-            bouton_play.clearTint(); // Couleur normale
-        });
+        // Texte du bouton
+        this.add.text(240, 240, 'JOUER', {
+            fontSize: '32px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
 
-        // Cas ou la souris clique sur le bouton play
-        // on lance le niveau 1 (la scène "selection")
-        bouton_play.on("pointerup", () => {
-            this.scene.start("selection");
+        // Événement au clic du bouton
+        boutonJouer.on('pointerdown', () => {
+            this.scene.start('selection');
         });
     }
 
