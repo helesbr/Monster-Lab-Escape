@@ -1,6 +1,6 @@
-export default class menu extends Phaser.Scene {
+export default class regles extends Phaser.Scene {
     constructor() {
-        super({ key: "menu" });
+        super({ key: "regles" });
     }
 
     //on charge les images
