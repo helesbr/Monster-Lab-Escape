@@ -7,6 +7,7 @@ export default class menu extends Phaser.Scene {
     preload() {
         this.load.image("menu_fond", "src/assets/images/menu_fond.png");
         this.load.image("title", "src/assets/images/title.png");
+        this.load.image("mogger", "src/assets/images/mogger.png");
     }
 
     create() {
@@ -24,6 +25,13 @@ export default class menu extends Phaser.Scene {
         this.add
             .image(240, 80, "title")
             .setDisplaySize(350, 220)  // Proportion mieux équilibrée
+            .setOrigin(0.5)
+            .setDepth(1);
+
+        // Mogger en bas au centre
+        this.add
+            .image(240, 420, "mogger")
+            .setDisplaySize(300, 200)  // Taille appropriée
             .setOrigin(0.5)
             .setDepth(1);
 
