@@ -110,6 +110,7 @@ const fondLayer   = carteDuNiveau.createLayer("Fond",   tileset, 0, 0);
 const floorLayer  = carteDuNiveau.createLayer("Floor",  tileset, 0, 0);
 const murLayer    = carteDuNiveau.createLayer("Mur",    tileset, 0, 0);
 const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
+
 }
 /***********************************************************************/
 /** FONCTION UPDATE 
