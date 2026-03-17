@@ -118,27 +118,6 @@ this.cameras.main.setBounds(0, 0, 960, 960);
     this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
 
 }
-update() {
-  
-  // Gauche / Droite (déjà existant)
-  if (clavier.right.isDown) {
-    player.setVelocityX(160);
-    player.setFlipX(false);
-    player.anims.play('anim_tourne_droite', true);
-  }
-  else if (clavier.left.isDown) {
-    player.setVelocityX(-160);
-    player.setFlipX(false);
-    player.anims.play('anim_tourne_gauche', true);
-  } else {
-    player.setVelocityX(0);
-    player.setFlipX(false);
-    player.anims.play('anim_face');
-    
-
-  }
-  
-  }
   update() {
 
     // Gauche / Droite (déjà existant)
@@ -149,7 +128,7 @@ update() {
     }
     else if (clavier.left.isDown) {
       player.setVelocityX(-160);
-      player.setFlipX(true);
+      player.setFlipX(false);
       player.anims.play('anim_tourne_gauche', true);
     } else {
       player.setVelocityX(0);
@@ -164,8 +143,9 @@ update() {
     else if (clavier.down.isDown) {
       player.setVelocityY(160);
     }
+    else {
+      player.setVelocityY(0);
+    }
   }
-  else {
-  player.setVelocityY(0);
 }
-}
+
