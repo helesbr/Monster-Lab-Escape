@@ -11,6 +11,9 @@ export default class map_cuisine extends Phaser.Scene{
             frameWidth: 44,
             frameHeight: 48
         });
+        // Charger les images des produits
+        this.load.image('preworkout', 'src/assets/images/prewarkout.png');
+        this.load.image('creatine', 'src/assets/images/creatine.png');
     }
 
     create() {
@@ -83,6 +86,31 @@ export default class map_cuisine extends Phaser.Scene{
                 this.physics.add.collider(this.groupe_monstres, objetsLayer);
                 
                 console.log("Monstres spawned!");
+            }
+
+            // ✅ Spawn des produits (creatine et pre-workout)
+            const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
+            if (calqueProduit) {
+                calqueProduit.objects.forEach((produitObj) => {
+                    // Déterminer l'image selon le nom du produit
+                    const imageKey = produitObj.name === 'creatine' ? 'creatine' : 'preworkout';
+                    const produit = this.add.image(produitObj.x, produitObj.y, imageKey);
+                    produit.setDisplaySize(30, 30); // Taille du produit
+                    produit.setDepth(45); // Au-dessus de la map mais sous les monstres
+                    // Les produits restent statiques (pas de physique)
+                });
+                console.log("Produits spawned!");
+            }
+
+            // ✅ Spawn des creatines (calque séparé)
+            const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
+            if (calqueCreatine) {
+                calqueCreatine.objects.forEach((creatineObj) => {
+                    const creatine = this.add.image(creatineObj.x, creatineObj.y, 'creatine');
+                    creatine.setDisplaySize(30, 30); // Taille de la creatine
+                    creatine.setDepth(45); // Au-dessus de la map mais sous les monstres
+                });
+                console.log("Creatines spawned!");
             }
 
             console.log("Map cuisine chargée!");
