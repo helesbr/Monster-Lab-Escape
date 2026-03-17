@@ -17,6 +17,11 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 44,
             frameHeight: 48
         });
+        this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+        
     }
 
     create() {
@@ -92,6 +97,17 @@ export default class map_stuff extends Phaser.Scene {
                     arme.setDepth(45);
                 });
                 console.log("Armes spawned!");
+            }
+
+            // Spawn des guns
+            const calqueGuns = carte.getObjectLayer("Guns");
+            if (calqueGuns) {
+                calqueGuns.objects.forEach((gunObj) => {
+                    const gun = this.add.sprite(gunObj.x, gunObj.y, 'image_gun');
+                    gun.setDisplaySize(32, 32);
+                    gun.setDepth(45);
+                });
+                console.log("Guns spawned!");
             }
 
             console.log("Map stuff chargée!");

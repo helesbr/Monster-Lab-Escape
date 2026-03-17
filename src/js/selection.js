@@ -102,6 +102,7 @@ export default class selection extends Phaser.Scene {
           porte.body.moves = false;  // Désactiver complètement les mouvements du body
           porte.isOpen = false;
           porte.estSolide = true;// État initial : fermée
+          porte.nom = obj.name;  // Stocker le nom de la porte
           porte.play('door_closed'); // Affiche le frame fermé
           groupe_portes.add(porte);
           
@@ -221,9 +222,15 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
           porte.setFrame(1);
           porte.body.setEnable(false);
 
-          // Téléporter le joueur à la destination (ou map_cuisine par défaut)
-          const destination = porte.destination || "map_cuisine";
-          this.scene.start(destination);
+          // Debug: afficher le nom de la porte
+          console.log("Porte ouverte:", porte.nom);
+
+          // Téléporter selon le nom de la porte
+          if (porte.nom === "door1") {
+            this.scene.start("map_cuisine");
+          } else if (porte.nom === "door 3") {
+            this.scene.start("map_stuff");
+          }
 
         } else if (distance < 100 && !porte.estSolide) {
           porte.estSolide = true;
