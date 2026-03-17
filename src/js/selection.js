@@ -19,6 +19,7 @@ export default class selection extends Phaser.Scene {
     });
     // chargement tuiles de jeu
     this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
+    this.load.image('background', 'src/tilesets/tile-background.png');
 
     // chargement de la carte
     this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");
@@ -34,8 +35,10 @@ export default class selection extends Phaser.Scene {
     // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
+    const backgroundTileset = carteDuNiveau.addTilesetImage("background", "background");
 
     // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
+    const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
     const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
     const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
     const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
