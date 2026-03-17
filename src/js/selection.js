@@ -1,19 +1,10 @@
-// chargement des librairies
-
 var player;
-
 var clavier;
-
 var zone_texte_score;
-
 var groupe_monstres;
-
 var groupe_bombes;
-
 var gameOver = false;
-
 var groupe_portes;
-
 
 export default class selection extends Phaser.Scene {
 
@@ -22,7 +13,6 @@ export default class selection extends Phaser.Scene {
     super({ key: "selection" });
 
   }
-
 
   preload() {
 

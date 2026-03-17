@@ -1,15 +1,9 @@
 var player;
 
 export default class map_stuff extends Phaser.Scene {
-
-
-
     constructor() {
-
         super({ key: "map_stuff" });
-
     }
-
     preload() { 
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
