@@ -45,7 +45,7 @@ export default class selection extends Phaser.Scene {
   /***********************************************************************/
   /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
   /***********************************************************************/
-  player = this.physics.add.sprite(190.50, 481.50, 'img_perso');
+  player = this.physics.add.sprite(200, 200, 'img_perso');
   player.setCollideWorldBounds(true);
   player.body.setGravityY(-this.physics.world.gravity.y);
 
