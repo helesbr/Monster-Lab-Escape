@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"map_cuisine.tmj"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -199,20 +207,8 @@
         {
          "draworder":"topdown",
          "id":5,
-         "name":"Calque pre workout",
+         "name":"Calque Produit",
          "objects":[
-                {
-                 "height":0,
-                 "id":6,
-                 "name":"pre workout",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":65.3709746063271,
-                 "y":98.0564619094907
-                }, 
                 {
                  "height":0,
                  "id":7,
@@ -230,9 +226,32 @@
          "visible":true,
          "x":0,
          "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"calque crea",
+         "objects":[
+                {
+                 "height":0,
+                 "id":8,
+                 "name":"creatine",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":42,
+                 "y":158
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":8,
+ "nextlayerid":7,
+ "nextobjectid":9,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

@@ -1,4 +1,5 @@
 export default class map_stuff extends Phaser.Scene {
+
     constructor() {
         super({ key: "map_stuff" });
     }
@@ -7,12 +8,13 @@ export default class map_stuff extends Phaser.Scene {
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
         this.load.image('porte', 'src/assets/images/wall128x128.png');
-        this.load.spritesheet('monstre', 'src/assets/images/mini_monstres.png', {
-            frameWidth: 44,
-            frameHeight: 48
-        });
+        this.load.image('arme', 'src/assets/images/arme.png');
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
             frameWidth: 32,
+            frameHeight: 48
+        });
+        this.load.spritesheet('monstre', 'src/assets/images/mini_monstres.png', {
+            frameWidth: 44,
             frameHeight: 48
         });
     }
@@ -76,10 +78,20 @@ export default class map_stuff extends Phaser.Scene {
 
                 this.physics.add.collider(this.groupe_monstres, wallLayer);
                 this.physics.add.collider(this.groupe_monstres, objetsLayer);
-
                 console.log("Monstres spawned!");
             } else {
                 console.warn("Calque 'monstres' introuvable dans map_stuff");
+            }
+
+            // Spawn des armes
+            const calqueArmes = carte.getObjectLayer("Arme");
+            if (calqueArmes) {
+                calqueArmes.objects.forEach((armeObj) => {
+                    const arme = this.add.image(armeObj.x, armeObj.y, 'arme');
+                    arme.setDisplaySize(30, 30);
+                    arme.setDepth(45);
+                });
+                console.log("Armes spawned!");
             }
 
             console.log("Map stuff chargée!");
@@ -91,9 +103,10 @@ export default class map_stuff extends Phaser.Scene {
     update() {
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
-                if (monstre.body.velocity.x > 0) {
+                const vx = monstre.body.velocity.x;
+                if (vx > 0) {
                     monstre.setFlipX(false);
-                } else if (monstre.body.velocity.x < 0) {
+                } else if (vx < 0) {
                     monstre.setFlipX(true);
                 }
             });
@@ -101,3 +114,6 @@ export default class map_stuff extends Phaser.Scene {
     }
 }
 
+ 
+
+ 
