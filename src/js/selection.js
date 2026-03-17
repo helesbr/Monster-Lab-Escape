@@ -72,6 +72,7 @@ export default class selection extends Phaser.Scene {
     // Créer les animations des portes
     this.anims.create({
       key: 'door_closed',
+      
       frames: [{ key: 'porte', frame: 0 }],
       frameRate: 10
     });
@@ -103,6 +104,14 @@ export default class selection extends Phaser.Scene {
           porte.estSolide = true;// État initial : fermée
           porte.play('door_closed'); // Affiche le frame fermé
           groupe_portes.add(porte);
+          
+          if (obj.properties) {
+            const destProp = obj.properties.find(p => p.name === "destination");
+            if (destProp) {
+              porte.destination = destProp.value; // ex: "map_cuisine"
+            }
+          }
+          
           // Vérifier si la porte a la propriété "horizontale"
           if (obj.properties) {
             const hasHorizontal = obj.properties.some(prop =>
@@ -207,17 +216,19 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
           porte.x, porte.y
         );
 
-        // Si le joueur est proche et la porte est fermée (solide), ouvrir
         if (distance < 100 && porte.estSolide) {
           porte.estSolide = false;
-          porte.setFrame(1);  // Afficher la 2ème image (porte ouverte)
-          porte.body.setEnable(false);  // Désactiver la collision
-        }
-        // Si le joueur est proche et la porte est ouverte, fermer
-        else if (distance < 100 && !porte.estSolide) {
+          porte.setFrame(1);
+          porte.body.setEnable(false);
+
+          // Téléporter le joueur à la destination (ou map_cuisine par défaut)
+          const destination = porte.destination || "map_cuisine";
+          this.scene.start(destination);
+
+        } else if (distance < 100 && !porte.estSolide) {
           porte.estSolide = true;
-          porte.setFrame(0);  // Afficher la 1ère image (porte fermée)
-          porte.body.setEnable(true);  // Réactiver la collision
+          porte.setFrame(0);
+          porte.body.setEnable(true);
         }
       });
     }
