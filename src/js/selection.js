@@ -3,8 +3,8 @@ var player;
 var clavier;
 var score = 0;
 var zone_texte_score;
-var groupe_bombes;
 var groupe_monstres;
+var groupe_bombes;
 var gameOver = false;
 
 export default class selection extends Phaser.Scene {
@@ -28,80 +28,104 @@ export default class selection extends Phaser.Scene {
   }
 
   create() {
-    player = this.physics.add.sprite(100, 450, 'img_perso');
-    player.setCollideWorldBounds(true);
-    clavier = this.input.keyboard.createCursorKeys();
 
-    this.anims.create({
-      key: "anim_tourne_gauche", // key est le nom de l'animation : doit etre unique pour la scene.
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 0, end: 3 }), // on prend toutes les frames de img perso numerotées de 0 à 3
-      frameRate: 10, // vitesse de défilement des frames
-      repeat: -1 // nombre de répétitions de l'animation. -1 = infini
-    });
-
-    this.anims.create({
-      key: "anim_tourne_droite",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 5, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
-
-    this.anims.create({
-      key: "anim_face",
-      frames: [{ key: "img_perso", frame: 4 }],
-      frameRate: 20
-    });
-
-    //On rajoute un groupe monstre, vide pour l'instant
-    groupe_monstres = this.physics.add.group();
-
-
-    groupe_monstres.children.iterate(function iterateur(monstre_i) {
-      // On tire un coefficient aléatoire de rebond : valeur entre 0.4 et 0.8
-      var coef_rebond = Phaser.Math.FloatBetween(0.4, 0.8);
-      monstre_i.setBounceY(coef_rebond); // on attribut le coefficient de rebond à l'étoile etoile_i
-    });
-
-    zone_texte_score = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-    groupe_bombes = this.physics.add.group();
-
-    // chargement de la carte
+    // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
+    const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
 
-    // chargement du jeu de tuiles
-    const tileset = carteDuNiveau.addTilesetImage(
-      "all_tilset",  // ← nom du tileset dans Tiled
-      "allTiles"        // ← clé utilisée dans this.load.image()
-    )
+  // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
+  const fondLayer   = carteDuNiveau.createLayer("Fond",   tileset, 0, 0);
+  const floorLayer  = carteDuNiveau.createLayer("Floor",  tileset, 0, 0);
+  const murLayer    = carteDuNiveau.createLayer("Mur",    tileset, 0, 0);
+  const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-    // Après (les 4 calques)
-    const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
-    const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
-    const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
-    const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
+  // Définition des collisions pour les murs uniquement
+  murLayer.setCollisionByExclusion([-1]);
+
+  /***********************************************************************/
+  /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
+  /***********************************************************************/
+  player = this.physics.add.sprite(190.50, 481.50, 'img_perso');
+  player.setCollideWorldBounds(true);
+  player.body.setGravityY(-this.physics.world.gravity.y);
+
+  // Ajout de la collision entre le joueur et les murs
+  this.physics.add.collider(player, murLayer);
+
+  /***********************************************************************/
+  /** 3. ENTRÉES CLAVIER ET ANIMATIONS
+  /***********************************************************************/
+  clavier = this.input.keyboard.createCursorKeys();
+
+  this.anims.create({
+    key: "anim_tourne_gauche",
+    frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 4 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: "anim_tourne_droite",
+    frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
+    frameRate: 10,
+    repeat: -1
+  });
+
+  this.anims.create({
+    key: "anim_face",
+    frames: [{ key: "img_perso", frame: 1 }],
+    frameRate: 20
+  });
+
+  /***********************************************************************/
+  /** 4. GROUPES ET INTERFACE
+  /***********************************************************************/
+  groupe_monstres = this.physics.add.group();
+  groupe_bombes = this.physics.add.group();
+
+  zone_texte_score = this.add.text(16, 16, 'Score: 0', {
+    fontSize: '32px',
+    fill: '#000'
+  });
+
+  // Si ton jeu est en vue de haut, n'oublie pas de régler la gravité
+  // à 0 dans ton objet "config" en haut de ton script.
+// 1. On calcule le ratio nécessaire pour que la largeur ET la hauteur rentrent
+// On divise la taille de l'écran par la taille réelle de la map en pixels
+let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
+let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
+
+// 2. On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
+let meilleurZoom = Math.min(zoomX, zoomY);
+
+// 3. On applique le zoom et on centre la caméra
+this.cameras.main.setZoom(meilleurZoom);
+this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
+}
+update() {
+  
+  // Gauche / Droite (déjà existant)
+  if (clavier.right.isDown) {
+    player.setVelocityX(160);
+    player.setFlipX(false);
+    player.anims.play('anim_tourne_droite', true);
+  }
+  else if (clavier.left.isDown) {
+    player.setVelocityX(-160);
+    player.setFlipX(true);
+    player.anims.play('anim_tourne_gauche', true);
+  } else {
+    player.setVelocityX(0);
+    player.setFlipX(false);
+    player.anims.play('anim_face');
   }
 
-  update() {
-    if (player.body.touching.down) {
-      nbSauts = 0;
-    }
-    if (clavier.right.isDown) {
-      player.setVelocityX(160);
-      player.anims.play('anim_tourne_droite', true);
-    }
-    else if (clavier.left.isDown) {
-      player.setVelocityX(-160);
-      player.anims.play('anim_tourne_gauche', true);
-    } else {
-      player.setVelocityX(0);
-      player.anims.play('anim_face');
-    }
-    if (Phaser.Input.Keyboard.JustDown(clavier.space) && nbSauts < SAUT_MAX) {
-      player.setVelocityY(-330);
-      nbSauts++;
-    }
-    if (gameOver) {
-      return;
-    }
+  // ✅ Haut / Bas — tu rajoutes juste ces lignes ici :
+  if (clavier.up.isDown) {
+    player.setVelocityY(-160);
   }
+  else if (clavier.down.isDown) {
+    player.setVelocityY(160);
+  }
+}
 }
