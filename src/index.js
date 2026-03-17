@@ -20,7 +20,7 @@ var config = {
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("selection");
+game.scene.start("map_cuisine");
 function chocAvecBombe(un_player, une_bombe) {
   this.physics.pause();
   player.setTint(0xff0000);
