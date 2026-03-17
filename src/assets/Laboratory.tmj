@@ -80,7 +80,7 @@
          "name":"Floor",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":30,
          "x":0,
          "y":0
@@ -122,7 +122,7 @@
          "name":"Mur",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":30,
          "x":0,
          "y":0
@@ -164,7 +164,7 @@
          "name":"Object",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":30,
          "x":0,
          "y":0
@@ -180,6 +180,12 @@
                  "id":1,
                  "name":"door1",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -193,6 +199,11 @@
                  "name":"door1",
                  "point":true,
                  "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
                         {
                          "name":"orientation",
                          "type":"string",
@@ -210,6 +221,12 @@
                  "id":3,
                  "name":"door2",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -222,6 +239,12 @@
                  "id":4,
                  "name":"door2",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -235,6 +258,11 @@
                  "name":"door3",
                  "point":true,
                  "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
                         {
                          "name":"horizontal",
                          "type":"string",
@@ -252,6 +280,12 @@
                  "id":6,
                  "name":"door3",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -264,6 +298,12 @@
                  "id":7,
                  "name":"door4",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -273,7 +313,7 @@
                 }],
          "opacity":1,
          "type":"objectgroup",
-         "visible":false,
+         "visible":true,
          "x":0,
          "y":0
         }],

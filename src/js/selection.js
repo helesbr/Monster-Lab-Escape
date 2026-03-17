@@ -1,11 +1,11 @@
 // chargement des librairies
 var player;
 var clavier;
-var score = 0;
 var zone_texte_score;
 var groupe_monstres;
 var groupe_bombes;
 var gameOver = false;
+var groupe_portes;
 
 export default class selection extends Phaser.Scene {
   constructor() {
@@ -26,12 +26,13 @@ export default class selection extends Phaser.Scene {
     this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
     this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
     this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");
-    this.load.image('porte', 'src/assets/images/wall128x128.png');
+    this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
+      frameWidth: 64,
+      frameHeight: 32
+    });
   }
 
   create() {
-
-   
     // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
@@ -44,63 +45,89 @@ export default class selection extends Phaser.Scene {
     const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
     const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-  // Définition des collisions pour les murs uniquement
-  murLayer.setCollisionByExclusion([-1]);
-  objectLayer.setCollisionByExclusion([-1]);
     // Définition des collisions pour les murs uniquement
     murLayer.setCollisionByExclusion([-1]);
+    objectLayer.setCollisionByExclusion([-1]);
 
-  // Redimensionnement du monde avec les dimensions calculées via tiled
-  this.physics.world.setBounds(0, 0, 3200, 640);
-  // Ajout du champs de la caméra de taille identique à celle du monde
-  this.cameras.main.setBounds(0, 0, 3200, 640);
+    // Redimensionnement du monde avec les dimensions calculées via tiled
+    this.physics.world.setBounds(0, 0, 960, 960);
+    // Ajout du champs de la caméra de taille identique à celle du monde
+    this.cameras.main.setBounds(0, 0, 960, 960);
 
-  /***********************************************************************/
-  /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
-  /***********************************************************************/
-  player = this.physics.add.sprite(190, 480, 'img_perso');
- 
-  
-  // Check the sprite's display origin and bounds
-  
-  player.setCollideWorldBounds(true);
-  player.setDepth(100); // Force le joueur au-dessus de la map
-  player.body.setGravityY(-this.physics.world.gravity.y);
+    /***********************************************************************/
+    /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
+    /***********************************************************************/
+    player = this.physics.add.sprite(190, 480, 'img_perso');
+    player.setCollideWorldBounds(true);
+    player.setDepth(100); // Force le joueur au-dessus de la map
+    player.body.setGravityY(-this.physics.world.gravity.y);
 
-  // Ajout de la collision entre le joueur et les murs
-  this.physics.add.collider(player, murLayer);
-  this.physics.add.collider(player, objectLayer);
+    // Ajout de la collision entre le joueur et les murs
+    this.physics.add.collider(player, murLayer);
+    this.physics.add.collider(player, objectLayer);
 
-  /***********************************************************************/
-  /** CRÉATION DES PORTES
-  /***********************************************************************/
-  // Récupération du calque d'objets des portes
-  const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
-  
-  // Création des portes sur chaque objet door
-  if (doorsObjectsLayer) {
-    doorsObjectsLayer.objects.forEach((obj) => {
-      if (obj.name.startsWith("door")) {
-        const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
-        porte.setCollideWorldBounds(true);
-        porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
-      }
+    /***********************************************************************/
+    /** CRÉATION DES ANIMATIONS DES PORTES
+    /***********************************************************************/
+    // Créer les animations des portes
+    this.anims.create({
+      key: 'door_closed',
+      frames: [{ key: 'porte', frame: 0 }],
+      frameRate: 10
     });
+
+    this.anims.create({
+      key: 'door_open',
+      frames: [{ key: 'porte', frame: 1 }],
+      frameRate: 10
+    });
+
+    /***********************************************************************/
+    /** CRÉATION DES PORTES
+    /***********************************************************************/
+    groupe_portes = this.physics.add.group();
+    // Récupération du calque d'objets des portes
+    const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
+
+    // Création des portes sur chaque objet door
+    if (doorsObjectsLayer) {
+      doorsObjectsLayer.objects.forEach((obj) => {
+        if (obj.name.startsWith("door")) {
+          const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+          porte.setCollideWorldBounds(true);
+          porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
+          porte.isOpen = false;
+          porte.estSolide = true;// État initial : fermée
+          porte.play('door_closed'); // Affiche le frame fermé
+          groupe_portes.add(porte);
+          // Vérifier si la porte a la propriété "horizontale"
+          if (obj.properties) {
+            const hasHorizontal = obj.properties.some(prop =>
+              prop.name === "horizontal" || prop.name === "orientation"
+            );
+            if (!hasHorizontal) {
+              porte.setAngle(90); // Tourner de 90° si n'a pas la propriété horizontale
+            }
+          } else {
+            // Si pas de propriétés, tourner de 90° par défaut
+            porte.setAngle(90);
+          }
+        }
+      });
+    }
+this.physics.add.collider(player, groupe_portes, (player, porte) => {
+  if (!porte.estSolide) {
+    this.physics.add.collider(player, groupe_portes);
   }
-
- // redimentionnement du monde avec les dimensions calculées via tiled
-this.physics.world.setBounds(0, 0, 960, 960);
-//  ajout du champs de la caméra de taille identique à celle du monde
-this.cameras.main.setBounds(0, 0, 960, 960);
-
-  // Ancrage de la caméra sur le joueur
-  this.cameras.main.startFollow(player);
+});
+    // Ancrage de la caméra sur le joueur
+    this.cameras.main.startFollow(player);
 
     /***********************************************************************/
     /** 3. ENTRÉES CLAVIER ET ANIMATIONS
     /***********************************************************************/
     clavier = this.input.keyboard.createCursorKeys();
-
+this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     this.anims.create({
       key: "anim_tourne_gauche",
       frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
@@ -131,19 +158,19 @@ this.cameras.main.setBounds(0, 0, 960, 960);
       fontSize: '32px',
       fill: '#000'
     });
+
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
     let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
 
-    // 2. On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
+    // On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
     let meilleurZoom = Math.min(zoomX, zoomY);
-    // 3. On applique le zoom et on centre la caméra
+    // On applique le zoom et on centre la caméra
     this.cameras.main.setZoom(meilleurZoom);
     this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
- 
-}
-  update() {
+  }
 
-    // Gauche / Droite (déjà existant)
+  update() {
+    // Gauche / Droite
     if (clavier.right.isDown) {
       player.setVelocityX(160);
       player.setFlipX(false);
@@ -159,7 +186,7 @@ this.cameras.main.setBounds(0, 0, 960, 960);
       player.anims.play('anim_face');
     }
 
-    // ✅ Haut / Bas — tu rajoutes juste ces lignes ici :
+    // Haut / Bas
     if (clavier.up.isDown) {
       player.setVelocityY(-160);
     }
@@ -170,5 +197,24 @@ this.cameras.main.setBounds(0, 0, 960, 960);
       player.setVelocityY(0);
     }
   }
-}
+   if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+  groupe_portes.children.entries.forEach(porte => {
+    const distance = Phaser.Math.Distance.Between(
+      player.x, player.y,
+      porte.x, porte.y
+    );
 
+    if (distance < 100 && !porte.isOpen) {
+      porte.isOpen = true;
+      porte.estSolide = false;
+      porte.play('door_open');
+      porte.body.setEnable(false); // ✅ Désactiver la collision physique
+    } else if (distance < 100 && porte.isOpen) {
+      porte.isOpen = false;
+      porte.estSolide = true;
+      porte.play('door_closed');
+      porte.body.setEnable(true); // ✅ Réactiver la collision
+    }
+  });
+}
+}
