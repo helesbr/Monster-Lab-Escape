@@ -68,6 +68,23 @@ export default class selection extends Phaser.Scene {
   this.physics.add.collider(player, murLayer);
   this.physics.add.collider(player, objectLayer);
 
+  /***********************************************************************/
+  /** CRÉATION DES PORTES
+  /***********************************************************************/
+  // Récupération du calque d'objets des portes
+  const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
+  
+  // Création des portes sur chaque objet door
+  if (doorsObjectsLayer) {
+    doorsObjectsLayer.objects.forEach((obj) => {
+      if (obj.name.startsWith("door")) {
+        const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+        porte.setCollideWorldBounds(true);
+        porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
+      }
+    });
+  }
+
  // redimentionnement du monde avec les dimensions calculées via tiled
 this.physics.world.setBounds(0, 0, 960, 960);
 //  ajout du champs de la caméra de taille identique à celle du monde
