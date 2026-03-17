@@ -1,10 +1,15 @@
 // chargement des librairies
 var player;
+var clavier;
+var score = 0;
+var zone_texte_score;
+var groupe_bombes;
+var groupe_monstres;
+var gameOver = false;
 
-
-export default class selection extends Phaser.Scene{ 
+export default class selection extends Phaser.Scene {
   constructor() {
-    super({key : "selection"});
+    super({ key: "selection" });
   }
 
   preload() {
@@ -16,8 +21,11 @@ export default class selection extends Phaser.Scene{
     this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
 
     // chargement de la carte
-    this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");  
-    }
+    this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");
+    this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
+    this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
+    this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");  
+  }
 
   create() {
     player = this.physics.add.sprite(100, 450, 'img_perso');
@@ -62,16 +70,16 @@ export default class selection extends Phaser.Scene{
 
     // chargement du jeu de tuiles
     const tileset = carteDuNiveau.addTilesetImage(
-        "all_tilset",  // ← nom du tileset dans Tiled
-        "allTiles"        // ← clé utilisée dans this.load.image()
+      "all_tilset",  // ← nom du tileset dans Tiled
+      "allTiles"        // ← clé utilisée dans this.load.image()
     )
 
     // Après (les 4 calques)
-    const fondLayer   = carteDuNiveau.createLayer("Fond",   tileset, 0, 0);
-    const floorLayer  = carteDuNiveau.createLayer("Floor",  tileset, 0, 0);
-    const murLayer    = carteDuNiveau.createLayer("Mur",    tileset, 0, 0);
+    const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
+    const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
+    const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
     const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
-    }
+  }
 
   update() {
     if (player.body.touching.down) {
