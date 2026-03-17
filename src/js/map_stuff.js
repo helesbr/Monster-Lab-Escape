@@ -78,9 +78,6 @@ export default class map_stuff extends Phaser.Scene {
 
                 this.physics.add.collider(this.groupe_monstres, wallLayer);
                 this.physics.add.collider(this.groupe_monstres, objetsLayer);
-                console.log("Monstres spawned!");
-            } else {
-                console.warn("Calque 'monstres' introuvable dans map_stuff");
             }
 
             // Spawn des armes
