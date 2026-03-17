@@ -20,43 +20,16 @@ export default class map_cuisine extends Phaser.Scene{
         // Charger les images des produits
         this.load.image('preworkout', 'src/assets/images/prewarkout.png');
         this.load.image('creatine', 'src/assets/images/creatine.png');
+        this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
+      frameWidth: 64,
+      frameHeight: 32
+    });
     }
 
     create() {
         try {
             // Charger la carte
             const carteCuisine = this.make.tilemap({ key: "cuisine" });
-            
-            // Ne pas essayer d'ajouter le tileset s'il n'existe pas
-            let tileset = null;
-            try {
-                tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
-            } catch (e) {
-                console.warn("Tileset 'all_tileset' non trouvé, continue sans lui");
-            }
-
-            // Créer seulement les couches qui existent
-            let solLayer = null;
-            let wallLayer = null;
-            let objetsLayer = null;
-            
-            try {
-                solLayer = tileset ? carteCuisine.createLayer("sol", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Floor' non trouvée");
-            }
-            
-            try {
-                wallLayer = tileset ? carteCuisine.createLayer("Wall", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Mur' non trouvée");
-            }
-            
-            try {
-                objetsLayer = tileset ? carteCuisine.createLayer("objets", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Object' non trouvée");
-            }
 
             // Activer les collisions si les couches existent
             if (wallLayer) wallLayer.setCollisionByExclusion([-1]);
@@ -88,30 +61,6 @@ export default class map_cuisine extends Phaser.Scene{
             // Suivre le joueur avec la caméra
             this.cameras.main.startFollow(player);
             
-            // Créer les animations du joueur s'ils n'existent pas
-            if (!this.anims.exists("anim_tourne_gauche")) {
-                this.anims.create({
-                    key: "anim_tourne_gauche",
-                    frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
-                    frameRate: 10,
-                    repeat: -1
-                });
-            }
-            if (!this.anims.exists("anim_tourne_droite")) {
-                this.anims.create({
-                    key: "anim_tourne_droite",
-                    frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-                    frameRate: 10,
-                    repeat: -1
-                });
-            }
-            if (!this.anims.exists("anim_face")) {
-                this.anims.create({
-                    key: "anim_face",
-                    frames: [{ key: "img_perso", frame: 1 }],
-                    frameRate: 20
-                });
-            }
 
             // ✅ Créer les animations des monstres
             this.anims.create({
@@ -157,30 +106,74 @@ export default class map_cuisine extends Phaser.Scene{
                 console.log("Monstres spawned!");
             }
 
-            // ✅ Spawn des portes
-            groupe_portes = this.physics.add.group();
-            const tab_points = carteCuisine.getObjectLayer("door retour");
-            
-            if (tab_points) {
-                tab_points.objects.forEach(point => {
-                    if (point.name == "door retour") {
-                        var nouvelle_porte = this.physics.add.sprite(point.x, point.y, "porte");
-                        groupe_portes.add(nouvelle_porte);
-                    }
-                });
-            }
+    /** CRÉATION DES ANIMATIONS DES PORTES
+    /***********************************************************************/
+    // Créer les animations des portes seulement si elles n'existent pas
+    if (!this.anims.exists('door_closed')) {
+      this.anims.create({
+        key: 'door_closed',
+        frames: [{ key: 'porte', frame: 0 }],
+        frameRate: 10
+      });
+    }
 
-            // Spawn de la deuxième porte (door allé)
-            const tab_points_alle = carteCuisine.getObjectLayer("door allé");
-            
-            if (tab_points_alle) {
-                tab_points_alle.objects.forEach(point => {
-                    if (point.name == "door allé") {
-                        var nouvelle_porte = this.physics.add.sprite(point.x, point.y, "porte");
-                        groupe_portes.add(nouvelle_porte);
-                    }
-                });
+    if (!this.anims.exists('door_open')) {
+      this.anims.create({
+        key: 'door_open',
+        frames: [{ key: 'porte', frame: 1 }],
+        frameRate: 10
+      });
+    }
+
+    /***********************************************************************/
+    /** CRÉATION DES PORTES
+    /***********************************************************************/
+    const groupe_portes = this.physics.add.group();
+    // Récupération du calque d'objets des portes
+    const doorsObjectsLayer = carteCuisine.getObjectLayer("door_retour");
+
+    // Création des portes sur chaque objet door
+    if (doorsObjectsLayer) {
+      doorsObjectsLayer.objects.forEach((obj) => {
+        if (obj.name.startsWith("door")) {
+          const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+          porte.setCollideWorldBounds(true);
+          porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
+          porte.setDisplaySize(64, 32);  // Taille correcte pour la collision
+          porte.body.setImmovable(true);  // La porte ne se déplace pas
+          porte.body.moves = false;  // Désactiver complètement les mouvements du body
+          porte.isOpen = false;
+          porte.estSolide = true;// État initial : fermée
+          porte.play('door_closed'); // Affiche le frame fermé
+          groupe_portes.add(porte);
+          
+          if (obj.properties) {
+            const destProp = obj.properties.find(p => p.name === "destination");
+            if (destProp) {
+              porte.destination = destProp.value; // ex: "map_cuisine"
             }
+          }
+          
+          // Vérifier si la porte a la propriété "horizontal" et si elle est vraie
+          if (obj.properties) {
+            const horizontalProp = obj.properties.find(prop =>
+              prop.name === "horizontal" || prop.name === "orientation"
+            );
+            // Si la propriété n'existe PAS ou est fausse, on tourne de 90°
+            if (!horizontalProp || (horizontalProp.value !== true && horizontalProp.value !== "true")) {
+              porte.setAngle(90);
+            }
+          } else {
+            // Si pas de propriétés, tourner de 90° par défaut
+            porte.setAngle(90);
+          }
+        }
+      });
+    }
+    
+    // Collider solide entre le joueur et les portes
+    this.physics.add.collider(player, groupe_portes);
+    
 
             // ✅ Spawn des produits (creatine et pre-workout)
             const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
