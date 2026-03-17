@@ -51,8 +51,19 @@
                 {
                  "height":0,
                  "id":12,
-                 "name":"",
+                 "name":"door_monstre",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
+                        {
+                         "name":"verticale",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

@@ -79,15 +79,9 @@ export default class selection extends Phaser.Scene {
 
 
     // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
-
     const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
-
-    const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
-
     const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
-
     const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
-
     const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
 
@@ -207,6 +201,8 @@ export default class selection extends Phaser.Scene {
           porte.estSolide = true;// État initial : fermée
 
           porte.play('door_closed'); // Affiche le frame fermé
+
+          porte.doorName = obj.name; // Stocker le nom de la porte
 
           groupe_portes.add(porte);
 
@@ -442,11 +438,13 @@ export default class selection extends Phaser.Scene {
 
           porte.body.setEnable(false);
 
-
-
-          // Téléporter le joueur à la destination (ou map_cuisine par défaut)
-
-          const destination = porte.destination || "map_cuisine";
+          // Déterminer la destination selon le nom de la porte
+          let destination = "map_cuisine"; // défaut
+          if (porte.doorName === "door3") {
+              destination = "map_stuff";
+          } else if (porte.doorName === "door4") {
+              destination = "map_monstre";
+          }
 
           this.scene.start(destination);
 
