@@ -41,6 +41,26 @@ export default class menu extends Phaser.Scene {
         boutonJouer.on('pointerdown', () => {
             this.scene.start('selection');
         });
+        const boutonJouer = this.add.rectangle(240, 240, 200, 60, 0x00aa00);
+        boutonJouer.setInteractive();
+        boutonJouer.on('pointerover', () => {
+            boutonJouer.setFillStyle(0x00ff00);
+        });
+        boutonJouer.on('pointerout', () => {
+            boutonJouer.setFillStyle(0x00aa00);
+        });
+
+        // Texte du bouton
+        this.add.text(240, 240, 'JOUER', {
+            fontSize: '32px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        // Événement au clic du bouton
+        boutonJouer.on('pointerdown', () => {
+            this.scene.start('selection');
+        });
     }
 
     update() {
