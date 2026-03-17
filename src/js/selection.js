@@ -42,28 +42,28 @@ export default class selection extends Phaser.Scene {
   // Définition des collisions pour les murs uniquement
   murLayer.setCollisionByExclusion([-1]);
 
+  // Redimensionnement du monde avec les dimensions calculées via tiled
+  this.physics.world.setBounds(0, 0, 3200, 640);
+  // Ajout du champs de la caméra de taille identique à celle du monde
+  this.cameras.main.setBounds(0, 0, 3200, 640);
+
   /***********************************************************************/
   /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
   /***********************************************************************/
   player = this.physics.add.sprite(200, 200, 'img_perso');
-  console.log("Player créé:", player);
-  console.log("Position joueur:", player.x, player.y);
-  console.log("Texture:", player.texture.key);
-  console.log("Visible:", player.visible);
-  console.log("Alpha:", player.alpha);
-  console.log("Scale:", player.scaleX, player.scaleY);
-  console.log("Active:", player.active);
-  
-  // Check the sprite's display origin and bounds
-  console.log("Display origin:", player.displayOriginX, player.displayOriginY);
-  console.log("Bounds:", player.getBounds());
-  console.log("Display list:", this.sys.displayList.length);
   player.setCollideWorldBounds(true);
   player.setDepth(100); // Force le joueur au-dessus de la map
   player.body.setGravityY(-this.physics.world.gravity.y);
 
   // Ajout de la collision entre le joueur et les murs
   this.physics.add.collider(player, murLayer);
+ // redimentionnement du monde avec les dimensions calculées via tiled
+this.physics.world.setBounds(0, 0, 960, 960);
+//  ajout du champs de la caméra de taille identique à celle du monde
+this.cameras.main.setBounds(0, 0, 960, 960);
+
+  // Ancrage de la caméra sur le joueur
+  this.cameras.main.startFollow(player);
 
   /***********************************************************************/
   /** 3. ENTRÉES CLAVIER ET ANIMATIONS
