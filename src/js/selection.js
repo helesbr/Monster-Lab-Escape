@@ -69,18 +69,6 @@ this.cameras.main.setBounds(0, 0, 960, 960);
     /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
     /***********************************************************************/
     player = this.physics.add.sprite(200, 200, 'img_perso');
-    console.log("Player créé:", player);
-    console.log("Position joueur:", player.x, player.y);
-    console.log("Texture:", player.texture.key);
-    console.log("Visible:", player.visible);
-    console.log("Alpha:", player.alpha);
-    console.log("Scale:", player.scaleX, player.scaleY);
-    console.log("Active:", player.active);
-
-    // Check the sprite's display origin and bounds
-    console.log("Display origin:", player.displayOriginX, player.displayOriginY);
-    console.log("Bounds:", player.getBounds());
-    console.log("Display list:", this.sys.displayList.length);
     player.setCollideWorldBounds(true);
     player.setDepth(100); // Force le joueur au-dessus de la map
     player.body.setGravityY(-this.physics.world.gravity.y);
