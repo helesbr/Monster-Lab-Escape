@@ -241,6 +241,12 @@
                  "id":10,
                  "name":"door_retour",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"horizontal",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -278,32 +284,12 @@
          "y":0
         }],
  "nextlayerid":8,
- "nextobjectid":11,
+ "nextobjectid":12,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
  "tileheight":32,
  "tilesets":[
-        {
-         "firstgid":1,
-         "source":"..\/..\/..\/tilesFloor32.tsx"
-        }, 
-        {
-         "firstgid":1,
-         "source":"..\/..\/..\/tilesStuff.tsx"
-        }, 
-        {
-         "firstgid":1,
-         "source":"..\/..\/..\/table.tsx"
-        }, 
-        {
-         "firstgid":1,
-         "source":"..\/..\/..\/frigo.tsx"
-        }, 
-        {
-         "firstgid":1,
-         "source":"..\/..\/..\/sol_monstre.tsx"
-        }, 
         {
          "columns":50,
          "firstgid":1,
@@ -318,28 +304,32 @@
          "tilewidth":32
         }, 
         {
-         "columns":50,
+         "columns":0,
          "firstgid":14901,
-         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
-         "imageheight":1200,
-         "imagewidth":1600,
          "margin":0,
-         "name":"blood",
+         "name":"sang",
          "spacing":0,
-         "tilecount":1850,
+         "tilecount":0,
          "tileheight":32,
          "tilewidth":32
         }, 
         {
-         "columns":50,
-         "firstgid":16751,
-         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
-         "imageheight":1200,
-         "imagewidth":1600,
+         "columns":0,
+         "firstgid":14901,
          "margin":0,
-         "name":"blood",
+         "name":"sang",
          "spacing":0,
-         "tilecount":1850,
+         "tilecount":0,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":0,
+         "firstgid":14901,
+         "margin":0,
+         "name":"sang",
+         "spacing":0,
+         "tilecount":0,
          "tileheight":32,
          "tilewidth":32
         }],
