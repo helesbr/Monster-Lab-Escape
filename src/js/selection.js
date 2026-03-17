@@ -207,17 +207,10 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
           porte.x, porte.y
         );
 
-        // Si le joueur est proche et la porte est fermée (solide), ouvrir
-        if (distance < 100 && porte.estSolide) {
-          porte.estSolide = false;
-          porte.setFrame(1);  // Afficher la 2ème image (porte ouverte)
-          porte.body.setEnable(false);  // Désactiver la collision
-        }
-        // Si le joueur est proche et la porte est ouverte, fermer
-        else if (distance < 100 && !porte.estSolide) {
-          porte.estSolide = true;
-          porte.setFrame(0);  // Afficher la 1ère image (porte fermée)
-          porte.body.setEnable(true);  // Réactiver la collision
+        if (distance < 100) {
+          porte.estSolide = !porte.estSolide;
+          porte.setFrame(porte.estSolide ? 0 : 1);
+          porte.body.setEnable(porte.estSolide);
         }
       });
     }
