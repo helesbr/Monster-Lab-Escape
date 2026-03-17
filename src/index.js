@@ -7,8 +7,8 @@
 // configuration générale du jeu
 var config = {
   type: Phaser.AUTO,
-  width: 960, // largeur en pixels
-  height: 960, // hauteur en pixels
+  width: 480, // largeur en pixels// 960 * 0.5
+  height: 480, // hauteur en pixels// 960 * 0.5
   physics: {
     // définition des parametres physiques
     default: "arcade", // mode arcade : le plus simple : des rectangles pour gérer les collisions. Pas de pentes
@@ -111,6 +111,17 @@ const floorLayer  = carteDuNiveau.createLayer("Floor",  tileset, 0, 0);
 const murLayer    = carteDuNiveau.createLayer("Mur",    tileset, 0, 0);
 const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
+// 1. On calcule le ratio nécessaire pour que la largeur ET la hauteur rentrent
+// On divise la taille de l'écran par la taille réelle de la map en pixels
+let zoomX = config.width / carteDuNiveau.widthInPixels;
+let zoomY = config.height / carteDuNiveau.heightInPixels;
+
+// 2. On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
+let meilleurZoom = Math.min(zoomX, zoomY);
+
+// 3. On applique le zoom et on centre la caméra
+this.cameras.main.setZoom(meilleurZoom);
+this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
 }
 /***********************************************************************/
 /** FONCTION UPDATE 
