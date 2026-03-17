@@ -139,44 +139,8 @@ function update() {
  }
 }
 
-var groupe_plateformes;
 var player; // désigne le sprite du joueur
 var clavier;
-var groupe_etoiles; // contient tous les sprite etoiles
-
-
-function ramasserEtoile(un_player, une_etoile) {
-  // on désactive le "corps physique" de l'étoile mais aussi sa texture
-  // l'étoile existe alors sans exister : elle est invisible et ne peut plus intéragir
-  une_etoile.disableBody(true, true);
-  // on regarde le nombre d'étoiles qui sont encore actives (non ramassées)
-  if (groupe_etoiles.countActive(true) === 0) {
-    // si ce nombre est égal à 0 : on va réactiver toutes les étoiles désactivées
-    // pour chaque étoile etoile_i du groupe, on réacttive etoile_i avec la méthode enableBody
-    // ceci s'ecrit bizarrement : avec un itérateur sur les enfants (children) du groupe (equivalent du for)
-    groupe_etoiles.children.iterate(function iterateur(etoile_i) {
-      etoile_i.enableBody(true, etoile_i.x, 0, true, true);
-    });
-  }
-  // on ajoute 10 points au score total, on met à jour l'affichage
- score += 10;
- zone_texte_score.setText("Score: " + score);
-// on ajoute une nouvelle bombe au jeu
- // - on génère une nouvelle valeur x qui sera l'abcisse de la bombe
- var x;
- if (player.x < 400) {
- x = Phaser.Math.Between(400, 800);
- } else {
- x = Phaser.Math.Between(0, 400);
- }
- var une_bombe = groupe_bombes.create(x, 16, "img_bombe");
- une_bombe.setBounce(1);
- une_bombe.setCollideWorldBounds(true);
- une_bombe.setVelocity(Phaser.Math.Between(-200, 200), 20);
- une_bombe.allowGravity = false;
- }
-
-
 var score = 0;
 var zone_texte_score;
 var groupe_bombes;
@@ -188,6 +152,3 @@ function chocAvecBombe(un_player, une_bombe) {
  player.anims.play("anim_face");
  gameOver = true;
 }
-
-var nbSauts = 0;
-var SAUT_MAX = 2;
