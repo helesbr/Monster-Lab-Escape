@@ -302,10 +302,6 @@
         }, 
         {
          "firstgid":1,
-         "source":"..\/..\/..\/brks_2.tsx"
-        }, 
-        {
-         "firstgid":1,
          "source":"..\/..\/..\/sol_monstre.tsx"
         }, 
         {
@@ -318,6 +314,32 @@
          "name":"all_tileset",
          "spacing":0,
          "tilecount":14900,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":50,
+         "firstgid":14901,
+         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
+         "imageheight":1200,
+         "imagewidth":1600,
+         "margin":0,
+         "name":"blood",
+         "spacing":0,
+         "tilecount":1850,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":50,
+         "firstgid":16751,
+         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
+         "imageheight":1200,
+         "imagewidth":1600,
+         "margin":0,
+         "name":"blood",
+         "spacing":0,
+         "tilecount":1850,
          "tileheight":32,
          "tilewidth":32
         }],

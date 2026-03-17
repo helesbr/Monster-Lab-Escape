@@ -4,51 +4,42 @@ export default class map_stuff extends Phaser.Scene {
         super({ key: "map_stuff" });
     }
 
-    preload() {
+    preload() { 
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
-        this.load.image('tilesFloor32', 'src/tilesets/tilesFloor32.png');
-        this.load.image('spriteSheet_tiledLiquids_32x32', 'src/tilesets/floor-tiles.png');
-        this.load.image('tilesWalls', 'src/tilesets/tilesWalls.png');
-        this.load.image('tilesStuff', 'src/tilesets/tilesStuff.png');
+        this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
         this.load.image('porte', 'src/assets/images/wall128x128.png');
-        // Charger les monstres en tant que spritesheet
+        this.load.image('arme', 'src/assets/images/arme.png');
+        this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
+            frameWidth: 32,
+            frameHeight: 48
+        });
         this.load.spritesheet('monstre', 'src/assets/images/mini_monstres.png', {
             frameWidth: 44,
             frameHeight: 48
         });
-        // Charger l'image de l'arme
-        this.load.image('arme', 'src/assets/images/arme.png');
     }
 
     create() {
         try {
-            // Charger la carte
-            const carteStuff = this.make.tilemap({ key: "stuff" });
-            
-        
-            // Créer les couches (il n'y a pas de couche "Fond" dans map_stuff)
-            const floorLayer = carteStuff.createLayer("Floor", [tileset1, tileset2], 0, 0);
-            const objetLayer = carteStuff.createLayer("Object", tileset4, 0, 0);
-            const murLayer = carteStuff.createLayer("Mur", [tileset3, tileset4], 0, 0);
+            const carte = this.make.tilemap({ key: "stuff" });
+            const tileset = carte.addTilesetImage("all_tileset", "allTiles");
 
-            // ✅ ACTIVER LES COLLISIONS DES COUCHES
-            if (murLayer) murLayer.setCollisionByExclusion([-1]);
-            if (objetLayer) objetLayer.setCollisionByExclusion([-1]);
+            const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
+            const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
+            const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
-            // Ajuster le monde et la caméra pour afficher la totalité de la map
-            this.physics.world.setBounds(0, 0, carteStuff.widthInPixels, carteStuff.heightInPixels);
-            this.cameras.main.setBounds(0, 0, carteStuff.widthInPixels, carteStuff.heightInPixels);
-            
-            // Calculer le zoom pour faire rentrer la map entière
-            let zoomX = this.scale.width / carteStuff.widthInPixels;
-            let zoomY = this.scale.height / carteStuff.heightInPixels;
-            let meilleurZoom = Math.min(zoomX, zoomY);
-            
-            // Appliquer le zoom et centrer la caméra
-            this.cameras.main.setZoom(meilleurZoom);
-            this.cameras.main.centerOn(carteStuff.widthInPixels / 2, carteStuff.heightInPixels / 2);
+            wallLayer.setCollisionByExclusion([-1]);
+            objetsLayer.setCollisionByExclusion([-1]);
 
-            // ✅ Créer les animations des monstres
+            // Caméra et zoom
+            this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+            this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+            let zoomX = this.scale.width / carte.widthInPixels;
+            let zoomY = this.scale.height / carte.heightInPixels;
+            this.cameras.main.setZoom(Math.min(zoomX, zoomY));
+            this.cameras.main.centerOn(carte.widthInPixels / 2, carte.heightInPixels / 2);
+
+            // Animation monstres
             this.anims.create({
                 key: "monstre_marche",
                 frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 3 }),
@@ -56,10 +47,10 @@ export default class map_stuff extends Phaser.Scene {
                 repeat: -1
             });
 
-            // ✅ Spawn des monstres
-            const calqueMonstres = carteStuff.getObjectLayer("monstres");
+            // Spawn des monstres
             this.groupe_monstres = this.physics.add.group();
-            
+            const calqueMonstres = carte.getObjectLayer("monstres");
+
             if (calqueMonstres) {
                 calqueMonstres.objects.forEach((monstreObj) => {
                     const monstre = this.groupe_monstres.create(monstreObj.x, monstreObj.y, 'monstre', 0);
@@ -67,12 +58,12 @@ export default class map_stuff extends Phaser.Scene {
                     monstre.setCollideWorldBounds(true);
                     monstre.setDisplaySize(40, 40);
                     monstre.setDepth(50);
-                    let velocityX = Phaser.Math.Between(-80, 80);
-                    let velocityY = Phaser.Math.Between(-80, 80);
-                    monstre.setVelocity(velocityX, velocityY);
+                    monstre.setVelocity(
+                        Phaser.Math.Between(-80, 80),
+                        Phaser.Math.Between(-80, 80)
+                    );
                     monstre.anims.play('monstre_marche');
-                    
-                    // IA: Changer de direction aléatoirement
+
                     this.time.addEvent({
                         delay: Phaser.Math.Between(2000, 4000),
                         callback: function() {
@@ -84,16 +75,16 @@ export default class map_stuff extends Phaser.Scene {
                         loop: true
                     });
                 });
-                
-                // ✅ Ajouter les collisions avec les murs et objets
-                if (murLayer) this.physics.add.collider(this.groupe_monstres, murLayer);
-                if (objetLayer) this.physics.add.collider(this.groupe_monstres, objetLayer);
-                
+
+                this.physics.add.collider(this.groupe_monstres, wallLayer);
+                this.physics.add.collider(this.groupe_monstres, objetsLayer);
                 console.log("Monstres spawned!");
+            } else {
+                console.warn("Calque 'monstres' introuvable dans map_stuff");
             }
 
-            // ✅ Spawn des armes (statiques)
-            const calqueArmes = carteStuff.getObjectLayer("Arme");
+            // Spawn des armes
+            const calqueArmes = carte.getObjectLayer("Arme");
             if (calqueArmes) {
                 calqueArmes.objects.forEach((armeObj) => {
                     const arme = this.add.image(armeObj.x, armeObj.y, 'arme');
@@ -105,16 +96,14 @@ export default class map_stuff extends Phaser.Scene {
 
             console.log("Map stuff chargée!");
         } catch (error) {
-            console.error("Erreur lors du chargement de la map stuff:", error);
+            console.error("Erreur lors du chargement de map_stuff:", error);
         }
     }
 
     update() {
-        // Vérifier la direction de chaque monstre et ajuster le flip
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
                 const vx = monstre.body.velocity.x;
-                
                 if (vx > 0) {
                     monstre.setFlipX(false);
                 } else if (vx < 0) {
@@ -124,8 +113,6 @@ export default class map_stuff extends Phaser.Scene {
         }
     }
 }
-
-
 
  
 
