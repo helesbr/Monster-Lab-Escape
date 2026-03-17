@@ -19,13 +19,13 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [menu, selection, map_cuisine, regles, map_directeur, map_stuff, map_monstre] // liste des scènes du jeu
+  scene: [map_monstre ,menu, selection, map_cuisine, regles, map_directeur, map_stuff] // liste des scènes du jeu
 
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("menu"); // Démarrer avec le menu
+game.scene.start("map_monstre"); // Démarrer avec le menu
 function chocAvecBombe(un_player, une_bombe) {
   this.physics.pause();
   player.setTint(0xff0000);

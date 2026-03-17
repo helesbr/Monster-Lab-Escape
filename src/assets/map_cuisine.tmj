@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"map_cuisine.tmj"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
