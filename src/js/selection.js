@@ -5,6 +5,7 @@ var zone_texte_score;
 var groupe_monstres;
 var groupe_bombes;
 var gameOver = false;
+var groupe_portes;
 
 export default class selection extends Phaser.Scene {
   constructor() {
@@ -84,6 +85,7 @@ export default class selection extends Phaser.Scene {
     /***********************************************************************/
     /** CRÉATION DES PORTES
     /***********************************************************************/
+    groupe_portes = this.physics.add.group();
     // Récupération du calque d'objets des portes
     const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
 
@@ -94,9 +96,10 @@ export default class selection extends Phaser.Scene {
           const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
           porte.setCollideWorldBounds(true);
           porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
-          porte.isOpen = false; // État initial : fermée
+          porte.isOpen = false;
+          porte.estSolide = true;// État initial : fermée
           porte.play('door_closed'); // Affiche le frame fermé
-
+          groupe_portes.add(porte);
           // Vérifier si la porte a la propriété "horizontale"
           if (obj.properties) {
             const hasHorizontal = obj.properties.some(prop =>
@@ -112,7 +115,11 @@ export default class selection extends Phaser.Scene {
         }
       });
     }
-
+this.physics.add.collider(player, groupe_portes, (player, porte) => {
+  if (!porte.estSolide) {
+    this.physics.add.collider(player, groupe_portes);
+  }
+});
     // Ancrage de la caméra sur le joueur
     this.cameras.main.startFollow(player);
 
@@ -120,7 +127,7 @@ export default class selection extends Phaser.Scene {
     /** 3. ENTRÉES CLAVIER ET ANIMATIONS
     /***********************************************************************/
     clavier = this.input.keyboard.createCursorKeys();
-
+this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
     this.anims.create({
       key: "anim_tourne_gauche",
       frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
@@ -190,4 +197,24 @@ export default class selection extends Phaser.Scene {
       player.setVelocityY(0);
     }
   }
+   if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+  groupe_portes.children.entries.forEach(porte => {
+    const distance = Phaser.Math.Distance.Between(
+      player.x, player.y,
+      porte.x, porte.y
+    );
+
+    if (distance < 100 && !porte.isOpen) {
+      porte.isOpen = true;
+      porte.estSolide = false;
+      porte.play('door_open');
+      porte.body.setEnable(false); // ✅ Désactiver la collision physique
+    } else if (distance < 100 && porte.isOpen) {
+      porte.isOpen = false;
+      porte.estSolide = true;
+      porte.play('door_closed');
+      porte.body.setEnable(true); // ✅ Réactiver la collision
+    }
+  });
+}
 }
