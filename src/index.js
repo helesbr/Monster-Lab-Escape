@@ -1,5 +1,6 @@
 import selection from "./js/selection.js";
 import map_cuisine from "./js/map_cuisine.js";
+import map_stuff from "./js/map_stuff.js";
 
 // configuration générale du jeu
 var config = {
@@ -14,13 +15,14 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [selection, map_cuisine] // liste des scènes du jeu
+  scene: [map_stuff, map_cuisine, selection] // liste des scènes du jeu
 
 };
 
+
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("map_cuisine");
+game.scene.start("map_stuff");
 function chocAvecBombe(un_player, une_bombe) {
   this.physics.pause();
   player.setTint(0xff0000);

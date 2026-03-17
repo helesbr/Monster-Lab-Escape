@@ -12,6 +12,9 @@ export default class map_stuff extends Phaser.Scene {
             frameHeight: 48
         });
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
+            frameWidth: 32,
+            frameHeight: 48
+        });
     }
 
     create() {
@@ -97,3 +100,4 @@ export default class map_stuff extends Phaser.Scene {
         }
     }
 }
+
