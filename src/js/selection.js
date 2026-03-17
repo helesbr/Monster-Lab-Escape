@@ -96,6 +96,9 @@ export default class selection extends Phaser.Scene {
           const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
           porte.setCollideWorldBounds(true);
           porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
+          porte.setDisplaySize(64, 32);  // Taille correcte pour la collision
+          porte.body.setImmovable(true);  // La porte ne se déplace pas
+          porte.body.moves = false;  // Désactiver complètement les mouvements du body
           porte.isOpen = false;
           porte.estSolide = true;// État initial : fermée
           porte.play('door_closed'); // Affiche le frame fermé
@@ -115,11 +118,10 @@ export default class selection extends Phaser.Scene {
         }
       });
     }
-this.physics.add.collider(player, groupe_portes, (player, porte) => {
-  if (!porte.estSolide) {
+    
+    // Collider solide entre le joueur et les portes
     this.physics.add.collider(player, groupe_portes);
-  }
-});
+    
     // Ancrage de la caméra sur le joueur
     this.cameras.main.startFollow(player);
 
@@ -196,25 +198,28 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
     else {
       player.setVelocityY(0);
     }
-  }
-   if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-  groupe_portes.children.entries.forEach(porte => {
-    const distance = Phaser.Math.Distance.Between(
-      player.x, player.y,
-      porte.x, porte.y
-    );
 
-    if (distance < 100 && !porte.isOpen) {
-      porte.isOpen = true;
-      porte.estSolide = false;
-      porte.play('door_open');
-      porte.body.setEnable(false); // ✅ Désactiver la collision physique
-    } else if (distance < 100 && porte.isOpen) {
-      porte.isOpen = false;
-      porte.estSolide = true;
-      porte.play('door_closed');
-      porte.body.setEnable(true); // ✅ Réactiver la collision
+    // Ouverture/Fermeture des portes avec interaction proximité + Enter
+    if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+      groupe_portes.children.entries.forEach(porte => {
+        const distance = Phaser.Math.Distance.Between(
+          player.x, player.y,
+          porte.x, porte.y
+        );
+
+        // Si le joueur est proche et la porte est fermée (solide), ouvrir
+        if (distance < 100 && porte.estSolide) {
+          porte.estSolide = false;
+          porte.setFrame(1);  // Afficher la 2ème image (porte ouverte)
+          porte.body.setEnable(false);  // Désactiver la collision
+        }
+        // Si le joueur est proche et la porte est ouverte, fermer
+        else if (distance < 100 && !porte.estSolide) {
+          porte.estSolide = true;
+          porte.setFrame(0);  // Afficher la 1ère image (porte fermée)
+          porte.body.setEnable(true);  // Réactiver la collision
+        }
+      });
     }
-  });
-}
+  }
 }
