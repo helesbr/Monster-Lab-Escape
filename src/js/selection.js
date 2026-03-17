@@ -26,8 +26,10 @@ export default class selection extends Phaser.Scene {
     this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
     this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
     this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");
-    this.load.image('porte', 'src/assets/images/wall128x128.png');
-  }
+    this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
+  frameWidth: 64,
+  frameHeight: 32
+});
 
   create() {
 
@@ -71,22 +73,30 @@ export default class selection extends Phaser.Scene {
   this.physics.add.collider(player, murLayer);
   this.physics.add.collider(player, objectLayer);
 
-  /***********************************************************************/
-  /** CRÉATION DES PORTES
-  /***********************************************************************/
-  // Récupération du calque d'objets des portes
-  const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
-  
+  // Créer les animations des portes
+this.anims.create({
+  key: 'door_closed',
+  frames: [{ key: 'porte', frame: 0 }],
+  frameRate: 10
+});
+
+this.anims.create({
+  key: 'door_open',
+  frames: [{ key: 'porte', frame: 1 }],
+  frameRate: 10
+});
   // Création des portes sur chaque objet door
   if (doorsObjectsLayer) {
-    doorsObjectsLayer.objects.forEach((obj) => {
-      if (obj.name.startsWith("door")) {
-        const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
-        porte.setCollideWorldBounds(true);
-        porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
-      }
-    });
-  }
+  doorsObjectsLayer.objects.forEach((obj) => {
+    if (obj.name.startsWith("door")) {
+      const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+      porte.setCollideWorldBounds(true);
+      porte.setDepth(50);
+      porte.isOpen = false; // État initial : fermée
+      porte.play('door_closed'); // Affiche le frame fermé
+    }
+  });
+}
 
  // redimentionnement du monde avec les dimensions calculées via tiled
 this.physics.world.setBounds(0, 0, 960, 960);
@@ -172,3 +182,4 @@ this.cameras.main.setBounds(0, 0, 960, 960);
   }
 }
 
+}
