@@ -24,6 +24,10 @@ export default class map_cuisine extends Phaser.Scene{
             const wallLayer = carteCuisine.createLayer("Wall", tileset, 0, 0);
             const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
+            // ✅ ACTIVER LES COLLISIONS DES COUCHES
+            wallLayer.setCollisionByExclusion([-1]);
+            objetsLayer.setCollisionByExclusion([-1]);
+
             // Ajuster le monde et la caméra pour afficher la totalité de la map
             this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
             this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
