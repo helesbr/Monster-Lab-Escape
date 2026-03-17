@@ -21,7 +21,7 @@ export default class menu extends Phaser.Scene {
             .setDepth(0);
 
         // Bouton de démarrage
-        const boutonJouer = this.add.rectangle(240, 240, 200, 60, 0x00aa00);
+        const boutonJouer = this.add.rectangle(240, 150, 200, 60, 0x00aa00);
         boutonJouer.setInteractive();
         boutonJouer.on('pointerover', () => {
             boutonJouer.setFillStyle(0x00ff00);
@@ -31,7 +31,7 @@ export default class menu extends Phaser.Scene {
         });
 
         // Texte du bouton
-        this.add.text(240, 240, 'JOUER', {
+        this.add.text(240, 150, 'JOUER', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
@@ -40,6 +40,27 @@ export default class menu extends Phaser.Scene {
         // Événement au clic du bouton
         boutonJouer.on('pointerdown', () => {
             this.scene.start('selection');
+        });
+
+        const boutonRegle = this.add.rectangle(240, 330, 200, 60, 0x00aa00);
+        boutonRegle.setInteractive();
+        boutonRegle.on('pointerover', () => {
+            boutonRegle.setFillStyle(0x00ff00);
+        });
+        boutonRegle.on('pointerout', () => {
+            boutonRegle.setFillStyle(0x00aa00);
+        });
+
+        // Texte du bouton
+        this.add.text(240, 330, 'RÈGLES', {
+            fontSize: '32px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+
+        // Événement au clic du bouton
+        boutonRegle.on('pointerdown', () => {
+            this.scene.start('regles');
         });
     }
 

@@ -1,6 +1,7 @@
 import menu from "./js/menu.js";
 import selection from "./js/selection.js";
 import map_cuisine from "./js/map_cuisine.js";
+import regles from "./js/Regles.js";
 
 // configuration générale du jeu
 var config = {
@@ -15,7 +16,7 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [menu, selection, map_cuisine] // liste des scènes du jeu
+  scene: [menu, selection, map_cuisine, regles] // liste des scènes du jeu
 
 };
 
