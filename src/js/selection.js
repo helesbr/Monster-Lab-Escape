@@ -1,7 +1,6 @@
 // chargement des librairies
 var player;
 var clavier;
-var score = 0;
 var zone_texte_score;
 var groupe_monstres;
 var groupe_bombes;
@@ -31,7 +30,7 @@ export default class selection extends Phaser.Scene {
 
   create() {
 
-   
+
     // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
@@ -44,57 +43,57 @@ export default class selection extends Phaser.Scene {
     const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
     const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-  // Définition des collisions pour les murs uniquement
-  murLayer.setCollisionByExclusion([-1]);
-  objectLayer.setCollisionByExclusion([-1]);
+    // Définition des collisions pour les murs uniquement
+    murLayer.setCollisionByExclusion([-1]);
+    objectLayer.setCollisionByExclusion([-1]);
     // Définition des collisions pour les murs uniquement
     murLayer.setCollisionByExclusion([-1]);
 
-  // Redimensionnement du monde avec les dimensions calculées via tiled
-  this.physics.world.setBounds(0, 0, 3200, 640);
-  // Ajout du champs de la caméra de taille identique à celle du monde
-  this.cameras.main.setBounds(0, 0, 3200, 640);
+    // Redimensionnement du monde avec les dimensions calculées via tiled
+    this.physics.world.setBounds(0, 0, 3200, 640);
+    // Ajout du champs de la caméra de taille identique à celle du monde
+    this.cameras.main.setBounds(0, 0, 3200, 640);
 
-  /***********************************************************************/
-  /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
-  /***********************************************************************/
-  player = this.physics.add.sprite(190, 480, 'img_perso');
- 
-  
-  // Check the sprite's display origin and bounds
-  
-  player.setCollideWorldBounds(true);
-  player.setDepth(100); // Force le joueur au-dessus de la map
-  player.body.setGravityY(-this.physics.world.gravity.y);
+    /***********************************************************************/
+    /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
+    /***********************************************************************/
+    player = this.physics.add.sprite(190, 480, 'img_perso');
 
-  // Ajout de la collision entre le joueur et les murs
-  this.physics.add.collider(player, murLayer);
-  this.physics.add.collider(player, objectLayer);
 
-  /***********************************************************************/
-  /** CRÉATION DES PORTES
-  /***********************************************************************/
-  // Récupération du calque d'objets des portes
-  const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
-  
-  // Création des portes sur chaque objet door
-  if (doorsObjectsLayer) {
-    doorsObjectsLayer.objects.forEach((obj) => {
-      if (obj.name.startsWith("door")) {
-        const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
-        porte.setCollideWorldBounds(true);
-        porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
-      }
-    });
-  }
+    // Check the sprite's display origin and bounds
 
- // redimentionnement du monde avec les dimensions calculées via tiled
-this.physics.world.setBounds(0, 0, 960, 960);
-//  ajout du champs de la caméra de taille identique à celle du monde
-this.cameras.main.setBounds(0, 0, 960, 960);
+    player.setCollideWorldBounds(true);
+    player.setDepth(100); // Force le joueur au-dessus de la map
+    player.body.setGravityY(-this.physics.world.gravity.y);
 
-  // Ancrage de la caméra sur le joueur
-  this.cameras.main.startFollow(player);
+    // Ajout de la collision entre le joueur et les murs
+    this.physics.add.collider(player, murLayer);
+    this.physics.add.collider(player, objectLayer);
+
+    /***********************************************************************/
+    /** CRÉATION DES PORTES
+    /***********************************************************************/
+    // Récupération du calque d'objets des portes
+    const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
+
+    // Création des portes sur chaque objet door
+    if (doorsObjectsLayer) {
+      doorsObjectsLayer.objects.forEach((obj) => {
+        if (obj.name.startsWith("door")) {
+          const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+          porte.setCollideWorldBounds(true);
+          porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
+        }
+      });
+    }
+
+    // redimentionnement du monde avec les dimensions calculées via tiled
+    this.physics.world.setBounds(0, 0, 960, 960);
+    //  ajout du champs de la caméra de taille identique à celle du monde
+    this.cameras.main.setBounds(0, 0, 960, 960);
+
+    // Ancrage de la caméra sur le joueur
+    this.cameras.main.startFollow(player);
 
     /***********************************************************************/
     /** 3. ENTRÉES CLAVIER ET ANIMATIONS
@@ -126,11 +125,6 @@ this.cameras.main.setBounds(0, 0, 960, 960);
     /***********************************************************************/
     groupe_monstres = this.physics.add.group();
     groupe_bombes = this.physics.add.group();
-
-    zone_texte_score = this.add.text(16, 16, 'Score: 0', {
-      fontSize: '32px',
-      fill: '#000'
-    });
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
     let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
 
@@ -139,8 +133,8 @@ this.cameras.main.setBounds(0, 0, 960, 960);
     // 3. On applique le zoom et on centre la caméra
     this.cameras.main.setZoom(meilleurZoom);
     this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
- 
-}
+
+  }
   update() {
 
     // Gauche / Droite (déjà existant)
