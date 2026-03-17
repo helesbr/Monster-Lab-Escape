@@ -12,7 +12,7 @@
  * lors du chargement de la scene dans le jeu.
  * On y trouve surtout le chargement des assets (images, son ..)
  */
-class selection extends Phaser.Scene{ 
+export default class selection extends Phaser.Scene{ 
   constructor() {
     super({key : "selection"});
   }
