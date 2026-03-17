@@ -14,7 +14,7 @@ export default class selection extends Phaser.Scene {
 
   preload() {
     this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
-      frameWidth: 32,
+      frameWidth: 44,
       frameHeight: 48
     });
     // chargement tuiles de jeu
@@ -41,23 +41,16 @@ export default class selection extends Phaser.Scene {
 
   // Définition des collisions pour les murs uniquement
   murLayer.setCollisionByExclusion([-1]);
+  objectLayer.setCollisionByExclusion([-1]);
 
   /***********************************************************************/
   /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
   /***********************************************************************/
   player = this.physics.add.sprite(200, 200, 'img_perso');
-  console.log("Player créé:", player);
-  console.log("Position joueur:", player.x, player.y);
-  console.log("Texture:", player.texture.key);
-  console.log("Visible:", player.visible);
-  console.log("Alpha:", player.alpha);
-  console.log("Scale:", player.scaleX, player.scaleY);
-  console.log("Active:", player.active);
+ 
   
   // Check the sprite's display origin and bounds
-  console.log("Display origin:", player.displayOriginX, player.displayOriginY);
-  console.log("Bounds:", player.getBounds());
-  console.log("Display list:", this.sys.displayList.length);
+  
   player.setCollideWorldBounds(true);
   player.setDepth(100); // Force le joueur au-dessus de la map
   player.body.setGravityY(-this.physics.world.gravity.y);
@@ -120,13 +113,16 @@ update() {
   }
   else if (clavier.left.isDown) {
     player.setVelocityX(-160);
-    player.setFlipX(true);
+    player.setFlipX(false);
     player.anims.play('anim_tourne_gauche', true);
   } else {
     player.setVelocityX(0);
     player.setFlipX(false);
     player.anims.play('anim_face');
+    
+
   }
+  
 
   // ✅ Haut / Bas — tu rajoutes juste ces lignes ici :
   if (clavier.up.isDown) {
@@ -135,5 +131,8 @@ update() {
   else if (clavier.down.isDown) {
     player.setVelocityY(160);
   }
+  else {
+  player.setVelocityY(0);
+}
 }
 }
