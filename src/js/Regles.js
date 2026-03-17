@@ -5,8 +5,7 @@ export default class regles extends Phaser.Scene {
 
     //on charge les images
     preload() {
-        this.load.image("menu_fond", "src/assets/images/menu_fond.png");
-        this.load.image("imageBoutonPlay", "src/assets/images/bouton_play.png");
+        this.load.image("regles_fond", "src/assets/images/regles_fond.png");
     }
 
     create() {
@@ -15,52 +14,27 @@ export default class regles extends Phaser.Scene {
 
         // on place les éléments de fond
         this.add
-            .image(240, 240, "menu_fond")
+            .image(240, 240, "regles_fond")
             .setDisplaySize(480, 480)  // Redimensionner au 480x480 du canvas
             .setOrigin(0.5)  // Centrer l'image
             .setDepth(0);
 
         // Bouton de démarrage
-        const boutonJouer = this.add.rectangle(240, 240, 200, 60, 0x00aa00);
-        boutonJouer.setInteractive();
-        boutonJouer.on('pointerover', () => {
-            boutonJouer.setFillStyle(0x00ff00);
+        const boutonRetour = this.add.rectangle(240, 240, 200, 60, 0x00aa00);
+        boutonRetour.setInteractive();
+        boutonRetour.on('pointerover', () => {
+            boutonRetour.setFillStyle(0x00ff00);
         });
-        boutonJouer.on('pointerout', () => {
-            boutonJouer.setFillStyle(0x00aa00);
+        boutonRetour.on('pointerout', () => {
+            boutonRetour.setFillStyle(0x00aa00);
         });
-
         // Texte du bouton
-        this.add.text(240, 240, 'JOUER', {
+        this.add.text(240, 240, 'RETOUR', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
         }).setOrigin(0.5);
-
-        // Événement au clic du bouton
-        boutonJouer.on('pointerdown', () => {
-            this.scene.start('selection');
-        });
-        const boutonRegle = this.add.rectangle(240, 320, 200, 60, 0x00aa00);
-        boutonRegle.setInteractive();
-        boutonRegle.on('pointerover', () => {
-            boutonRegle.setFillStyle(0x00ff00);
-        });
-        boutonRegle.on('pointerout', () => {
-            boutonRegle.setFillStyle(0x00aa00);
-        });
-
-        // Texte du bouton
-        this.add.text(240, 320, 'RÈGLES', {
-            fontSize: '32px',
-            fill: '#fff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
-
-        // Événement au clic du bouton
-        boutonRegle.on('pointerdown', () => {
-            this.scene.start('regles');
-        });
+        
     }
 
     update() {
