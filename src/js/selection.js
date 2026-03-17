@@ -146,6 +146,7 @@ export default class selection extends Phaser.Scene {
 
       key: 'door_closed',
 
+      
       frames: [{ key: 'porte', frame: 0 }],
 
       frameRate: 10
@@ -208,6 +209,14 @@ export default class selection extends Phaser.Scene {
 
           groupe_portes.add(porte);
 
+          
+          if (obj.properties) {
+            const destProp = obj.properties.find(p => p.name === "destination");
+            if (destProp) {
+              porte.destination = destProp.value; // ex: "map_cuisine"
+            }
+          }
+          
           // Vérifier si la porte a la propriété "horizontale"
 
           if (obj.properties) {
@@ -427,6 +436,19 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
             window.spawnData.map_cuisine = { x: 100, y: 100 }; // Choisis la position de spawn souhaitée
             this.scene.start("map_cuisine");
           }
+        if (distance < 100 && porte.estSolide) {
+          porte.estSolide = false;
+          porte.setFrame(1);
+          porte.body.setEnable(false);
+
+          // Téléporter le joueur à la destination (ou map_cuisine par défaut)
+          const destination = porte.destination || "map_cuisine";
+          this.scene.start(destination);
+
+        } else if (distance < 100 && !porte.estSolide) {
+          porte.estSolide = true;
+          porte.setFrame(0);
+          porte.body.setEnable(true);
         }
         // Si le joueur est proche et la porte est ouverte, fermer
         else if (distance < 100 && !porte.estSolide) {

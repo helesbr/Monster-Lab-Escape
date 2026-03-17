@@ -1,12 +1,4 @@
 { "compressionlevel":-1,
- "editorsettings":
-    {
-     "export":
-        {
-         "format":"json",
-         "target":"map_cuisine.tmj"
-        }
-    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -229,6 +221,41 @@
         }, 
         {
          "draworder":"topdown",
+         "id":7,
+         "name":"door_retour",
+         "objects":[
+                {
+                 "height":0,
+                 "id":9,
+                 "name":"door_retour",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":944,
+                 "y":314
+                }, 
+                {
+                 "height":0,
+                 "id":10,
+                 "name":"door_retour",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":350,
+                 "y":942
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
          "id":6,
          "name":"calque crea",
          "objects":[
@@ -250,8 +277,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":7,
- "nextobjectid":9,
+ "nextlayerid":8,
+ "nextobjectid":11,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
@@ -275,10 +302,6 @@
         }, 
         {
          "firstgid":1,
-         "source":"..\/..\/..\/brks_2.tsx"
-        }, 
-        {
-         "firstgid":1,
          "source":"..\/..\/..\/sol_monstre.tsx"
         }, 
         {
@@ -291,6 +314,32 @@
          "name":"all_tileset",
          "spacing":0,
          "tilecount":14900,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":50,
+         "firstgid":14901,
+         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
+         "imageheight":1200,
+         "imagewidth":1600,
+         "margin":0,
+         "name":"blood",
+         "spacing":0,
+         "tilecount":1850,
+         "tileheight":32,
+         "tilewidth":32
+        }, 
+        {
+         "columns":50,
+         "firstgid":16751,
+         "image":"..\/..\/..\/..\/..\/..\/Downloads\/blood.png",
+         "imageheight":1200,
+         "imagewidth":1600,
+         "margin":0,
+         "name":"blood",
+         "spacing":0,
+         "tilecount":1850,
          "tileheight":32,
          "tilewidth":32
         }],
