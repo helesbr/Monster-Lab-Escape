@@ -1,15 +1,25 @@
 var player;
 
 export default class map_monstre extends Phaser.Scene {
+
     constructor() {
+
         super({ key: "map_monstre" });
+
     }
+
     preload() {
+
         this.load.tilemapTiledJSON("monstre", "src/assets/map_monstre.tmj");
+
         this.load.image("allTiles", "src/tilesets/all_tilesets.png");
+
         this.load.spritesheet('monstre', 'src/assets/images/monstre.png', {
+
             frameWidth: 44,
+
             frameHeight: 48
+
         });
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
             frameWidth: 44,
@@ -20,6 +30,8 @@ export default class map_monstre extends Phaser.Scene {
             frameHeight: 80
         });
     }
+
+ 
 
     create() {
         const carteMonstreLab = this.make.tilemap({ key: "monstre" });
@@ -169,7 +181,9 @@ export default class map_monstre extends Phaser.Scene {
                     this.scene.start('map_stuff');
                 });
             }
+
         });
+
     }
     update() {
         const cursors = this.cursors;

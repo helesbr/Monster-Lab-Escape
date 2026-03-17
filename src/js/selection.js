@@ -15,7 +15,6 @@ var gameOver = false;
 var groupe_portes;
 
 
-
 export default class selection extends Phaser.Scene {
 
   constructor() {
@@ -23,7 +22,6 @@ export default class selection extends Phaser.Scene {
     super({ key: "selection" });
 
   }
-
 
 
   preload() {
@@ -41,7 +39,6 @@ export default class selection extends Phaser.Scene {
     this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
 
     this.load.image('background', 'src/tilesets/tile-background.png');
-
 
 
     // chargement de la carte
@@ -65,7 +62,6 @@ export default class selection extends Phaser.Scene {
   }
 
 
-
   create() {
 
     // Récupération de la carte et du tileset
@@ -77,13 +73,14 @@ export default class selection extends Phaser.Scene {
     const backgroundTileset = carteDuNiveau.addTilesetImage("background", "background");
 
 
-
     // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
+
     const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
     const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
-    const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
-    const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
+    const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
+
+    const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
 
     // Définition des collisions pour les murs uniquement
@@ -93,7 +90,6 @@ export default class selection extends Phaser.Scene {
     objectLayer.setCollisionByExclusion([-1]);
 
 
-
     // Redimensionnement du monde avec les dimensions calculées via tiled
 
     this.physics.world.setBounds(0, 0, 960, 960);
@@ -101,7 +97,6 @@ export default class selection extends Phaser.Scene {
     // Ajout du champs de la caméra de taille identique à celle du monde
 
     this.cameras.main.setBounds(0, 0, 960, 960);
-
 
 
     /***********************************************************************/
@@ -119,13 +114,11 @@ export default class selection extends Phaser.Scene {
     player.body.setGravityY(-this.physics.world.gravity.y);
 
 
-
     // Ajout de la collision entre le joueur et les murs
 
     this.physics.add.collider(player, murLayer);
 
     this.physics.add.collider(player, objectLayer);
-
 
 
     /***********************************************************************/
@@ -149,7 +142,6 @@ export default class selection extends Phaser.Scene {
     });
 
 
-
     this.anims.create({
 
       key: 'door_open',
@@ -159,7 +151,6 @@ export default class selection extends Phaser.Scene {
       frameRate: 10
 
     });
-
 
 
     /***********************************************************************/
@@ -173,7 +164,6 @@ export default class selection extends Phaser.Scene {
     // Récupération du calque d'objets des portes
 
     const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
-
 
 
     // Création des portes sur chaque objet door
@@ -253,17 +243,14 @@ export default class selection extends Phaser.Scene {
     }
 
 
-
     // Collider solide entre le joueur et les portes
 
     this.physics.add.collider(player, groupe_portes);
 
 
-
     // Ancrage de la caméra sur le joueur
 
     this.cameras.main.startFollow(player);
-
 
 
     /***********************************************************************/
@@ -289,7 +276,6 @@ export default class selection extends Phaser.Scene {
     });
 
 
-
     this.anims.create({
 
       key: "anim_tourne_droite",
@@ -303,7 +289,6 @@ export default class selection extends Phaser.Scene {
     });
 
 
-
     this.anims.create({
 
       key: "anim_face",
@@ -313,7 +298,6 @@ export default class selection extends Phaser.Scene {
       frameRate: 20
 
     });
-
 
 
     /***********************************************************************/
@@ -327,7 +311,6 @@ export default class selection extends Phaser.Scene {
     groupe_bombes = this.physics.add.group();
 
 
-
     zone_texte_score = this.add.text(16, 16, 'Score: 0', {
 
       fontSize: '32px',
@@ -337,11 +320,9 @@ export default class selection extends Phaser.Scene {
     });
 
 
-
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
 
     let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
-
 
 
     // On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
@@ -355,7 +336,6 @@ export default class selection extends Phaser.Scene {
     this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
 
   }
-
 
 
   update() {
@@ -391,7 +371,6 @@ export default class selection extends Phaser.Scene {
     }
 
 
-
     // Haut / Bas
 
     if (clavier.up.isDown) {
@@ -411,7 +390,6 @@ export default class selection extends Phaser.Scene {
       player.setVelocityY(0);
 
     }
-
 
 
     // Ouverture/Fermeture des portes avec interaction proximité + Enter
@@ -459,7 +437,19 @@ export default class selection extends Phaser.Scene {
           porte.body.setEnable(true);
 
         }
+        // Si le joueur est proche et la porte est ouverte, fermer
+        else if (distance < 100 && !porte.estSolide) {
+          porte.estSolide = true;
+          porte.setFrame(0);  // Afficher la 1ère image (porte fermée)
+          porte.body.setEnable(true);  // Réactiver la collision
+        }
+
       });
+
     }
+
   }
+
 }
+
+

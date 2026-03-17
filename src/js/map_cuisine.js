@@ -240,11 +240,9 @@ export default class map_cuisine extends Phaser.Scene{
 
                 if (objetsLayer) this.physics.add.collider(this.groupe_monstres, objetsLayer);
 
-
             }
 
  
-
             // ✅ Spawn des portes
 
             groupe_portes = this.physics.add.group();
@@ -318,6 +316,8 @@ export default class map_cuisine extends Phaser.Scene{
                 });
  
 
+ 
+
             // ✅ Spawn des creatines (calque séparé)
 
             const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
@@ -335,6 +335,7 @@ export default class map_cuisine extends Phaser.Scene{
                 });
             }
         }
+
     }
     update() {
         // Contrôles du joueur
