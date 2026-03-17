@@ -30,6 +30,7 @@ export default class selection extends Phaser.Scene {
 
   create() {
 
+   
     // Récupération de la carte et du tileset
     const carteDuNiveau = this.make.tilemap({ key: "carte" });
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
@@ -54,7 +55,7 @@ export default class selection extends Phaser.Scene {
   /***********************************************************************/
   /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
   /***********************************************************************/
-  player = this.physics.add.sprite(200, 200, 'img_perso');
+  player = this.physics.add.sprite(190, 480, 'img_perso');
  
   
   // Check the sprite's display origin and bounds
@@ -65,6 +66,8 @@ export default class selection extends Phaser.Scene {
 
   // Ajout de la collision entre le joueur et les murs
   this.physics.add.collider(player, murLayer);
+  this.physics.add.collider(player, objectLayer);
+
  // redimentionnement du monde avec les dimensions calculées via tiled
 this.physics.world.setBounds(0, 0, 960, 960);
 //  ajout du champs de la caméra de taille identique à celle du monde
@@ -80,7 +83,7 @@ this.cameras.main.setBounds(0, 0, 960, 960);
 
     this.anims.create({
       key: "anim_tourne_gauche",
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 4 }),
+      frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
       frameRate: 10,
       repeat: -1
     });
@@ -116,7 +119,7 @@ this.cameras.main.setBounds(0, 0, 960, 960);
     // 3. On applique le zoom et on centre la caméra
     this.cameras.main.setZoom(meilleurZoom);
     this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
-
+ 
 }
   update() {
 
