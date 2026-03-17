@@ -46,7 +46,20 @@ export default class selection extends Phaser.Scene {
   /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
   /***********************************************************************/
   player = this.physics.add.sprite(200, 200, 'img_perso');
+  console.log("Player créé:", player);
+  console.log("Position joueur:", player.x, player.y);
+  console.log("Texture:", player.texture.key);
+  console.log("Visible:", player.visible);
+  console.log("Alpha:", player.alpha);
+  console.log("Scale:", player.scaleX, player.scaleY);
+  console.log("Active:", player.active);
+  
+  // Check the sprite's display origin and bounds
+  console.log("Display origin:", player.displayOriginX, player.displayOriginY);
+  console.log("Bounds:", player.getBounds());
+  console.log("Display list:", this.sys.displayList.length);
   player.setCollideWorldBounds(true);
+  player.setDepth(100); // Force le joueur au-dessus de la map
   player.body.setGravityY(-this.physics.world.gravity.y);
 
   // Ajout de la collision entre le joueur et les murs
@@ -87,20 +100,15 @@ export default class selection extends Phaser.Scene {
     fontSize: '32px',
     fill: '#000'
   });
-
-  // Si ton jeu est en vue de haut, n'oublie pas de régler la gravité
-  // à 0 dans ton objet "config" en haut de ton script.
-// 1. On calcule le ratio nécessaire pour que la largeur ET la hauteur rentrent
-// On divise la taille de l'écran par la taille réelle de la map en pixels
 let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
 let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
 
 // 2. On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
 let meilleurZoom = Math.min(zoomX, zoomY);
-
 // 3. On applique le zoom et on centre la caméra
 this.cameras.main.setZoom(meilleurZoom);
 this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
+
 }
 update() {
   
