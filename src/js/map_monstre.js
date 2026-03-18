@@ -25,7 +25,11 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
+
+        this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
+
+
     }
 
     create() {
@@ -88,7 +92,7 @@ export default class map_monstre extends Phaser.Scene {
 
                     monstre.moveEvent = this.time.addEvent({
                         delay: Phaser.Math.Between(2000, 4000),
-                        callback: function() {
+                        callback: function () {
                             if (monstre.active) {
                                 monstre.setVelocity(
                                     Phaser.Math.Between(-80, 80),
@@ -281,6 +285,23 @@ export default class map_monstre extends Phaser.Scene {
                 });
             }
         });
+
+        // ✅ Créer le bouton_directeur à partir du ping
+        this.calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
+        if (this.calqueBoutons) {
+            const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
+            if (pingBoutonDirecteur) {
+                const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
+                boutonDirecteur.disableInteractive();
+                boutonDirecteur.setDepth(50);
+                boutonDirecteur.setVisible(false); // Cacher le bouton
+
+                // Interaction au clic
+                boutonDirecteur.on('pointerdown', () => {
+                    this.scene.start('map_directeur');
+                });
+            }
+        }
     }
 
     tirer() {
@@ -293,10 +314,10 @@ export default class map_monstre extends Phaser.Scene {
         const vitesse = 600;
 
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
 
         const balle = this.groupeBullets.create(

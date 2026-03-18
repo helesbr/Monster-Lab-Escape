@@ -219,15 +219,15 @@ export default class selection extends Phaser.Scene {
         }
 
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-            groupe_portes.children.entries.forEach(porte => {
+            for (const porte of groupe_portes.children.entries) {
                 const distance = Phaser.Math.Distance.Between(
                     player.x, player.y,
                     porte.x, porte.y
                 );
 
                 if (distance < 100 && porte.estSolide) {
-                    // Vérifier si c'est la porte 2 (fermée) en premier
-                    if (porte.doorName === "door2") {
+                    // Vérifier si c'est la porte 2 (fermée) - bloquée si monstres actifs
+                    if (porte.doorName === "door2" && groupe_monstres.countActive(true) > 0) {
                         const texte = this.add.text(480, 480, "Cette porte est fermée, il faut tuer tous les monstres de la salle monstre", {
                             fontSize: '32px',
                             fontStyle: 'bold',
@@ -236,9 +236,10 @@ export default class selection extends Phaser.Scene {
                             wordWrap: { width: 400 }
                         }).setOrigin(0.5);
                         this.time.delayedCall(4000, () => texte.destroy());
-                        return;
+                        break; // Sortir complètement de la boucle
                     }
 
+                    // Ouvrir la porte et se préparer à changer de scène
                     porte.estSolide = false;
                     porte.setFrame(1);
                     porte.body.setEnable(false);
@@ -261,15 +262,20 @@ export default class selection extends Phaser.Scene {
                     } else if (porte.doorName === "door12") {
                         destination = "map_cuisine";
                         porteDestination = "door_retour1";
+                    } else if (porte.doorName === "door2") {
+                        destination = "map_monstre";
+                        porteDestination = "door_monstre";
                     }
                     this.scene.start(destination, { porteDestination });
+                    break; // Sortir après lancement de la scène
 
                 } else if (distance < 100 && !porte.estSolide) {
                     porte.estSolide = true;
                     porte.setFrame(0);
                     porte.body.setEnable(true);
+                    break;
                 }
-            });
+            }
         }
 
         // ✅ mettre à jour la position de l'arme
