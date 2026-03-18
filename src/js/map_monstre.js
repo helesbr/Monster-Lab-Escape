@@ -55,6 +55,14 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
+
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 

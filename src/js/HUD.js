@@ -6,6 +6,7 @@ export default class HUD extends Phaser.Scene {
     create() {
         this.pointsVie = 3;
         this.aArme = false;
+        this.money = 0; // ✅ ajout money
         const heartSize = 32;
         this.heartSize = heartSize;
 
@@ -22,26 +23,30 @@ export default class HUD extends Phaser.Scene {
             .setScrollFactor(0)
             .setDepth(201);
 
+        // ✅ texte money
+        this.texteMoney = this.add.text(20, 60, 'Money: 0', {
+            fontSize: '16px',
+            fill: '#FFD700',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setScrollFactor(0).setDepth(200);
+
         this.updateHeart();
 
-        // ✅ reçoit un coup
         this.game.events.on('playerHit', () => {
             this.pointsVie--;
             this.updateHeart();
         });
 
-        // ✅ reset complet (retour menu)
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
             this.updateHeart();
         });
 
-        // ✅ une autre scène demande la vie actuelle
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
         });
 
-        // ✅ gestion arme
         this.game.events.on('armeRamassee', () => {
             this.aArme = true;
         });
@@ -52,6 +57,21 @@ export default class HUD extends Phaser.Scene {
 
         this.game.events.on('resetArme', () => {
             this.aArme = false;
+        });
+
+        // ✅ événements money
+        this.game.events.on('addMoney', (montant) => {
+            this.money += montant;
+            this.texteMoney.setText('Money: ' + this.money);
+        });
+
+        this.game.events.on('getMoney', (callback) => {
+            callback(this.money);
+        });
+
+        this.game.events.on('resetMoney', () => {
+            this.money = 0;
+            this.texteMoney.setText('Money: 0');
         });
     }
 

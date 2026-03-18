@@ -1,6 +1,5 @@
 var player;
 var clavier;
-var zone_texte_score;
 var groupe_monstres;
 var groupe_bombes;
 var gameOver = false;
@@ -41,6 +40,14 @@ export default class selection extends Phaser.Scene {
         this.events.on('shutdown', () => {
             if (this.son_laboratory) this.son_laboratory.stop();
         });
+
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
 
         const carteDuNiveau = this.add.tilemap("carte");
         const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
@@ -170,10 +177,7 @@ export default class selection extends Phaser.Scene {
         groupe_monstres = this.physics.add.group();
         groupe_bombes = this.physics.add.group();
 
-        zone_texte_score = this.add.text(16, 16, 'Score: 0', {
-            fontSize: '32px',
-            fill: '#000'
-        });
+        
 
         let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
         let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
