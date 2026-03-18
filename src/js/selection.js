@@ -109,7 +109,7 @@ export default class selection extends Phaser.Scene {
     /***********************************************************************/
 
     // Récupérer la porte de destination si elle a été passée
-    const { porteDestination, offsetY = 0 } = this.scene.settings.data || {};
+    const { porteDestination, offsetY = 0, offsetX = 0 } = this.scene.settings.data || {};
     let playerX = 190;
     let playerY = 480;
 
@@ -119,7 +119,7 @@ export default class selection extends Phaser.Scene {
       if (taxiPoints) {
         const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
         if (door) {
-          playerX = door.x;
+          playerX = door.x + offsetX; // Ajouter l'offset X
           playerY = door.y + offsetY; // Ajouter l'offset Y
         }
       }
@@ -448,9 +448,15 @@ export default class selection extends Phaser.Scene {
           } else if (porte.doorName === "door4") {
             destination = "map_monstre";
             porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
+          } else if (porte.doorName === "door1") {
+            destination = "map_cuisine";
+            porteDestination = "door_retour2"; // porte d'arrivée dans map_cuisine
+          } else if (porte.doorName === "door12") {
+            destination = "map_cuisine";
+            porteDestination = "door_retour1"; // porte d'arrivée dans map_cuisine
           }
 
-          this.scene.start(destination, { porteDestination: porteDestination });
+          this.scene.start(destination, { porteDestination: porteDestination});
 
 
 

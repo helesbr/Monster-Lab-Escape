@@ -332,6 +332,7 @@ export default class map_cuisine extends Phaser.Scene{
                     let destination = "selection";
                     let porteDestination = "door1";
                     let offsetY = 0;
+                    let offsetX = 0;
                     if (doorName === "door_retour2") {
                         destination = "selection";
                         porteDestination = "door1";
@@ -339,8 +340,9 @@ export default class map_cuisine extends Phaser.Scene{
                     } else if (doorName === 'door_retour1') {
                         destination = 'selection';
                         porteDestination = 'door12';
+                        offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination: porteDestination, offsetY: offsetY });
+                    this.scene.start(destination, { porteDestination: porteDestination, offsetY: offsetY, offsetX: offsetX });
                 });
             }
 
