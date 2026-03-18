@@ -138,6 +138,7 @@
                  "height":0,
                  "id":1,
                  "name":"monstres",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -150,6 +151,7 @@
                  "height":0,
                  "id":2,
                  "name":"monstres",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -162,6 +164,7 @@
                  "height":0,
                  "id":3,
                  "name":"monstres",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -174,6 +177,7 @@
                  "height":0,
                  "id":4,
                  "name":"monstres",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -186,6 +190,7 @@
                  "height":0,
                  "id":5,
                  "name":"monstres",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
@@ -208,15 +213,16 @@
          "objects":[
                 {
                  "height":0,
-                 "id":7,
-                 "name":"pre workout",
+                 "id":33,
+                 "name":"prewarkout",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":114.399,
-                 "y":95.3327
+                 "x":141.125226860254,
+                 "y":202.105263157895
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -234,6 +240,7 @@
                  "height":0,
                  "id":9,
                  "name":"door_retour1",
+                 "opacity":1,
                  "point":true,
                  "properties":[
                         {
@@ -257,6 +264,7 @@
                  "height":0,
                  "id":10,
                  "name":"door_retour2",
+                 "opacity":1,
                  "point":true,
                  "properties":[
                         {
@@ -290,15 +298,52 @@
          "objects":[
                 {
                  "height":0,
-                 "id":8,
+                 "id":31,
                  "name":"creatine",
+                 "opacity":1,
                  "point":true,
                  "rotation":0,
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":42,
-                 "y":158
+                 "x":71.4338,
+                 "y":200.363
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":8,
+         "locked":true,
+         "name":"shops",
+         "objects":[
+                {
+                 "height":81.8875,
+                 "id":29,
+                 "name":"shop",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":74.9183,
+                 "x":59.2377,
+                 "y":41.8149
+                }, 
+                {
+                 "height":0,
+                 "id":30,
+                 "name":"",
+                 "opacity":1,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":1137.71,
+                 "y":158.548
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -306,11 +351,11 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":12,
+ "nextlayerid":9,
+ "nextobjectid":34,
  "orientation":"orthogonal",
  "renderorder":"right-down",
- "tiledversion":"1.11.2",
+ "tiledversion":"1.12.0",
  "tileheight":32,
  "tilesets":[
         {
@@ -76211,7 +76256,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -76220,7 +76265,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
@@ -76229,7 +76274,7 @@
                         {
                          "name":"estSolide",
                          "type":"bool",
-                         "value":true
+                         "value":false
                         }]
                 }, 
                 {
