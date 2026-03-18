@@ -392,6 +392,8 @@ export default class map_cuisine extends Phaser.Scene{
                 });
             }
         }
+    
+    this.game.config.maVariable-=10;
 
     }
     update() {
