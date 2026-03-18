@@ -24,11 +24,11 @@ export default class map_directeur extends Phaser.Scene {
             console.log('Money actuelle:', money);
         });
 
-        // Pour ajouter de la money (ex: quand un monstre meurt) :
-        // this.game.events.emit('addMoney', 10);
         const carteDirecteurLab = this.add.tilemap("directeur");
         const tileset = carteDirecteurLab.addTilesetImage("all-tileset", "allTiles");
+        const yellow = carteDirecteurLab.addTilesetImage("yellow", "tapis_jaune");
         const floorLayer = carteDirecteurLab.createLayer("floor", tileset, 0, 0);
+        const yellowLayer = carteDirecteurLab.createLayer("yellow", yellow, 0, 0);
         const carpetLayer = carteDirecteurLab.createLayer("carpet", tileset, 0, 0);
         const wallLayer = carteDirecteurLab.createLayer("wall", tileset, 0, 0);
         const objectsLayer = carteDirecteurLab.createLayer("objects", tileset, 0, 0);
@@ -43,7 +43,7 @@ export default class map_directeur extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteDirecteurLab.widthInPixels / 2, carteDirecteurLab.heightInPixels / 2);
 
-        // ✅ Créer les portes
+        // ✅ Créer la porte
         var groupe_portes = this.physics.add.group();
         const doorsObjectsLayer = carteDirecteurLab.getObjectLayer("doors");
         if (doorsObjectsLayer) {
