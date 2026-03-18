@@ -211,12 +211,14 @@ export default class map_monstre extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     let destination = "selection";
                     let porteDestination = "door4";
+                    let offsetX = 0;
 
                     if (doorName === "selection") {
                         destination = "selection";
                         porteDestination = "door4";
+                        let offsetY = -50;
                     }
-                    this.scene.start(destination, { porteDestination: porteDestination });
+                    this.scene.start(destination, { porteDestination: porteDestination, offsetX: offsetX    });
                 });
             }
 
