@@ -13,7 +13,9 @@ export default class HUD extends Phaser.Scene {
         // ✅ tableau de 6 coeurs
         this.coeurs = [];
         for (let i = 0; i < 6; i++) {
-            const coeur = this.add.image(20 + (i * 36), 20, 'heart', 0)
+            const ligne = Math.floor(i / 3); // 0 ou 1
+            const colonne = i % 3; // 0, 1 ou 2
+            const coeur = this.add.image(this.scale.width - 150 + (colonne * 36), 20 + (ligne * 36), 'heart', 0)
                 .setOrigin(0, 0)
                 .setDisplaySize(32, 32)
                 .setScrollFactor(0)
