@@ -45,6 +45,7 @@ export default class map_monstre extends Phaser.Scene {
         // Set collision for walls
         if (murLayer) murLayer.setCollisionByExclusion([-1]);
 
+
         // Ajuster le monde et la caméra pour afficher la totalité de la map
         this.physics.world.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
         this.cameras.main.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
@@ -108,25 +109,42 @@ export default class map_monstre extends Phaser.Scene {
         }
 
         // ✅ Spawn des portes
-        const groupe_portes = this.physics.add.group();
-        const tabPoints = carteMonstreLab.getObjectLayer("door_retour");
+        var groupe_portes = this.physics.add.group();
+        
+        // Charger les deux couches de portes
+        const tabPoints1 = carteMonstreLab.getObjectLayer("door_retour");
+        const tabPoints2 = carteMonstreLab.getObjectLayer("door retour");
 
-        if (tabPoints) {
-            tabPoints.objects.forEach(point => {
-                const porte = groupe_portes.create(point.x, point.y, 'doors');
-                porte.anims.play('door_closed');
-                porte.setAngle(90);
-                porte.setDepth(40);
-                porte.setData('nom', point.name);
-                porte.body.setCollideWorldBounds(false);
-                porte.body.setImmovable(true);
-                porte.body.moves = false;
-                porte.estSolide = true;
-            });
+        [tabPoints1, tabPoints2].forEach(tabPoints => {
+            if (tabPoints) {
+                tabPoints.objects.forEach(point => {
+                    const porte = groupe_portes.create(point.x, point.y, 'doors');
+                    porte.anims.play('door_closed');
+                    porte.setAngle(90);
+                    porte.setDepth(40);
+                    porte.doorName = point.name;
+                    porte.body.setCollideWorldBounds(false);
+                    porte.body.setImmovable(true);
+                    porte.body.moves = false;
+                    porte.estSolide = true;
+                });
+            }
+        });
+
+        // ✅ Créer le joueur - positionné selon la porte d'arrivée
+        const { porteDestination } = this.scene.settings.data || {};
+        let playerSpawnX = 100;
+        let playerSpawnY = 100;
+        
+        if (porteDestination) {
+            const porteArrivee = groupe_portes.children.entries.find(p => p.doorName === porteDestination);
+            if (porteArrivee) {
+                playerSpawnX = porteArrivee.x;
+                playerSpawnY = porteArrivee.y;
+            }
         }
-
-        // ✅ Créer le joueur
-        player = this.physics.add.sprite(100, 100, 'img_perso');
+        
+        player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
         player.setCollideWorldBounds(true);
         player.setDepth(100);
         player.body.setGravityY(-this.physics.world.gravity.y);
@@ -178,7 +196,14 @@ export default class map_monstre extends Phaser.Scene {
                 this.doorCollider.active = false;
                 this.doorNearby.anims.play('door_open');
                 this.time.delayedCall(500, () => {
-                    this.scene.start('map_stuff');
+                    let destination = "map_stuff";
+                    let porteDestination = "door_retour2";
+                    
+                    if (doorName === "door_monstre") {
+                        destination = "map_stuff";
+                        porteDestination = "door_retour2";
+                    }
+                    this.scene.start(destination, { porteDestination: porteDestination });
                 });
             }
 

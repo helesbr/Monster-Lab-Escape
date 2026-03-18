@@ -235,6 +235,12 @@
                  "id":9,
                  "name":"door_retour",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":false
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,
@@ -248,6 +254,11 @@
                  "name":"door_retour",
                  "point":true,
                  "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }, 
                         {
                          "name":"horizontal",
                          "type":"bool",

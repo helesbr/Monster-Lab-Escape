@@ -12936,6 +12936,9 @@
  </layer>
  <objectgroup id="5" name="door retour" locked="1">
   <object id="1" name="door_retour" x="16" y="518">
+   <properties>
+    <property name="estSolide" type="bool" value="false"/>
+   </properties>
    <point/>
   </object>
  </objectgroup>

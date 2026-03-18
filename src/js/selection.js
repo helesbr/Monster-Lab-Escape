@@ -95,7 +95,24 @@ export default class selection extends Phaser.Scene {
 
     /***********************************************************************/
 
-    player = this.physics.add.sprite(190, 480, 'img_perso');
+    // Récupérer la porte de destination si elle a été passée
+    const { porteDestination } = this.scene.settings.data || {};
+    let playerX = 190;
+    let playerY = 480;
+    
+    if (porteDestination === 'door3') {
+        // Chercher door3 dans les portes de selection
+        const taxiPoints = carteDuNiveau.getObjectLayer("doors");
+        if (taxiPoints) {
+            const door3 = taxiPoints.objects.find(obj => obj.name === "door3");
+            if (door3) {
+                playerX = door3.x;
+                playerY = door3.y;
+            }
+        }
+    }
+
+    player = this.physics.add.sprite(playerX, playerY, 'img_perso');
 
     player.setCollideWorldBounds(true);
 
@@ -234,7 +251,6 @@ export default class selection extends Phaser.Scene {
 
 
     // Collider solide entre le joueur et les portes
-
     this.physics.add.collider(player, groupe_portes);
 
 
@@ -408,13 +424,14 @@ export default class selection extends Phaser.Scene {
 
           // Déterminer la destination selon le nom de la porte
           let destination = "map_cuisine"; // défaut
+          let porteDestination = "door_retour"; // porte de destination par défaut
+          
           if (porte.doorName === "door3") {
               destination = "map_stuff";
-          } else if (porte.doorName === "door4") {
-              destination = "map_monstre";
+              porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
           }
 
-          this.scene.start(destination);
+          this.scene.start(destination, { porteDestination: porteDestination });
 
 
 

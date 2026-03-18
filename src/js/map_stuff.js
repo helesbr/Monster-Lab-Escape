@@ -90,8 +90,20 @@ export default class map_stuff extends Phaser.Scene {
                 });
             }
 
-            // ✅ Créer le joueur
-            player = this.physics.add.sprite(100, 100, 'img_perso');
+            // ✅ Créer le joueur - positionné selon la porte d'arrivée
+            const { porteDestination } = this.scene.settings.data || {};
+            let playerSpawnX = 100;
+            let playerSpawnY = 100;
+            
+            if (porteDestination) {
+                const porteArrivee = groupe_portes.children.entries.find(p => p.doorName === porteDestination);
+                if (porteArrivee) {
+                    playerSpawnX = porteArrivee.x;
+                    playerSpawnY = porteArrivee.y;
+                }
+            }
+            
+            player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
             player.setCollideWorldBounds(true);
             player.setDepth(100);
             player.body.setGravityY(-this.physics.world.gravity.y);
@@ -186,14 +198,17 @@ export default class map_stuff extends Phaser.Scene {
                     this.doorCollider.active = false;
                     this.doorNearby.anims.play('door_open');
                     this.time.delayedCall(500, () => {
-                        // Déterminer la destination selon le nom de la porte
-                        let destination = 'selection'; // défaut
-                        if (doorName === 'door_retour2') {
-                            destination = 'map_monstre';
-                        } else if (doorName === 'door_retour1') {
+                        let destination = 'map_monstre';
+                        let porteDestination = 'door_monstre';
+                        
+                        if (doorName === 'door_retour1') {
                             destination = 'selection';
+                            porteDestination = 'door3'; // Retour au même door3
+                        } else if (doorName === 'door_retour2') {
+                            destination = 'map_monstre';
+                            porteDestination = 'door_monstre';
                         }
-                        this.scene.start(destination);
+                        this.scene.start(destination, { porteDestination: porteDestination });
                     });
                 }
             });
