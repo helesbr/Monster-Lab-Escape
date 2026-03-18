@@ -57,7 +57,7 @@ export default class selection extends Phaser.Scene {
 
   create() {
     this.son_laboratory = this.sound.add('laboratory');
-    
+
     // Lancer le son du laboratory
     this.son_laboratory.play();
 

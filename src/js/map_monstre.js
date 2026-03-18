@@ -29,11 +29,25 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
+
+        // Chargement du son monstre
+        this.load.audio('monstre', 'src/assets/son/monstre.mp3');
     }
 
- 
+
 
     create() {
+        // Lancer le son de monstre
+        this.son_monstre = this.sound.add('monstre');
+        this.son_monstre.play();
+
+        // Arrêter la musique quand on quitte la scène
+        this.events.on('shutdown', () => {
+            if (this.son_monstre) {
+                this.son_monstre.stop();
+            }
+        });
+
         const carteMonstreLab = this.add.tilemap("monstre");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
@@ -65,7 +79,7 @@ export default class map_monstre extends Phaser.Scene {
                 // Position aléatoire sur la map
                 const randomX = Phaser.Math.Between(50, carteMonstreLab.widthInPixels - 50);
                 const randomY = Phaser.Math.Between(50, carteMonstreLab.heightInPixels - 50);
-                
+
                 const monstre = this.groupe_monstres.create(randomX, randomY, 'monstre');
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
@@ -74,11 +88,11 @@ export default class map_monstre extends Phaser.Scene {
                 let velocityX = Phaser.Math.Between(-80, 80);
                 let velocityY = Phaser.Math.Between(-80, 80);
                 monstre.setVelocity(velocityX, velocityY);
-                
+
                 // IA: Changer de direction aléatoirement
                 this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function() {
+                    callback: function () {
                         monstre.setVelocity(
                             Phaser.Math.Between(-80, 80),
                             Phaser.Math.Between(-80, 80)
@@ -110,7 +124,7 @@ export default class map_monstre extends Phaser.Scene {
 
         // ✅ Spawn des portes
         var groupe_portes = this.physics.add.group();
-        
+
         // Charger les deux couches de portes
         const tabPoints1 = carteMonstreLab.getObjectLayer("door_retour");
         const tabPoints2 = carteMonstreLab.getObjectLayer("door retour");
@@ -135,7 +149,7 @@ export default class map_monstre extends Phaser.Scene {
         const { porteDestination } = this.scene.settings.data || {};
         let playerSpawnX = 100;
         let playerSpawnY = 100;
-        
+
         if (porteDestination) {
             const porteArrivee = groupe_portes.children.entries.find(p => p.doorName === porteDestination);
             if (porteArrivee) {
@@ -143,7 +157,7 @@ export default class map_monstre extends Phaser.Scene {
                 playerSpawnY = porteArrivee.y;
             }
         }
-        
+
         player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
         player.setCollideWorldBounds(true);
         player.setDepth(100);
@@ -154,11 +168,11 @@ export default class map_monstre extends Phaser.Scene {
 
         // ✅ Collision avec les portes fermées
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
-        
+
         // Stocker référence pour utilisation dans update
         this.groupe_portes = groupe_portes;
 
-           
+
 
         // Créer les animations du joueur s'ils n'existent pas
         if (!this.anims.exists("anim_tourne_gauche")) {
@@ -198,7 +212,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     let destination = "selection";
                     let porteDestination = "door4";
-                    
+
                     if (doorName === "selection") {
                         destination = "selection";
                         porteDestination = "door4";
@@ -212,7 +226,7 @@ export default class map_monstre extends Phaser.Scene {
     }
     update() {
         const cursors = this.cursors;
-        
+
         // ✅ Détection de proximité avec les portes
         this.doorNearby = null;
         if (this.groupe_portes) {
@@ -226,7 +240,7 @@ export default class map_monstre extends Phaser.Scene {
                 }
             });
         }
-        
+
         // Gauche / Droite
         if (cursors.right.isDown) {
             player.setVelocityX(160);

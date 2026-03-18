@@ -43,11 +43,25 @@ export default class map_cuisine extends Phaser.Scene {
 
         this.load.image('creatine', 'src/assets/images/creatine.png');
 
+        // Chargement du son cuisine
+        this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
+
     }
 
 
 
     create() {
+        // Lancer le son de la cuisine
+        this.son_cuisine = this.sound.add('cuisine');
+        this.son_cuisine.play();
+
+        // Arrêter la musique quand on quitte la scène
+        this.events.on('shutdown', () => {
+            if (this.son_cuisine) {
+                this.son_cuisine.stop();
+            }
+        });
+
         // Charger la carte
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
