@@ -11,20 +11,24 @@ import HUD from './js/HUD.js';
 // configuration générale du jeu
 var config = {
   type: Phaser.AUTO,
-  width: 480, // largeur en pixels// 960 * 0.5
-  height: 480, // hauteur en pixels// 960 * 0.5
+  width: 480,
+  height: 480,
+  scale: {
+    mode: Phaser.Scale.FIT,
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+    parent: 'game-container',
+    expandParent: true,
+    fullscreenTarget: 'game-container'
+  },
   physics: {
-    // définition des parametres physiques
-    default: "arcade", // mode arcade : le plus simple : des rectangles pour gérer les collisions. Pas de pentes
+    default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
+      debug: false
     }
   },
-  scene: [menu, character_select, selection, map_cuisine, regles, map_directeur, map_stuff, map_monstre, HUD] // liste des scènes du jeu
-
+  scene: [menu, character_select, selection, map_cuisine, regles, map_directeur, map_stuff, map_monstre, HUD]
 };
-
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
