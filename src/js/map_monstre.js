@@ -189,7 +189,8 @@ export default class map_monstre extends Phaser.Scene {
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
                 this.scene.stop('HUD');
-                this.scene.start('selection');
+                this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                this.scene.launch('HUD');
             }
         });
 
