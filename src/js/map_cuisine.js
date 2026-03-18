@@ -35,11 +35,20 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     create() {
+
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
         });
+
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
 
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
@@ -235,6 +244,7 @@ export default class map_cuisine extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
+                this.game.events.emit('addMoney', 10); // ✅ +10 à la mort du monstre
             }
         });
 
