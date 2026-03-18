@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="12">
+<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="31">
  <editorsettings>
   <export target="map_cuisine.tmj" format="json"/>
  </editorsettings>
@@ -125,11 +125,7 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="5" name="Calque Produit" locked="1">
-  <object id="7" name="pre workout" x="114.399" y="95.3327">
-   <point/>
-  </object>
- </objectgroup>
+ <objectgroup id="5" name="Calque Produit" locked="1"/>
  <objectgroup id="7" name="door_retour" locked="1">
   <object id="9" name="door_retour1" x="944" y="314">
    <properties>
@@ -146,9 +142,9 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="6" name="calque crea" locked="1">
-  <object id="8" name="creatine" x="42" y="158">
-   <point/>
-  </object>
+ <objectgroup id="6" name="calque crea" locked="1"/>
+ <objectgroup id="8" name="shops" locked="1">
+  <object id="29" name="shop" x="59.2377" y="41.8149" width="74.9183" height="81.8875"/>
+  <object id="30" x="1137.71" y="158.548"/>
  </objectgroup>
 </map>

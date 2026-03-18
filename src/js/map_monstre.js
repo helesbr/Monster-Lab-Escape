@@ -37,7 +37,7 @@ export default class map_monstre extends Phaser.Scene {
 
 
     create() {
-        // Lancer le son de monstre
+        // Lancer le son du monstre
         this.son_monstre = this.sound.add('monstre');
         this.son_monstre.play();
 
