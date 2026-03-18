@@ -193,6 +193,8 @@ export default class map_cuisine extends Phaser.Scene {
         player.armeEquipee = null;
         player.directionArme = 'droite';
         player.pointsVie = 3;
+        player.vitesseBase = 160;
+        player.vitesseBoost = null;
         this.invincible = false;
 
         this.game.events.emit('getVie', (vie) => {
@@ -384,13 +386,16 @@ export default class map_cuisine extends Phaser.Scene {
         }
         const cursors = this.cursors;
 
+        // ✅ vitesse avec boost preworkout
+        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
@@ -400,10 +405,10 @@ export default class map_cuisine extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
@@ -490,12 +495,19 @@ export default class map_cuisine extends Phaser.Scene {
         imgCreatine.on('pointerover', () => imgCreatine.setDisplaySize(370, 370));
         imgCreatine.on('pointerout', () => imgCreatine.setDisplaySize(340, 340));
 
-        // ✅ prix créatine
         const prixCreatine = this.add.text(90, 460, '30 💰', {
             fontSize: '24px',
             fill: '#FFD700',
             stroke: '#000',
             strokeThickness: 3
+        }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
+
+        // ✅ description créatine
+        const descCreatine = this.add.text(90, 490, '+3 vies', {
+            fontSize: '18px',
+            fill: '#fff',
+            stroke: '#000',
+            strokeThickness: 2
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
         const imgPreworkout = this.add.image(390, 280, 'preworkout_shop');
@@ -509,7 +521,6 @@ export default class map_cuisine extends Phaser.Scene {
         imgPreworkout.on('pointerover', () => imgPreworkout.setDisplaySize(370, 370));
         imgPreworkout.on('pointerout', () => imgPreworkout.setDisplaySize(340, 340));
 
-        // ✅ prix preworkout
         const prixPreworkout = this.add.text(390, 460, '30 💰', {
             fontSize: '24px',
             fill: '#FFD700',
@@ -517,9 +528,16 @@ export default class map_cuisine extends Phaser.Scene {
             strokeThickness: 3
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        // ✅ money actuelle dans le shop
+        // ✅ description preworkout
+        const descPreworkout = this.add.text(390, 490, 'Vitesse x2.5 (10s)', {
+            fontSize: '18px',
+            fill: '#fff',
+            stroke: '#000',
+            strokeThickness: 2
+        }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
+
         this.game.events.emit('getMoney', (money) => {
-            this.texteMoneyShop = this.add.text(240, 510, 'Ton argent : ' + money + ' 💰', {
+            this.texteMoneyShop = this.add.text(240, 530, 'Ton argent : ' + money + ' 💰', {
                 fontSize: '22px',
                 fill: '#FFD700',
                 stroke: '#000',
@@ -527,15 +545,14 @@ export default class map_cuisine extends Phaser.Scene {
             }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
         });
 
-        // ✅ texte erreur vide au départ
-        this.texteErreur = this.add.text(240, 550, '', {
+        this.texteErreur = this.add.text(240, 565, '', {
             fontSize: '18px',
             fill: '#ff4444',
             stroke: '#000',
             strokeThickness: 2
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        const message = this.add.text(240, 590, 'ENTRÉE pour fermer', {
+        const message = this.add.text(240, 600, 'ENTRÉE pour fermer', {
             fontSize: '20px',
             fill: '#fff',
             align: 'center'
@@ -548,12 +565,13 @@ export default class map_cuisine extends Phaser.Scene {
             imgPreworkout: imgPreworkout,
             prixCreatine: prixCreatine,
             prixPreworkout: prixPreworkout,
+            descCreatine: descCreatine,
+            descPreworkout: descPreworkout,
             message: message
         };
     }
 
     spawnObjet(type) {
-        // ✅ vérifier si le joueur a assez de money
         this.game.events.emit('getMoney', (money) => {
             if (money < 30) {
                 if (this.texteErreur) {
@@ -565,19 +583,39 @@ export default class map_cuisine extends Phaser.Scene {
                 return;
             }
 
-            // ✅ débiter 30 money
             this.game.events.emit('addMoney', -30);
 
-            // ✅ mettre à jour l'affichage money dans le shop
             if (this.texteMoneyShop) {
                 this.texteMoneyShop.setText('Ton argent : ' + (money - 30) + ' 💰');
             }
 
             if (this.objetsDisponibles[type] && this.objetsDisponibles[type].length > 0) {
                 const position = this.objetsDisponibles[type].shift();
-                const objet = this.add.image(position.x, position.y, type);
+
+                // ✅ sprite physique
+                const objet = this.physics.add.sprite(position.x, position.y, type);
                 objet.setDisplaySize(30, 30);
                 objet.setDepth(45);
+                objet.body.setImmovable(true);
+                objet.body.moves = false;
+
+                // ✅ overlap joueur/objet → effet selon le type
+                this.physics.add.overlap(player, objet, () => {
+                    if (type === 'prewarkout') {
+                        // ✅ vitesse x2.5 pendant 10 secondes
+                        player.vitesseBoost = (player.vitesseBase || 160) * 2.5;
+                        if (this.timerBoostVitesse) this.timerBoostVitesse.remove();
+                        this.timerBoostVitesse = this.time.delayedCall(10000, () => {
+                            player.vitesseBoost = null;
+                        });
+                    } else if (type === 'creatine') {
+                        // ✅ +3 vies jusqu'à max 6
+                        player.pointsVie = Math.min(player.pointsVie + 3, 6);
+                        this.game.events.emit('setVieMax', 6, player.pointsVie);
+                    }
+                    objet.destroy();
+                });
+
             } else {
                 if (this.texteErreur) {
                     this.texteErreur.setText('Stock épuisé !');
@@ -597,6 +635,8 @@ export default class map_cuisine extends Phaser.Scene {
             this.menuShop.imgPreworkout.destroy();
             this.menuShop.prixCreatine.destroy();
             this.menuShop.prixPreworkout.destroy();
+            this.menuShop.descCreatine.destroy();
+            this.menuShop.descPreworkout.destroy();
             this.menuShop.message.destroy();
             this.menuShop = null;
         }
