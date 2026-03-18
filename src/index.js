@@ -5,6 +5,7 @@ import regles from "./js/Regles.js";
 import map_directeur from "./js/map_directeur.js";
 import map_stuff from "./js/map_stuff.js";
 import map_monstre from "./js/map_monstre.js";
+import HUD from './js/HUD.js';
 
 // configuration générale du jeu
 var config = {
@@ -19,7 +20,7 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [menu, selection, map_cuisine, regles, map_directeur,map_stuff,  map_monstre] // liste des scènes du jeu
+  scene: [menu, selection, map_cuisine, regles, map_directeur,map_stuff,  map_monstre, HUD] // liste des scènes du jeu
 
 };
 

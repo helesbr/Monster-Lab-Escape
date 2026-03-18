@@ -3,52 +3,45 @@ export default class menu extends Phaser.Scene {
         super({ key: "menu" });
     }
 
-    //on charge les images
     preload() {
         this.load.image("menu_fond", "src/assets/images/menu_fond.png");
         this.load.image("title", "src/assets/images/title.png");
         this.load.image("mogger", "src/assets/images/mogger.png");
-        // Chargement du son menu
         this.load.audio('menu', 'src/assets/son/menu.mp3');
+        // ✅ charger heart ici car le HUD en a besoin dès le lancement
+        this.load.image('heart', 'src/assets/images/heart.png');
     }
 
     create() {
-        // Lancer le son du menu
         this.son_menu = this.sound.add('menu');
         this.son_menu.play();
 
-        // Arrêter la musique quand on quitte le menu
         this.events.on('shutdown', () => {
             if (this.son_menu) {
                 this.son_menu.stop();
             }
         });
 
-        // Fond de sécurité (couleur)
         this.cameras.main.setBackgroundColor(0x2c3e50);
 
-        // on place les éléments de fond
         this.add
             .image(240, 240, "menu_fond")
-            .setDisplaySize(480, 480)  // Redimensionner au 480x480 du canvas
-            .setOrigin(0.5)  // Centrer l'image
+            .setDisplaySize(480, 480)
+            .setOrigin(0.5)
             .setDepth(0);
 
-        // Titre en haut au milieu
         this.add
             .image(240, 80, "title")
-            .setDisplaySize(350, 220)  // Proportion mieux équilibrée
+            .setDisplaySize(350, 220)
             .setOrigin(0.5)
             .setDepth(1);
 
-        // Mogger en bas au centre
         this.add
             .image(240, 420, "mogger")
-            .setDisplaySize(300, 200)  // Taille appropriée
+            .setDisplaySize(300, 200)
             .setOrigin(0.5)
             .setDepth(1);
 
-        // Bouton de démarrage
         const boutonJouer = this.add.rectangle(240, 150, 200, 60, 0x00aa00);
         boutonJouer.setInteractive();
         boutonJouer.on('pointerover', () => {
@@ -58,16 +51,20 @@ export default class menu extends Phaser.Scene {
             boutonJouer.setFillStyle(0x00aa00);
         });
 
-        // Texte du bouton
         this.add.text(240, 150, 'JOUER', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        // Événement au clic du bouton
+        // ✅ lancement du HUD en même temps que selection
         boutonJouer.on('pointerdown', () => {
+            if (this.scene.isActive('HUD')) {
+                this.scene.stop('HUD');
+            }
+            this.game.events.emit('resetVie');
             this.scene.start('selection');
+            this.scene.launch('HUD');
         });
 
         const boutonRegle = this.add.rectangle(240, 330, 200, 60, 0x00aa00);
@@ -79,18 +76,15 @@ export default class menu extends Phaser.Scene {
             boutonRegle.setFillStyle(0x00aa00);
         });
 
-        // Texte du bouton
         this.add.text(240, 330, 'RÈGLES', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        // Événement au clic du bouton
         boutonRegle.on('pointerdown', () => {
             this.scene.start('regles');
         });
-
     }
 
     update() {
