@@ -338,10 +338,6 @@
          "tilewidth":32
         }, 
         {
-         "firstgid":14901,
-         "source":"..\/..\/..\/..\/..\/tilesStuff.tsx"
-        }, 
-        {
          "columns":30,
          "firstgid":14901,
          "image":"..\/tilesets\/tile-background.png",

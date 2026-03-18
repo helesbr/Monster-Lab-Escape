@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="12">
+ <editorsettings>
+  <export target="map_cuisine.tmj" format="json"/>
+ </editorsettings>
  <tileset firstgid="1" name="all_tileset" tilewidth="32" tileheight="32" tilecount="14900" columns="50">
   <image source="../tilesets/all_tilesets.png" width="1600" height="9536"/>
  </tileset>
- <tileset firstgid="14901" name="sang" tilewidth="32" tileheight="32" tilecount="0" columns="0"/>
- <tileset firstgid="14901" name="sang" tilewidth="32" tileheight="32" tilecount="0" columns="0"/>
- <tileset firstgid="14901" name="sang" tilewidth="32" tileheight="32" tilecount="0" columns="0"/>
- <tileset firstgid="14901" name="sol_monstre" tilewidth="32" tileheight="32" tilecount="0" columns="0"/>
  <layer id="1" name="sol" width="30" height="30" locked="1">
   <data encoding="csv">
 9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,9260,

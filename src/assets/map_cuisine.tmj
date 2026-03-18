@@ -320,16 +320,6 @@
          "tilecount":14900,
          "tileheight":32,
          "tilewidth":32
-        }, 
-        {
-         "columns":0,
-         "firstgid":14901,
-         "margin":0,
-         "name":"sol_monstre",
-         "spacing":0,
-         "tilecount":0,
-         "tileheight":32,
-         "tilewidth":32
         }],
  "tilewidth":32,
  "type":"map",
