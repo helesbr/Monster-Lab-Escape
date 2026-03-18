@@ -317,6 +317,14 @@ export default class map_monstre extends Phaser.Scene {
                 });
             }
         }
+        // ✅ immunité de 3 secondes à l'entrée dans la scène
+        this.invincible = true;
+        player.setAlpha(0.5); // effet visuel semi-transparent
+
+        this.time.delayedCall(3000, () => {
+            this.invincible = false;
+            player.setAlpha(1);
+        });
     }
 
     tirer() {
