@@ -28,7 +28,7 @@ export default class HUD extends Phaser.Scene {
         }
 
         // ✅ texte money
-        this.texteMoney = this.add.text(20, 60, 'Money: 0', {
+        this.texteMoney = this.add.text(20, 20, 'Money: 0', {
             fontSize: '16px',
             fill: '#FFD700',
             stroke: '#000000',
