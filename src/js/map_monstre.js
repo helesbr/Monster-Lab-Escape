@@ -226,6 +226,11 @@ export default class map_monstre extends Phaser.Scene {
                 // ✅ si tous les monstres sont morts on le signale au HUD
                 if (this.groupe_monstres.countActive() === 0) {
                     this.game.events.emit('tousMonstresMorts');
+                    // Afficher le bouton directeur
+                    if (this.boutonDirecteur) {
+                        this.boutonDirecteur.setVisible(true);
+                        this.boutonDirecteur.setInteractive();
+                    }
                 }
             }
         });
@@ -292,7 +297,8 @@ export default class map_monstre extends Phaser.Scene {
             const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
-                boutonDirecteur.disableInteractive();
+                this.boutonDirecteur = boutonDirecteur; // Stocker en propriété pour l'accès global
+                boutonDirecteur.setInteractive();
                 boutonDirecteur.setDepth(50);
                 boutonDirecteur.setVisible(false); // Cacher le bouton
 
