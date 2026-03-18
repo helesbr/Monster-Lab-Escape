@@ -61,7 +61,7 @@ export default class selection extends Phaser.Scene {
 
     // Récupération de la carte et du tileset
 
-    const carteDuNiveau = this.make.tilemap({ key: "carte" });
+    const carteDuNiveau = this.add.tilemap("carte");
 
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
 
@@ -201,7 +201,7 @@ export default class selection extends Phaser.Scene {
           porte.isOpen = false;
 
           porte.estSolide = true;// État initial : fermée
-
+          porte.nom = obj.name;  // Stocker le nom de la porte
           porte.play('door_closed'); // Affiche le frame fermé
 
           porte.doorName = obj.name; // Stocker le nom de la porte
