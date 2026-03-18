@@ -9,25 +9,23 @@ export default class HUD extends Phaser.Scene {
         this.aArme = false;
         this.money = 0;
         this.monstresMorts = [];
+        // ✅ MODIFICATION VITESSE : ajout boost
+        this.vitesseBoost = null;
+        this.timerBoost = null;
 
-        // ✅ tableau de 6 coeurs
         this.coeurs = [];
         for (let i = 0; i < 6; i++) {
-            const ligne = Math.floor(i / 3); // 0 ou 1
-            const colonne = i % 3; // 0, 1 ou 2
+            const ligne = Math.floor(i / 3);
+            const colonne = i % 3;
             const coeur = this.add.image(this.scale.width - 150 + (colonne * 36), 20 + (ligne * 36), 'heart', 0)
                 .setOrigin(0, 0)
                 .setDisplaySize(32, 32)
                 .setScrollFactor(0)
                 .setDepth(200);
-
-            // ✅ cacher les 3 derniers au départ
             if (i >= 3) coeur.setVisible(false);
-
             this.coeurs.push(coeur);
         }
 
-        // ✅ texte money
         this.texteMoney = this.add.text(20, 20, 'Money: 0', {
             fontSize: '16px',
             fill: '#FFD700',
@@ -45,7 +43,6 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
             this.vieMax = 3;
-            // ✅ recacher les 3 derniers coeurs
             for (let i = 3; i < 6; i++) {
                 this.coeurs[i].setVisible(false);
             }
@@ -55,17 +52,13 @@ export default class HUD extends Phaser.Scene {
             callback(this.pointsVie);
         });
 
-        // ✅ creatine → afficher les 3 coeurs supplémentaires
+        // creatine
         this.game.events.on('setVieMax', (max, actuelle) => {
             this.vieMax = max;
             this.pointsVie = actuelle;
-            // afficher tous les coeurs jusqu'à vieMax
             for (let i = 0; i < 6; i++) {
-                if (i < max) {
-                    this.coeurs[i].setVisible(true);
-                } else {
-                    this.coeurs[i].setVisible(false);
-                }
+                if (i < max) this.coeurs[i].setVisible(true);
+                else this.coeurs[i].setVisible(false);
             }
             this.updateCoeurs();
         });
@@ -104,16 +97,30 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetMonstres', () => {
             this.monstresMorts = [];
         });
+
+        // ✅ MODIFICATION VITESSE : gestion boost
+        this.game.events.on('setBoostVitesse', (vitesse, duree) => {
+            this.vitesseBoost = vitesse;
+            if (this.timerBoost) this.timerBoost.remove();
+            this.timerBoost = this.time.delayedCall(duree, () => {
+                this.vitesseBoost = null;
+            });
+        });
+        this.game.events.on('getBoostVitesse', (callback) => {
+            callback(this.vitesseBoost);
+        });
+        this.game.events.on('resetBoost', () => {
+            this.vitesseBoost = null;
+            if (this.timerBoost) this.timerBoost.remove();
+        });
     }
 
     updateCoeurs() {
         for (let i = 0; i < this.vieMax; i++) {
             if (i < this.pointsVie) {
-                // ✅ coeur plein → frame 0
                 this.coeurs[i].setFrame(0);
                 this.coeurs[i].setAlpha(1);
             } else {
-                // ✅ coeur vide → grisé
                 this.coeurs[i].setFrame(0);
                 this.coeurs[i].setAlpha(0.3);
             }

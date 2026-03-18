@@ -25,11 +25,8 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
-
         this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
-
-
     }
 
     create() {
@@ -39,20 +36,16 @@ export default class map_monstre extends Phaser.Scene {
             if (this.son_monstre) this.son_monstre.stop();
         });
 
-        // Pour lire la money au démarrage de la scène si besoin :
         this.game.events.emit('getMoney', (money) => {
             console.log('Money actuelle:', money);
         });
 
-        // Pour ajouter de la money (ex: quand un monstre meurt) :
-        // this.game.events.emit('addMoney', 10);
-
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
-        const sangLayer = carteMonstreLab.createLayer("blood1", tileset, 0, 0);
-        const murLayer = carteMonstreLab.createLayer("Mur", tileset, 0, 0);
-        const bloodLayer = carteMonstreLab.createLayer("blood", tileset, 0, 0);
+        const sangLayer  = carteMonstreLab.createLayer("blood1", tileset, 0, 0);
+        const murLayer   = carteMonstreLab.createLayer("Mur",    tileset, 0, 0);
+        const bloodLayer = carteMonstreLab.createLayer("blood",  tileset, 0, 0);
 
         murLayer.setCollisionByProperty({ estSolide: true });
 
@@ -64,29 +57,18 @@ export default class map_monstre extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteMonstreLab.widthInPixels / 2, carteMonstreLab.heightInPixels / 2);
 
-        if (!this.anims.exists("gun_droite")) {
-            this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
-        }
-        if (!this.anims.exists("gun_gauche")) {
-            this.anims.create({ key: "gun_gauche", frames: [{ key: "image_gun", frame: 1 }], frameRate: 10 });
-        }
-        if (!this.anims.exists("gun_haut")) {
-            this.anims.create({ key: "gun_haut", frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
-        }
-        if (!this.anims.exists("gun_bas")) {
-            this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
-        }
+        if (!this.anims.exists("gun_droite")) this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
+        if (!this.anims.exists("gun_gauche")) this.anims.create({ key: "gun_gauche", frames: [{ key: "image_gun", frame: 1 }], frameRate: 10 });
+        if (!this.anims.exists("gun_haut"))   this.anims.create({ key: "gun_haut",   frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
+        if (!this.anims.exists("gun_bas"))    this.anims.create({ key: "gun_bas",    frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
 
-        // ✅ spawn monstres selon ceux qui sont encore vivants
         this.groupe_monstres = this.physics.add.group();
         const calqueMonstres = carteMonstreLab.getObjectLayer("monstres");
 
         this.game.events.emit('getMonstresMorts', (monstresMorts) => {
             if (calqueMonstres) {
                 calqueMonstres.objects.forEach((monstreObj, index) => {
-                    // ✅ si ce monstre a déjà été tué on le skip
                     if (monstresMorts.includes(index)) return;
-
                     const randomX = Phaser.Math.Between(50, carteMonstreLab.widthInPixels - 50);
                     const randomY = Phaser.Math.Between(50, carteMonstreLab.heightInPixels - 50);
                     const monstre = this.groupe_monstres.create(randomX, randomY, 'monstres');
@@ -95,22 +77,13 @@ export default class map_monstre extends Phaser.Scene {
                     monstre.setDisplaySize(100, 100);
                     monstre.setDepth(50);
                     monstre.pointsVie = Phaser.Math.Between(3, 6);
-                    // ✅ stocker l'index sur le monstre
                     monstre.index = index;
-                    monstre.setVelocity(
-                        Phaser.Math.Between(-150, 150),
-                        Phaser.Math.Between(-150, 150)
-                    );
+                    monstre.setVelocity(Phaser.Math.Between(-150, 150), Phaser.Math.Between(-150, 150));
 
                     monstre.moveEvent = this.time.addEvent({
                         delay: Phaser.Math.Between(2000, 4000),
                         callback: function () {
-                            if (monstre.active) {
-                                monstre.setVelocity(
-                                    Phaser.Math.Between(-150, 150),
-                                    Phaser.Math.Between(-150, 150)
-                                );
-                            }
+                            if (monstre.active) monstre.setVelocity(Phaser.Math.Between(-150, 150), Phaser.Math.Between(-150, 150));
                         },
                         loop: true
                     });
@@ -120,20 +93,8 @@ export default class map_monstre extends Phaser.Scene {
 
         this.physics.add.collider(this.groupe_monstres, murLayer);
 
-        if (!this.anims.exists("door_closed")) {
-            this.anims.create({
-                key: "door_closed",
-                frames: [{ key: 'doors', frame: 0 }],
-                frameRate: 10
-            });
-        }
-        if (!this.anims.exists("door_open")) {
-            this.anims.create({
-                key: "door_open",
-                frames: this.anims.generateFrameNumbers('doors', { start: 1, end: 4 }),
-                frameRate: 10
-            });
-        }
+        if (!this.anims.exists("door_closed")) this.anims.create({ key: "door_closed", frames: [{ key: 'doors', frame: 0 }], frameRate: 10 });
+        if (!this.anims.exists("door_open"))   this.anims.create({ key: "door_open",   frames: this.anims.generateFrameNumbers('doors', { start: 1, end: 4 }), frameRate: 10 });
 
         var groupe_portes = this.physics.add.group();
         const tabPoints1 = carteMonstreLab.getObjectLayer("door_retour");
@@ -159,10 +120,7 @@ export default class map_monstre extends Phaser.Scene {
         let playerSpawnY = 100;
         if (porteDestination) {
             const porteArrivee = groupe_portes.children.entries.find(p => p.doorName === porteDestination);
-            if (porteArrivee) {
-                playerSpawnX = porteArrivee.x;
-                playerSpawnY = porteArrivee.y;
-            }
+            if (porteArrivee) { playerSpawnX = porteArrivee.x; playerSpawnY = porteArrivee.y; }
         }
 
         player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
@@ -174,10 +132,7 @@ export default class map_monstre extends Phaser.Scene {
         player.pointsVie = 3;
         this.invincible = false;
 
-        this.game.events.emit('getVie', (vie) => {
-            player.pointsVie = vie;
-        });
-
+        this.game.events.emit('getVie', (vie) => { player.pointsVie = vie; });
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -194,37 +149,13 @@ export default class map_monstre extends Phaser.Scene {
         this.groupe_portes = groupe_portes;
         this.cameras.main.startFollow(player);
 
-        if (!this.anims.exists("anim_tourne_gauche")) {
-            this.anims.create({
-                key: "anim_tourne_gauche",
-                frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
-                frameRate: 10,
-                repeat: -1
-            });
-        }
-        if (!this.anims.exists("anim_tourne_droite")) {
-            this.anims.create({
-                key: "anim_tourne_droite",
-                frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-                frameRate: 10,
-                repeat: -1
-            });
-        }
-        if (!this.anims.exists("anim_face")) {
-            this.anims.create({
-                key: "anim_face",
-                frames: [{ key: "img_perso", frame: 1 }],
-                frameRate: 20
-            });
-        }
+        if (!this.anims.exists("anim_tourne_gauche")) this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
+        if (!this.anims.exists("anim_tourne_droite")) this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
+        if (!this.anims.exists("anim_face"))          this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
 
         this.groupeBullets = this.physics.add.group();
+        this.physics.add.collider(this.groupeBullets, murLayer, (balle) => balle.destroy());
 
-        this.physics.add.collider(this.groupeBullets, murLayer, (balle) => {
-            balle.destroy();
-        });
-
-        // ✅ overlap balles/monstres avec index
         this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
             balle.destroy();
             monstre.pointsVie--;
@@ -232,11 +163,8 @@ export default class map_monstre extends Phaser.Scene {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 this.game.events.emit('monstreMort', monstre.index);
                 monstre.destroy();
-
-                // ✅ si tous les monstres sont morts on le signale au HUD
                 if (this.groupe_monstres.countActive() === 0) {
                     this.game.events.emit('tousMonstresMorts');
-                    // Afficher le bouton directeur
                     if (this.boutonDirecteur) {
                         this.boutonDirecteur.setVisible(true);
                         this.boutonDirecteur.setInteractive();
@@ -252,15 +180,8 @@ export default class map_monstre extends Phaser.Scene {
             player.pointsVie--;
 
             this.tweens.add({
-                targets: player,
-                alpha: 0,
-                duration: 100,
-                repeat: 5,
-                yoyo: true,
-                onComplete: () => {
-                    player.setAlpha(1);
-                    this.invincible = false;
-                }
+                targets: player, alpha: 0, duration: 100, repeat: 5, yoyo: true,
+                onComplete: () => { player.setAlpha(1); this.invincible = false; }
             });
 
             if (player.pointsVie <= 0) {
@@ -274,9 +195,7 @@ export default class map_monstre extends Phaser.Scene {
 
         this.physics.world.on("worldbounds", (body) => {
             const objet = body.gameObject;
-            if (this.groupeBullets.contains(objet)) {
-                objet.destroy();
-            }
+            if (this.groupeBullets.contains(objet)) objet.destroy();
         });
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -300,54 +219,37 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
-        // ✅ Créer le bouton_directeur à partir du ping
         this.calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
         if (this.calqueBoutons) {
             const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
-                this.boutonDirecteur = boutonDirecteur; // Stocker en propriété pour l'accès global
+                this.boutonDirecteur = boutonDirecteur;
                 boutonDirecteur.setInteractive();
                 boutonDirecteur.setDepth(50);
-                boutonDirecteur.setVisible(false); // Cacher le bouton
-
-                // Interaction au clic
+                boutonDirecteur.setVisible(false);
                 boutonDirecteur.on('pointerdown', () => {
                     this.scene.start('map_directeur', { porteDestination: 'door_retour' });
                 });
             }
         }
-        // ✅ immunité de 3 secondes à l'entrée dans la scène
-        this.invincible = true;
-        player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(1000, () => {
-            this.invincible = false;
-            player.setAlpha(1);
-        });
+        this.invincible = true;
+        player.setAlpha(0.5);
+        this.time.delayedCall(1000, () => { this.invincible = false; player.setAlpha(1); });
     }
 
     tirer() {
         if (!player.armeEquipee) return;
-
-        let vx = 0;
-        let vy = 0;
-        let offsetX = 0;
-        let offsetY = 0;
+        let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
-
         switch (player.directionArme) {
-            case 'droite': vx = vitesse; offsetX = 30; break;
+            case 'droite': vx = vitesse;  offsetX = 30;  break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut': vy = -vitesse; offsetY = -30; break;
-            case 'bas': vy = vitesse; offsetY = 30; break;
+            case 'haut':   vy = -vitesse; offsetY = -30; break;
+            case 'bas':    vy = vitesse;  offsetY = 30;  break;
         }
-
-        const balle = this.groupeBullets.create(
-            player.x + offsetX,
-            player.y + offsetY,
-            'ball'
-        );
+        const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
         balle.setDepth(90);
         balle.setCollideWorldBounds(true);
@@ -359,26 +261,27 @@ export default class map_monstre extends Phaser.Scene {
     update() {
         const cursors = this.cursors;
 
+        // ✅ MODIFICATION VITESSE : récupérer boost depuis HUD
+        let vitesse = 160;
+        this.game.events.emit('getBoostVitesse', (boost) => {
+            if (boost) vitesse = boost;
+        });
+
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
-                const distance = Phaser.Math.Distance.Between(
-                    player.x, player.y,
-                    door.x, door.y
-                );
-                if (distance < 100 && door.estSolide) {
-                    this.doorNearby = door;
-                }
+                const distance = Phaser.Math.Distance.Between(player.x, player.y, door.x, door.y);
+                if (distance < 100 && door.estSolide) this.doorNearby = door;
             });
         }
 
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
@@ -388,18 +291,16 @@ export default class map_monstre extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) {
-            this.tirer();
-        }
+        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) this.tirer();
 
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
@@ -410,22 +311,10 @@ export default class map_monstre extends Phaser.Scene {
 
         if (player.armeEquipee) {
             switch (player.directionArme) {
-                case 'droite':
-                    player.armeEquipee.anims.play('gun_droite', true);
-                    player.armeEquipee.setPosition(player.x + 30, player.y);
-                    break;
-                case 'gauche':
-                    player.armeEquipee.anims.play('gun_gauche', true);
-                    player.armeEquipee.setPosition(player.x - 20, player.y);
-                    break;
-                case 'haut':
-                    player.armeEquipee.anims.play('gun_haut', true);
-                    player.armeEquipee.setPosition(player.x, player.y - 30);
-                    break;
-                case 'bas':
-                    player.armeEquipee.anims.play('gun_bas', true);
-                    player.armeEquipee.setPosition(player.x, player.y + 30);
-                    break;
+                case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
+                case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
+                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
