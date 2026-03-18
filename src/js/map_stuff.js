@@ -33,9 +33,7 @@ export default class map_stuff extends Phaser.Scene {
         this.son_stuff = this.sound.add('stuff');
         this.son_stuff.play();
         this.events.on('shutdown', () => {
-            if (this.son_stuff) {
-                this.son_stuff.stop();
-            }
+            if (this.son_stuff) this.son_stuff.stop();
         });
 
         const carte = this.add.tilemap("stuff");
@@ -46,8 +44,8 @@ export default class map_stuff extends Phaser.Scene {
             console.log('Money actuelle:', money);
         });
 
-        const solLayer = carte.createLayer("Floor", tileset, 0, 0);
-        const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
+        const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
+        const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
         const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
         wallLayer.setCollisionByExclusion([-1]);
@@ -60,12 +58,31 @@ export default class map_stuff extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carte.widthInPixels / 2, carte.heightInPixels / 2);
 
-        this.anims.create({
-            key: "monstre_marche",
-            frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 3 }),
-            frameRate: 8,
-            repeat: -1
-        });
+        // ✅ animations monstres selon direction
+        if (!this.anims.exists("monstre_marche")) {
+            this.anims.create({
+                key: "monstre_marche",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 2 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        if (!this.anims.exists("monstre_dos")) {
+            this.anims.create({
+                key: "monstre_dos",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 3, end: 5 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        if (!this.anims.exists("monstre_cote")) {
+            this.anims.create({
+                key: "monstre_cote",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 6, end: 8 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
 
         if (!this.anims.exists("door_closed")) {
             this.anims.create({
@@ -141,7 +158,7 @@ export default class map_stuff extends Phaser.Scene {
             }
         });
 
-        if (wallLayer) this.physics.add.collider(player, wallLayer);
+        if (wallLayer)   this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
@@ -171,7 +188,6 @@ export default class map_stuff extends Phaser.Scene {
                 frameRate: 20
             });
         }
-
         if (!this.anims.exists("gun_droite")) {
             this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
         }
@@ -185,6 +201,7 @@ export default class map_stuff extends Phaser.Scene {
             this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
         }
 
+        // Spawn des monstres
         this.groupe_monstres = this.physics.add.group();
         const calqueMonstres = carte.getObjectLayer("monstres");
         if (calqueMonstres) {
@@ -192,7 +209,7 @@ export default class map_stuff extends Phaser.Scene {
                 const monstre = this.groupe_monstres.create(monstreObj.x, monstreObj.y, 'monstre', 0);
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
-                monstre.setDisplaySize(40, 40);
+                monstre.setDisplaySize(60, 60); // ✅ taille augmentée
                 monstre.setDepth(50);
                 monstre.pointsVie = Phaser.Math.Between(1, 3);
                 monstre.setVelocity(
@@ -203,7 +220,7 @@ export default class map_stuff extends Phaser.Scene {
 
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function () {
+                    callback: function() {
                         if (monstre.active) {
                             monstre.setVelocity(
                                 Phaser.Math.Between(-80, 80),
@@ -218,6 +235,7 @@ export default class map_stuff extends Phaser.Scene {
             this.physics.add.collider(this.groupe_monstres, objetsLayer);
         }
 
+        // Spawn des armes
         this.groupe_armes = this.physics.add.group();
         const calqueArmes = carte.getObjectLayer("Arme");
         if (calqueArmes) {
@@ -232,23 +250,17 @@ export default class map_stuff extends Phaser.Scene {
 
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
-                this.groupe_armes.children.entries.forEach(arme => {
-                    arme.destroy();
-                });
+                this.groupe_armes.children.entries.forEach(arme => arme.destroy());
             }
         });
 
         this.groupeBullets = this.physics.add.group();
 
         if (wallLayer) {
-            this.physics.add.collider(this.groupeBullets, wallLayer, (balle) => {
-                balle.destroy();
-            });
+            this.physics.add.collider(this.groupeBullets, wallLayer, (balle) => balle.destroy());
         }
         if (objetsLayer) {
-            this.physics.add.collider(this.groupeBullets, objetsLayer, (balle) => {
-                balle.destroy();
-            });
+            this.physics.add.collider(this.groupeBullets, objetsLayer, (balle) => balle.destroy());
         }
 
         this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
@@ -263,7 +275,6 @@ export default class map_stuff extends Phaser.Scene {
 
         this.physics.add.overlap(player, this.groupe_monstres, () => {
             if (this.invincible) return;
-
             this.invincible = true;
             this.game.events.emit('playerHit');
             player.pointsVie--;
@@ -290,9 +301,7 @@ export default class map_stuff extends Phaser.Scene {
 
         this.physics.world.on("worldbounds", (body) => {
             const objet = body.gameObject;
-            if (this.groupeBullets.contains(objet)) {
-                objet.destroy();
-            }
+            if (this.groupeBullets.contains(objet)) objet.destroy();
         });
 
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -364,7 +373,7 @@ export default class map_stuff extends Phaser.Scene {
     update() {
         const cursors = this.cursors;
 
-        // ✅ MODIFICATION VITESSE : récupérer boost depuis HUD
+        // ✅ récupérer boost vitesse depuis HUD
         let vitesse = 160;
         this.game.events.emit('getBoostVitesse', (boost) => {
             if (boost) vitesse = boost;
@@ -395,9 +404,7 @@ export default class map_stuff extends Phaser.Scene {
             player.setVelocityY(0);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) {
-            this.tirer();
-        }
+        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) this.tirer();
 
         this.armeNearby = null;
         if (this.groupe_armes) {
@@ -416,10 +423,23 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
+        // ✅ animation monstres selon direction
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
-                if (monstre.body.velocity.x > 0) monstre.setFlipX(false);
-                else if (monstre.body.velocity.x < 0) monstre.setFlipX(true);
+                const vx = monstre.body.velocity.x;
+                const vy = monstre.body.velocity.y;
+
+                if (Math.abs(vx) > Math.abs(vy)) {
+                    monstre.anims.play('monstre_cote', true);
+                    if (vx < 0) monstre.setFlipX(true);
+                    else monstre.setFlipX(false);
+                } else if (vy < 0) {
+                    monstre.anims.play('monstre_dos', true);
+                    monstre.setFlipX(false);
+                } else {
+                    monstre.anims.play('monstre_marche', true);
+                    monstre.setFlipX(false);
+                }
             });
         }
 
