@@ -77,6 +77,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
          "height":30,
          "id":3,
+         "locked":true,
          "name":"carpet",
          "opacity":1,
          "properties":[
@@ -88,6 +89,29 @@
          "type":"tilelayer",
          "visible":true,
          "width":30,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"arthus",
+         "objects":[
+                {
+                 "height":0,
+                 "id":2,
+                 "name":"arthus",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":490.909090909091,
+                 "y":809.090909090909
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }, 
@@ -205,8 +229,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":6,
- "nextobjectid":2,
+ "nextlayerid":7,
+ "nextobjectid":3,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
