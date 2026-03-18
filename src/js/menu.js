@@ -90,6 +90,7 @@ export default class menu extends Phaser.Scene {
         boutonRegle.on('pointerdown', () => {
             this.scene.start('regles');
         });
+
     }
 
     update() {

@@ -17,8 +17,8 @@ export default class map_stuff extends Phaser.Scene {
             frameHeight: 48
         });
         this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
-            frameWidth: 32,
-            frameHeight: 32
+            frameWidth: 64,
+            frameHeight: 64
         });
         
         this.load.spritesheet('doors', 'src/assets/images/doors_spritesheet.png', {
@@ -220,7 +220,7 @@ export default class map_stuff extends Phaser.Scene {
             if (calqueArmes) {
                 calqueArmes.objects.forEach((armeObj) => {
                     const arme = this.groupe_armes.create(armeObj.x, armeObj.y, 'image_gun');
-                    arme.setDisplaySize(30, 30);
+                    arme.setDisplaySize(48, 48);
                     arme.setDepth(45);
                     arme.body.setImmovable(true);
                     arme.body.moves = false;
@@ -235,7 +235,7 @@ export default class map_stuff extends Phaser.Scene {
                     armePhysique.collectee = true;
                     // Créer une arme sprite animée qui suivra le joueur
                     const armeSprite = this.add.sprite(joueur.x + 20, joueur.y, 'image_gun');
-                    armeSprite.setDisplaySize(24, 24);
+                    armeSprite.setDisplaySize(40, 40);
                     armeSprite.setDepth(99);
                     armeSprite.anims.play('gun_droite');
                     joueur.armeEquipee = armeSprite;
@@ -336,7 +336,7 @@ export default class map_stuff extends Phaser.Scene {
             switch(player.directionArme) {
                 case 'droite':
                     player.armeEquipee.anims.play('gun_droite', true);
-                    player.armeEquipee.setPosition(player.x + 20, player.y);
+                    player.armeEquipee.setPosition(player.x +30, player.y);
                     break;
                 case 'gauche':
                     player.armeEquipee.anims.play('gun_gauche', true);
@@ -344,11 +344,11 @@ export default class map_stuff extends Phaser.Scene {
                     break;
                 case 'haut':
                     player.armeEquipee.anims.play('gun_haut', true);
-                    player.armeEquipee.setPosition(player.x, player.y - 20);
+                    player.armeEquipee.setPosition(player.x, player.y - 30);
                     break;
                 case 'bas':
                     player.armeEquipee.anims.play('gun_bas', true);
-                    player.armeEquipee.setPosition(player.x, player.y + 20);
+                    player.armeEquipee.setPosition(player.x, player.y + 30);
                     break;
             }
         }
