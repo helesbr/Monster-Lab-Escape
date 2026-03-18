@@ -46,7 +46,6 @@ export default class map_cuisine extends Phaser.Scene{
 
     create() {
         // Charger la carte
-        console.log("Création de la scène map_cuisine");
          const carteCuisine2 = this.add.tilemap("cuisine" );
 
         const carteCuisine = this.add.tilemap("cuisine");
