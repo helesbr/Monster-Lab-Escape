@@ -338,6 +338,17 @@ export default class selection extends Phaser.Scene {
 
     });
 
+    // ✅ Créer l'icône de l'arme
+    this.iconeArme = this.add.image(800, 32, 'image_gun');
+    this.iconeArme.setDisplaySize(32, 32);
+    this.iconeArme.setVisible(false); // Caché par défaut
+    this.iconeArme.setDepth(200);
+    this.iconeArme.setScrollFactor(0); // Fixe à la caméra
+
+    if (this.game.config.aPistole) {
+      this.iconeArme.setVisible(true);
+    }
+
 
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
 

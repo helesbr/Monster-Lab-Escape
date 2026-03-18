@@ -33,6 +33,7 @@ export default class map_stuff extends Phaser.Scene {
     create() {
         const carte = this.add.tilemap("stuff");
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
+        this.game.config.aPistole = false; // initialisation
 
         const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
         const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
@@ -98,6 +99,10 @@ export default class map_stuff extends Phaser.Scene {
                 playerSpawnY = porteArrivee.y;
             }
         }
+        // Seulement si le joueur n'a pas déjà le pistolet
+if (!this.game.config.aPistole) {
+    this.game.config.aPistole = false;
+}
 
         player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
         player.setCollideWorldBounds(true);
@@ -235,16 +240,22 @@ export default class map_stuff extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-ENTER', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
-                this.armeNearby.collectee = true;
-                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
-                armeSprite.setDisplaySize(40, 40);
-                armeSprite.setDepth(99);
-                armeSprite.anims.play('gun_droite');
-                player.armeEquipee = armeSprite;
-                this.armeNearby.destroy();
-                this.armeNearby = null;
+                if (!this.armeNearby.collectee) {
+                    this.armeNearby.collectee = true;
+                    const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                    armeSprite.setDisplaySize(40, 40);
+                    armeSprite.setDepth(99);
+                    armeSprite.anims.play('gun_droite');
+                    player.armeEquipee = armeSprite;
+                    player.aArmeEquipee = true;
+                    this.game.config.aPistole = true; // ✅ Le joueur a le pistolet
+                    console.log("Arme récupérée!");
+                    this.armeNearby.destroy();
+                    this.armeNearby = null;
+                }
                 return;
             }
+            
 
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
