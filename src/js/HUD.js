@@ -5,7 +5,8 @@ export default class HUD extends Phaser.Scene {
 
     create() {
         this.pointsVie = 3;
-        const heartSize = 48;
+        this.aArme = false;
+        const heartSize = 32;
         this.heartSize = heartSize;
 
         this.heartVide = this.add.image(20, 20, 'heart')
@@ -38,6 +39,19 @@ export default class HUD extends Phaser.Scene {
         // ✅ une autre scène demande la vie actuelle
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
+        });
+
+        // ✅ gestion arme
+        this.game.events.on('armeRamassee', () => {
+            this.aArme = true;
+        });
+
+        this.game.events.on('getArme', (callback) => {
+            callback(this.aArme);
+        });
+
+        this.game.events.on('resetArme', () => {
+            this.aArme = false;
         });
     }
 

@@ -8,7 +8,6 @@ export default class menu extends Phaser.Scene {
         this.load.image("title", "src/assets/images/title.png");
         this.load.image("mogger", "src/assets/images/mogger.png");
         this.load.audio('menu', 'src/assets/son/menu.mp3');
-        // ✅ charger heart ici car le HUD en a besoin dès le lancement
         this.load.image('heart', 'src/assets/images/heart.png');
     }
 
@@ -57,12 +56,13 @@ export default class menu extends Phaser.Scene {
             fontStyle: 'bold'
         }).setOrigin(0.5);
 
-        // ✅ lancement du HUD en même temps que selection
         boutonJouer.on('pointerdown', () => {
             if (this.scene.isActive('HUD')) {
                 this.scene.stop('HUD');
             }
+            // ✅ reset vies ET arme
             this.game.events.emit('resetVie');
+            this.game.events.emit('resetArme');
             this.scene.start('selection');
             this.scene.launch('HUD');
         });

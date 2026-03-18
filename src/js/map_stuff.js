@@ -111,6 +111,20 @@ export default class map_stuff extends Phaser.Scene {
             player.pointsVie = vie;
         });
 
+        // ✅ récupérer si le joueur a déjà l'arme
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                if (!this.anims.exists("gun_droite")) {
+                    this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
+                }
+                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                armeSprite.setDisplaySize(40, 40);
+                armeSprite.setDepth(99);
+                armeSprite.anims.play('gun_droite');
+                player.armeEquipee = armeSprite;
+            }
+        });
+
         if (wallLayer)   this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
@@ -202,6 +216,15 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
+        // ✅ si le joueur a déjà l'arme, cacher les armes au sol
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                this.groupe_armes.children.entries.forEach(arme => {
+                    arme.destroy();
+                });
+            }
+        });
+
         this.groupeBullets = this.physics.add.group();
 
         if (wallLayer) {
@@ -224,7 +247,6 @@ export default class map_stuff extends Phaser.Scene {
             }
         });
 
-        // ✅ overlap joueur/monstres → envoie au HUD
         this.physics.add.overlap(player, this.groupe_monstres, () => {
             if (this.invincible) return;
 
@@ -246,6 +268,7 @@ export default class map_stuff extends Phaser.Scene {
 
             if (player.pointsVie <= 0) {
                 this.game.events.emit('resetVie');
+                this.game.events.emit('resetArme');
                 this.scene.stop('HUD');
                 this.scene.start('menu');
             }
@@ -271,6 +294,8 @@ export default class map_stuff extends Phaser.Scene {
                 player.armeEquipee = armeSprite;
                 this.armeNearby.destroy();
                 this.armeNearby = null;
+                // ✅ signaler au HUD que l'arme est ramassée
+                this.game.events.emit('armeRamassee');
                 return;
             }
 
