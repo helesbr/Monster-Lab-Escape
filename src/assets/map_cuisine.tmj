@@ -143,8 +143,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":735.42346432118,
-                 "y":138.913321038445
+                 "x":735.423,
+                 "y":138.913
                 }, 
                 {
                  "height":0,
@@ -155,8 +155,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":781.727904667329,
-                 "y":610.12909632572
+                 "x":781.728,
+                 "y":610.129
                 }, 
                 {
                  "height":0,
@@ -167,8 +167,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":577.443609022556,
-                 "y":849.822669882253
+                 "x":577.444,
+                 "y":849.823
                 }, 
                 {
                  "height":0,
@@ -179,8 +179,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":70.8185558235211,
-                 "y":621.024258760108
+                 "x":70.8186,
+                 "y":621.024
                 }, 
                 {
                  "height":0,
@@ -191,8 +191,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":220.627039296354,
-                 "y":443.977869201305
+                 "x":220.627,
+                 "y":443.978
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -215,8 +215,8 @@
                  "type":"",
                  "visible":true,
                  "width":0,
-                 "x":114.399205561072,
-                 "y":95.3326713008937
+                 "x":114.399,
+                 "y":95.3327
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -318,36 +318,6 @@
          "name":"all_tileset",
          "spacing":0,
          "tilecount":14900,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
-         "columns":0,
-         "firstgid":14901,
-         "margin":0,
-         "name":"sang",
-         "spacing":0,
-         "tilecount":0,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
-         "columns":0,
-         "firstgid":14901,
-         "margin":0,
-         "name":"sang",
-         "spacing":0,
-         "tilecount":0,
-         "tileheight":32,
-         "tilewidth":32
-        }, 
-        {
-         "columns":0,
-         "firstgid":14901,
-         "margin":0,
-         "name":"sang",
-         "spacing":0,
-         "tilecount":0,
          "tileheight":32,
          "tilewidth":32
         }, 
