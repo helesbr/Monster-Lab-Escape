@@ -200,15 +200,17 @@ export default class map_stuff extends Phaser.Scene {
                     this.time.delayedCall(500, () => {
                         let destination = 'selection';
                         let porteDestination = 'door3';
+                        let offsetY = 0;
                         
                         if (doorName === 'door_retour1') {
                             destination = 'selection';
                             porteDestination = 'door3'; // Retour au même door3
+                            offsetY = -50; // Décaler de 5 pixels vers le haut
                         } else if (doorName === 'door_retour2') {
                             destination = 'selection';
                             porteDestination = 'door31'; // Vers door31 dans selection
                         }
-                        this.scene.start(destination, { porteDestination: porteDestination });
+                        this.scene.start(destination, { porteDestination: porteDestination, offsetY: offsetY });
                     });
                 }
             });
