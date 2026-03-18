@@ -4,7 +4,7 @@ export default class map_stuff extends Phaser.Scene {
     constructor() {
         super({ key: "map_stuff" });
     }
-    preload() { 
+    preload() {
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
         this.load.image('arme', 'src/assets/images/arme.png');
@@ -25,6 +25,9 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
+
+        // Chargement du son stuff
+        this.load.audio('stuff', 'src/assets/son/stuff.mp3');
     }
 
     create() {
