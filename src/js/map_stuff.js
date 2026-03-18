@@ -353,7 +353,7 @@ export default class map_stuff extends Phaser.Scene {
         this.invincible = true;
         player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
         });

@@ -371,7 +371,7 @@ export default class map_cuisine extends Phaser.Scene {
         this.invincible = true;
         player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(1500, () => {
+        this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
         });

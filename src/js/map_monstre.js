@@ -268,7 +268,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
                 this.scene.stop('HUD');
-                this.scene.start('menu');
+                this.scene.start('selection');
             }
         });
 
@@ -321,7 +321,7 @@ export default class map_monstre extends Phaser.Scene {
         this.invincible = true;
         player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
         });
