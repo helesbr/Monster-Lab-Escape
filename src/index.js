@@ -29,9 +29,3 @@ var config = {
 // création et lancement du jeu
 var game = new Phaser.Game(config);
 game.scene.start("menu"); // Démarrer avec le menu
-function chocAvecBombe(un_player, une_bombe) {
-  this.physics.pause();
-  player.setTint(0xff0000);
-  player.anims.play("anim_face");
-  gameOver = true;
-}

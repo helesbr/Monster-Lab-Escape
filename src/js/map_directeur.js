@@ -82,8 +82,6 @@ export default class map_directeur extends Phaser.Scene {
         player.setCollideWorldBounds(true);
         player.setDepth(100);
         player.body.setGravityY(-this.physics.world.gravity.y);
-        player.armeEquipee = null;
-        player.directionArme = 'droite';
         player.pointsVie = 3;
         this.invincible = false;
         
@@ -141,12 +139,10 @@ export default class map_directeur extends Phaser.Scene {
             player.setVelocityX(160);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
-            player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
             player.setVelocityX(-160);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
-            player.directionArme = 'gauche';
         } else {
             player.setVelocityX(0);
             player.anims.play('anim_face');
@@ -154,10 +150,8 @@ export default class map_directeur extends Phaser.Scene {
 
         if (cursors.up.isDown) {
             player.setVelocityY(-160);
-            player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
             player.setVelocityY(160);
-            player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
         }
