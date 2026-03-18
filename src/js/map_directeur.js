@@ -33,6 +33,7 @@ export default class map_directeur extends Phaser.Scene {
         const wallLayer = carteDirecteurLab.createLayer("wall", tileset, 0, 0);
         const objectsLayer = carteDirecteurLab.createLayer("objects", tileset, 0, 0);
         wallLayer.setCollisionByProperty({ estSolide: true });
+        objectsLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, carteDirecteurLab.widthInPixels, carteDirecteurLab.heightInPixels);
         this.cameras.main.setBounds(0, 0, carteDirecteurLab.widthInPixels, carteDirecteurLab.heightInPixels);
