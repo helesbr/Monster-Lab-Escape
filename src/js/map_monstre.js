@@ -313,7 +313,7 @@ export default class map_monstre extends Phaser.Scene {
 
                 // Interaction au clic
                 boutonDirecteur.on('pointerdown', () => {
-                    this.scene.start('map_directeur');
+                    this.scene.start('map_directeur', { porteDestination: 'door_retour' });
                 });
             }
         }
