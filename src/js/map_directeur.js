@@ -43,7 +43,7 @@ export default class map_directeur extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteDirecteurLab.widthInPixels / 2, carteDirecteurLab.heightInPixels / 2);
 
-        // ✅ Créer les portes
+        // ✅ Créer la porte
         var groupe_portes = this.physics.add.group();
         const doorsObjectsLayer = carteDirecteurLab.getObjectLayer("doors");
         if (doorsObjectsLayer) {
