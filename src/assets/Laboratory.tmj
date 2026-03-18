@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"tmx",
+         "target":"Laboratory.tmx"
+        }
+    },
  "height":30,
  "infinite":false,
  "layers":[
@@ -237,7 +245,7 @@
                 {
                  "height":0,
                  "id":4,
-                 "name":"door2",
+                 "name":"door21",
                  "point":true,
                  "properties":[
                         {
