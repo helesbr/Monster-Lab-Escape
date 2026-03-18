@@ -1,7 +1,6 @@
 var player;
 var clavier;
 var groupe_monstres;
-var groupe_bombes;
 var gameOver = false;
 var groupe_portes;
 
@@ -174,7 +173,6 @@ export default class selection extends Phaser.Scene {
     }
 
     groupe_monstres = this.physics.add.group();
-    groupe_bombes = this.physics.add.group();
 
     // ✅ Écouter si tous les monstres de map_monstre sont morts
     this.allMonstersDead = false;
