@@ -194,7 +194,6 @@ export default class map_cuisine extends Phaser.Scene {
         player.directionArme = 'droite';
         player.pointsVie = 3;
         player.vitesseBase = 160;
-        player.vitesseBoost = null;
         this.invincible = false;
 
         this.game.events.emit('getVie', (vie) => {
@@ -386,8 +385,11 @@ export default class map_cuisine extends Phaser.Scene {
         }
         const cursors = this.cursors;
 
-        // ✅ vitesse avec boost preworkout
-        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+        // ✅ récupérer boost vitesse depuis HUD
+        let vitesse = 160;
+        this.game.events.emit('getBoostVitesse', (boost) => {
+            if (boost) vitesse = boost;
+        });
 
         if (cursors.right.isDown) {
             player.setVelocityX(vitesse);
@@ -489,9 +491,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgCreatine.setDepth(201);
         imgCreatine.setScrollFactor(0);
         imgCreatine.setInteractive();
-        imgCreatine.on('pointerdown', () => {
-            this.spawnObjet('creatine');
-        });
+        imgCreatine.on('pointerdown', () => this.spawnObjet('creatine'));
         imgCreatine.on('pointerover', () => imgCreatine.setDisplaySize(370, 370));
         imgCreatine.on('pointerout', () => imgCreatine.setDisplaySize(340, 340));
 
@@ -502,7 +502,6 @@ export default class map_cuisine extends Phaser.Scene {
             strokeThickness: 3
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        // ✅ description créatine
         const descCreatine = this.add.text(90, 490, '+3 vies', {
             fontSize: '18px',
             fill: '#fff',
@@ -515,9 +514,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgPreworkout.setDepth(201);
         imgPreworkout.setScrollFactor(0);
         imgPreworkout.setInteractive();
-        imgPreworkout.on('pointerdown', () => {
-            this.spawnObjet('prewarkout');
-        });
+        imgPreworkout.on('pointerdown', () => this.spawnObjet('prewarkout'));
         imgPreworkout.on('pointerover', () => imgPreworkout.setDisplaySize(370, 370));
         imgPreworkout.on('pointerout', () => imgPreworkout.setDisplaySize(340, 340));
 
@@ -528,8 +525,7 @@ export default class map_cuisine extends Phaser.Scene {
             strokeThickness: 3
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        // ✅ description preworkout
-        const descPreworkout = this.add.text(390, 490, 'Vitesse x2.5 (10s)', {
+        const descPreworkout = this.add.text(390, 490, 'Vitesse x2.5 (1min30)', {
             fontSize: '18px',
             fill: '#fff',
             stroke: '#000',
@@ -592,24 +588,17 @@ export default class map_cuisine extends Phaser.Scene {
             if (this.objetsDisponibles[type] && this.objetsDisponibles[type].length > 0) {
                 const position = this.objetsDisponibles[type].shift();
 
-                // ✅ sprite physique
                 const objet = this.physics.add.sprite(position.x, position.y, type);
                 objet.setDisplaySize(30, 30);
                 objet.setDepth(45);
                 objet.body.setImmovable(true);
                 objet.body.moves = false;
 
-                // ✅ overlap joueur/objet → effet selon le type
                 this.physics.add.overlap(player, objet, () => {
                     if (type === 'prewarkout') {
-                        // ✅ vitesse x2.5 pendant 10 secondes
-                        player.vitesseBoost = (player.vitesseBase || 160) * 2.5;
-                        if (this.timerBoostVitesse) this.timerBoostVitesse.remove();
-                        this.timerBoostVitesse = this.time.delayedCall(10000, () => {
-                            player.vitesseBoost = null;
-                        });
+                        // ✅ boost stocké dans le HUD pour toutes les maps
+                        this.game.events.emit('setBoostVitesse', 160 * 2.5, 90000);
                     } else if (type === 'creatine') {
-                        // ✅ +3 vies jusqu'à max 6
                         player.pointsVie = Math.min(player.pointsVie + 3, 6);
                         this.game.events.emit('setVieMax', 6, player.pointsVie);
                     }

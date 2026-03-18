@@ -26,16 +26,12 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
-        // Chargement du son stuff
         this.load.audio('stuff', 'src/assets/son/stuff.mp3');
     }
 
     create() {
-        // Lancer le son de stuff
         this.son_stuff = this.sound.add('stuff');
         this.son_stuff.play();
-
-        // Arrêter la musique quand on quitte la scène
         this.events.on('shutdown', () => {
             if (this.son_stuff) {
                 this.son_stuff.stop();
@@ -44,15 +40,11 @@ export default class map_stuff extends Phaser.Scene {
 
         const carte = this.add.tilemap("stuff");
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
-        this.game.config.aPistole = false; // initialisation
+        this.game.config.aPistole = false;
 
-        // Pour lire la money au démarrage de la scène si besoin :
         this.game.events.emit('getMoney', (money) => {
             console.log('Money actuelle:', money);
         });
-
-        // Pour ajouter de la money (ex: quand un monstre meurt) :
-        // this.game.events.emit('addMoney', 10);
 
         const solLayer = carte.createLayer("Floor", tileset, 0, 0);
         const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
@@ -118,7 +110,7 @@ export default class map_stuff extends Phaser.Scene {
                 playerSpawnY = porteArrivee.y;
             }
         }
-        // Seulement si le joueur n'a pas déjà le pistolet
+
         if (!this.game.config.aPistole) {
             this.game.config.aPistole = false;
         }
@@ -132,12 +124,10 @@ export default class map_stuff extends Phaser.Scene {
         player.pointsVie = 3;
         this.invincible = false;
 
-        // ✅ récupérer les vies depuis le HUD
         this.game.events.emit('getVie', (vie) => {
             player.pointsVie = vie;
         });
 
-        // ✅ récupérer si le joueur a déjà l'arme
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
                 if (!this.anims.exists("gun_droite")) {
@@ -195,7 +185,6 @@ export default class map_stuff extends Phaser.Scene {
             this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
         }
 
-        // Spawn des monstres
         this.groupe_monstres = this.physics.add.group();
         const calqueMonstres = carte.getObjectLayer("monstres");
         if (calqueMonstres) {
@@ -229,7 +218,6 @@ export default class map_stuff extends Phaser.Scene {
             this.physics.add.collider(this.groupe_monstres, objetsLayer);
         }
 
-        // Spawn des armes
         this.groupe_armes = this.physics.add.group();
         const calqueArmes = carte.getObjectLayer("Arme");
         if (calqueArmes) {
@@ -242,7 +230,6 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // ✅ si le joueur a déjà l'arme, cacher les armes au sol
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
                 this.groupe_armes.children.entries.forEach(arme => {
@@ -270,7 +257,7 @@ export default class map_stuff extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
-                this.game.events.emit('addMoney', 10); // ✅ +10 à la mort du monstre
+                this.game.events.emit('addMoney', 10);
             }
         });
 
@@ -321,11 +308,9 @@ export default class map_stuff extends Phaser.Scene {
                 player.armeEquipee = armeSprite;
                 this.armeNearby.destroy();
                 this.armeNearby = null;
-                // ✅ signaler au HUD que l'arme est ramassée
                 this.game.events.emit('armeRamassee');
                 return;
             }
-
 
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
@@ -349,10 +334,8 @@ export default class map_stuff extends Phaser.Scene {
             }
         });
 
-        // ✅ immunité de 3 secondes à l'entrée dans la scène
         this.invincible = true;
-        player.setAlpha(0.5); // effet visuel semi-transparent
-
+        player.setAlpha(0.5);
         this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
@@ -361,25 +344,15 @@ export default class map_stuff extends Phaser.Scene {
 
     tirer() {
         if (!player.armeEquipee) return;
-
-        let vx = 0;
-        let vy = 0;
-        let offsetX = 0;
-        let offsetY = 0;
+        let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
-
         switch (player.directionArme) {
-            case 'droite': vx = vitesse; offsetX = 30; break;
+            case 'droite': vx = vitesse;  offsetX = 30;  break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut': vy = -vitesse; offsetY = -30; break;
-            case 'bas': vy = vitesse; offsetY = 30; break;
+            case 'haut':   vy = -vitesse; offsetY = -30; break;
+            case 'bas':    vy = vitesse;  offsetY = 30;  break;
         }
-
-        const balle = this.groupeBullets.create(
-            player.x + offsetX,
-            player.y + offsetY,
-            'ball'
-        );
+        const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
         balle.setDepth(90);
         balle.setCollideWorldBounds(true);
@@ -391,13 +364,19 @@ export default class map_stuff extends Phaser.Scene {
     update() {
         const cursors = this.cursors;
 
+        // ✅ MODIFICATION VITESSE : récupérer boost depuis HUD
+        let vitesse = 160;
+        this.game.events.emit('getBoostVitesse', (boost) => {
+            if (boost) vitesse = boost;
+        });
+
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
@@ -407,10 +386,10 @@ export default class map_stuff extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
@@ -424,26 +403,16 @@ export default class map_stuff extends Phaser.Scene {
         if (this.groupe_armes) {
             this.groupe_armes.children.entries.forEach((arme) => {
                 if (arme.collectee) return;
-                const distance = Phaser.Math.Distance.Between(
-                    player.x, player.y,
-                    arme.x, arme.y
-                );
-                if (distance < 60) {
-                    this.armeNearby = arme;
-                }
+                const distance = Phaser.Math.Distance.Between(player.x, player.y, arme.x, arme.y);
+                if (distance < 60) this.armeNearby = arme;
             });
         }
 
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
-                const distance = Phaser.Math.Distance.Between(
-                    player.x, player.y,
-                    door.x, door.y
-                );
-                if (distance < 100 && door.estSolide) {
-                    this.doorNearby = door;
-                }
+                const distance = Phaser.Math.Distance.Between(player.x, player.y, door.x, door.y);
+                if (distance < 100 && door.estSolide) this.doorNearby = door;
             });
         }
 
@@ -456,22 +425,10 @@ export default class map_stuff extends Phaser.Scene {
 
         if (player.armeEquipee) {
             switch (player.directionArme) {
-                case 'droite':
-                    player.armeEquipee.anims.play('gun_droite', true);
-                    player.armeEquipee.setPosition(player.x + 30, player.y);
-                    break;
-                case 'gauche':
-                    player.armeEquipee.anims.play('gun_gauche', true);
-                    player.armeEquipee.setPosition(player.x - 20, player.y);
-                    break;
-                case 'haut':
-                    player.armeEquipee.anims.play('gun_haut', true);
-                    player.armeEquipee.setPosition(player.x, player.y - 30);
-                    break;
-                case 'bas':
-                    player.armeEquipee.anims.play('gun_bas', true);
-                    player.armeEquipee.setPosition(player.x, player.y + 30);
-                    break;
+                case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
+                case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
+                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
