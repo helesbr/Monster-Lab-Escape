@@ -23,7 +23,7 @@ export default class map_stuff extends Phaser.Scene {
     }
 
     create() {
-        const carte = this.make.tilemap({ key: "stuff" });
+        const carte = this.add.tilemap("stuff" );
             const tileset = carte.addTilesetImage("all_tileset", "allTiles");
 
             const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);

@@ -34,7 +34,7 @@ export default class map_monstre extends Phaser.Scene {
  
 
     create() {
-        const carteMonstreLab = this.make.tilemap({ key: "monstre" });
+        const carteMonstreLab = this.add.tilemap("monstre");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
         // Create layers

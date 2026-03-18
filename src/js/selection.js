@@ -56,7 +56,7 @@ export default class selection extends Phaser.Scene {
 
     // Récupération de la carte et du tileset
 
-    const carteDuNiveau = this.make.tilemap({ key: "carte" });
+    const carteDuNiveau = this.add.tilemap("carte");
 
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
 
