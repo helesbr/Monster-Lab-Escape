@@ -16,6 +16,11 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 44,
             frameHeight: 48
         });
+        this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
+            frameWidth: 32,
+            frameHeight: 32
+        });
+        
         this.load.spritesheet('doors', 'src/assets/images/doors_spritesheet.png', {
             frameWidth: 64,
             frameHeight: 80
@@ -146,6 +151,36 @@ export default class map_stuff extends Phaser.Scene {
                 });
             }
 
+            // ✅ Créer les animations de l'arme
+            if (!this.anims.exists("gun_droite")) {
+                this.anims.create({
+                    key: "gun_droite",
+                    frames: [{ key: "image_gun", frame: 0 }],
+                    frameRate: 10
+                });
+            }
+            if (!this.anims.exists("gun_gauche")) {
+                this.anims.create({
+                    key: "gun_gauche",
+                    frames: [{ key: "image_gun", frame: 1 }],
+                    frameRate: 10
+                });
+            }
+            if (!this.anims.exists("gun_haut")) {
+                this.anims.create({
+                    key: "gun_haut",
+                    frames: [{ key: "image_gun", frame: 3 }],
+                    frameRate: 10
+                });
+            }
+            if (!this.anims.exists("gun_bas")) {
+                this.anims.create({
+                    key: "gun_bas",
+                    frames: [{ key: "image_gun", frame: 2 }],
+                    frameRate: 10
+                });
+            }
+
             // Spawn des monstres
             this.groupe_monstres = this.physics.add.group();
             const calqueMonstres = carte.getObjectLayer("monstres");
@@ -180,14 +215,34 @@ export default class map_stuff extends Phaser.Scene {
             }
 
             // Spawn des armes
+            this.groupe_armes = this.physics.add.group();
             const calqueArmes = carte.getObjectLayer("Arme");
             if (calqueArmes) {
                 calqueArmes.objects.forEach((armeObj) => {
-                    const arme = this.add.image(armeObj.x, armeObj.y, 'arme');
+                    const arme = this.groupe_armes.create(armeObj.x, armeObj.y, 'image_gun');
                     arme.setDisplaySize(30, 30);
                     arme.setDepth(45);
+                    arme.body.setImmovable(true);
+                    arme.body.moves = false;
                 });
             }
+
+            // ✅ Collision joueur avec les armes (système de pickup)
+            player.armeEquipee = null;
+            player.directionArme = 'droite';
+            this.physics.add.overlap(player, this.groupe_armes, (joueur, armePhysique) => {
+                if (!armePhysique.collectee) {
+                    armePhysique.collectee = true;
+                    // Créer une arme sprite animée qui suivra le joueur
+                    const armeSprite = this.add.sprite(joueur.x + 20, joueur.y, 'image_gun');
+                    armeSprite.setDisplaySize(24, 24);
+                    armeSprite.setDepth(99);
+                    armeSprite.anims.play('gun_droite');
+                    joueur.armeEquipee = armeSprite;
+                    console.log("Arme récupérée!");
+                    armePhysique.destroy();
+                }
+            });
 
             // ✅ Initialiser le clavier une seule fois
             this.cursors = this.input.keyboard.createCursorKeys();
@@ -224,11 +279,13 @@ export default class map_stuff extends Phaser.Scene {
             player.setVelocityX(160);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
+            player.directionArme = 'droite';
         }
         else if (cursors.left.isDown) {
             player.setVelocityX(-160);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
+            player.directionArme = 'gauche';
         } else {
             player.setVelocityX(0);
             player.anims.play('anim_face');
@@ -237,9 +294,11 @@ export default class map_stuff extends Phaser.Scene {
         // Haut / Bas
         if (cursors.up.isDown) {
             player.setVelocityY(-160);
+            player.directionArme = 'haut';
         }
         else if (cursors.down.isDown) {
             player.setVelocityY(160);
+            player.directionArme = 'bas';
         }
         else {
             player.setVelocityY(0);
@@ -269,6 +328,29 @@ export default class map_stuff extends Phaser.Scene {
                     monstre.setFlipX(true);
                 }
             });
+        }
+  
+        // ✅ Mettre à jour la position et l'animation de l'arme équipée
+        if (player.armeEquipee) {
+            // Gérer l'animation selon la direction
+            switch(player.directionArme) {
+                case 'droite':
+                    player.armeEquipee.anims.play('gun_droite', true);
+                    player.armeEquipee.setPosition(player.x + 20, player.y);
+                    break;
+                case 'gauche':
+                    player.armeEquipee.anims.play('gun_gauche', true);
+                    player.armeEquipee.setPosition(player.x - 20, player.y);
+                    break;
+                case 'haut':
+                    player.armeEquipee.anims.play('gun_haut', true);
+                    player.armeEquipee.setPosition(player.x, player.y - 20);
+                    break;
+                case 'bas':
+                    player.armeEquipee.anims.play('gun_bas', true);
+                    player.armeEquipee.setPosition(player.x, player.y + 20);
+                    break;
+            }
         }
     }
 }

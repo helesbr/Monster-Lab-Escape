@@ -23,6 +23,9 @@ export default class selection extends Phaser.Scene {
       frameHeight: 48
 
     });
+    // chargement des musiques 
+    this.load.audio('menu', 'src/assets/son/menu.mp3');
+    this.load.audio('laboratory', 'src/assets/son/laboratory.mp3');
 
     // chargement tuiles de jeu
 
@@ -53,7 +56,17 @@ export default class selection extends Phaser.Scene {
 
 
   create() {
+    this.son_laboratory = this.sound.add('laboratory');
+    
+    // Lancer le son du laboratory
+    this.son_laboratory.play();
 
+    // Arrêter la musique quand on quitte la scène
+    this.events.on('shutdown', () => {
+      if (this.son_laboratory) {
+        this.son_laboratory.stop();
+      }
+    });
     // Récupération de la carte et du tileset
 
     const carteDuNiveau = this.add.tilemap("carte");
@@ -99,19 +112,19 @@ export default class selection extends Phaser.Scene {
     const { porteDestination, offsetY = 0 } = this.scene.settings.data || {};
     let playerX = 190;
     let playerY = 480;
-    
+
     if (porteDestination) {
-        // Chercher la porte dans les portes de selection
-        const taxiPoints = carteDuNiveau.getObjectLayer("doors");
-        if (taxiPoints) {
-            const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
-            if (door) {
-                playerX = door.x;
-                playerY = door.y + offsetY; // Ajouter l'offset Y
-            }
+      // Chercher la porte dans les portes de selection
+      const taxiPoints = carteDuNiveau.getObjectLayer("doors");
+      if (taxiPoints) {
+        const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
+        if (door) {
+          playerX = door.x;
+          playerY = door.y + offsetY; // Ajouter l'offset Y
         }
+      }
     }
-//spaw du joueuur à la nouvelle porte
+    //spaw du joueuur à la nouvelle porte
     player = this.physics.add.sprite(playerX, playerY, 'img_perso');
 
     player.setCollideWorldBounds(true);
@@ -196,7 +209,7 @@ export default class selection extends Phaser.Scene {
           porte.isOpen = false;
 
           porte.estSolide = true;// État initial : fermée
-
+          porte.nom = obj.name;  // Stocker le nom de la porte
           porte.play('door_closed'); // Affiche le frame fermé
 
           porte.doorName = obj.name; // Stocker le nom de la porte
@@ -425,24 +438,17 @@ export default class selection extends Phaser.Scene {
           // Déterminer la destination selon le nom de la porte
           let destination = "map_cuisine"; // défaut
           let porteDestination = "door_retour"; // porte de destination par défaut
-          
+
           if (porte.doorName === "door3") {
-              destination = "map_stuff";
-              porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
+            destination = "map_stuff";
+            porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
           } else if (porte.doorName === "door31") {
-              destination = "map_stuff";
-              porteDestination = "door_retour2"; // porte d'arrivée dans map_stuff
+            destination = "map_stuff";
+            porteDestination = "door_retour2"; // porte d'arrivée dans map_stuff
           } else if (porte.doorName === "door4") {
-              destination = "map_monstre";
-              porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
-          } else if (porte.doorName === "door1") {
-            destination = "map_cuisine";
-             porteDestination = "door_retour2"; // porte d'arrivée dans map_cuisine
-           } else if (porte.doorName === "door12") {
-            destination = "map_cuisine";
-             porteDestination = "door_retour1"; // porte d'arrivée dans map_cuisine
-            }
-          
+            destination = "map_monstre";
+            porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
+          }
 
           this.scene.start(destination, { porteDestination: porteDestination });
 

@@ -19,7 +19,7 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [menu, selection, map_cuisine, regles,map_stuff, map_directeur,  map_monstre] // liste des scènes du jeu
+  scene: [menu, selection, map_cuisine, regles, map_directeur,map_stuff,  map_monstre] // liste des scènes du jeu
 
 };
 
