@@ -198,15 +198,15 @@ export default class map_stuff extends Phaser.Scene {
                     this.doorCollider.active = false;
                     this.doorNearby.anims.play('door_open');
                     this.time.delayedCall(500, () => {
-                        let destination = 'map_monstre';
-                        let porteDestination = 'door_monstre';
+                        let destination = 'selection';
+                        let porteDestination = 'door3';
                         
                         if (doorName === 'door_retour1') {
                             destination = 'selection';
                             porteDestination = 'door3'; // Retour au même door3
                         } else if (doorName === 'door_retour2') {
-                            destination = 'map_monstre';
-                            porteDestination = 'door_monstre';
+                            destination = 'selection';
+                            porteDestination = 'door31'; // Vers door31 dans selection
                         }
                         this.scene.start(destination, { porteDestination: porteDestination });
                     });

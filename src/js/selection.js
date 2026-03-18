@@ -100,14 +100,14 @@ export default class selection extends Phaser.Scene {
     let playerX = 190;
     let playerY = 480;
     
-    if (porteDestination === 'door3') {
-        // Chercher door3 dans les portes de selection
+    if (porteDestination) {
+        // Chercher la porte dans les portes de selection
         const taxiPoints = carteDuNiveau.getObjectLayer("doors");
         if (taxiPoints) {
-            const door3 = taxiPoints.objects.find(obj => obj.name === "door3");
-            if (door3) {
-                playerX = door3.x;
-                playerY = door3.y;
+            const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
+            if (door) {
+                playerX = door.x;
+                playerY = door.y;
             }
         }
     }
@@ -429,6 +429,12 @@ export default class selection extends Phaser.Scene {
           if (porte.doorName === "door3") {
               destination = "map_stuff";
               porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
+          } else if (porte.doorName === "door31") {
+              destination = "map_stuff";
+              porteDestination = "door_retour2"; // porte d'arrivée dans map_stuff
+          } else if (porte.doorName === "door4") {
+              destination = "map_monstre";
+              porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
           }
 
           this.scene.start(destination, { porteDestination: porteDestination });
