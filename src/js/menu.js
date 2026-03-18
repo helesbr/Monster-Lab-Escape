@@ -8,9 +8,22 @@ export default class menu extends Phaser.Scene {
         this.load.image("menu_fond", "src/assets/images/menu_fond.png");
         this.load.image("title", "src/assets/images/title.png");
         this.load.image("mogger", "src/assets/images/mogger.png");
+        // Chargement du son menu
+        this.load.audio('menu', 'src/assets/son/menu.mp3');
     }
 
     create() {
+        // Lancer le son du menu
+        this.son_menu = this.sound.add('menu');
+        this.son_menu.play();
+
+        // Arrêter la musique quand on quitte le menu
+        this.events.on('shutdown', () => {
+            if (this.son_menu) {
+                this.son_menu.stop();
+            }
+        });
+
         // Fond de sécurité (couleur)
         this.cameras.main.setBackgroundColor(0x2c3e50);
 

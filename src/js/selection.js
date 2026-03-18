@@ -24,8 +24,8 @@ export default class selection extends Phaser.Scene {
 
     });
     // chargement des musiques 
-    this.load.audio('menu', 'assets/son/menu.mp3');
-    this.load.audio('laboratory', 'assets/son/laboratory.mp3');
+    this.load.audio('menu', 'src/assets/son/menu.mp3');
+    this.load.audio('laboratory', 'src/assets/son/laboratory.mp3');
 
     // chargement tuiles de jeu
 
@@ -56,9 +56,17 @@ export default class selection extends Phaser.Scene {
 
 
   create() {
-    var son_menu = this.sound.add('menu');
-    var son_laboratory = this.sound.add('laboratory');
+    this.son_laboratory = this.sound.add('laboratory');
+    
+    // Lancer le son du laboratory
+    this.son_laboratory.play();
 
+    // Arrêter la musique quand on quitte la scène
+    this.events.on('shutdown', () => {
+      if (this.son_laboratory) {
+        this.son_laboratory.stop();
+      }
+    });
     // Récupération de la carte et du tileset
 
     const carteDuNiveau = this.add.tilemap("carte");
