@@ -10,11 +10,11 @@ export default class map_monstre extends Phaser.Scene {
 
     preload() {
 
-        this.load.tilemapTiledJSON("monstre", "src/assets/map_monstre.tmj");
+        this.load.tilemapTiledJSON("monstres", "src/assets/map_monstre.tmj");
 
         this.load.image("allTiles", "src/tilesets/all_tilesets.png");
 
-        this.load.spritesheet('monstre', 'src/assets/images/monstre.png', {
+        this.load.spritesheet('monstres', 'src/assets/images/monstre.png', {
 
             frameWidth: 44,
 
@@ -29,16 +29,17 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
+        this.load.image('bouton_directeur', 'src/assets/images/bouton.png');
 
         // Chargement du son monstre
-        this.load.audio('monstre', 'src/assets/son/monstre.mp3');
+        this.load.audio('monstres', 'src/assets/son/monstre.mp3');
     }
 
 
 
     create() {
-        // Lancer le son du monstre
-        this.son_monstre = this.sound.add('monstre');
+        // Lancer le son de monstre
+        this.son_monstre = this.sound.add('monstres');
         this.son_monstre.play();
 
         // Arrêter la musique quand on quitte la scène
@@ -48,7 +49,7 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
-        const carteMonstreLab = this.add.tilemap("monstre");
+        const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
         // Create layers
@@ -56,8 +57,7 @@ export default class map_monstre extends Phaser.Scene {
         const murLayer = carteMonstreLab.createLayer("Mur", tileset, 0, 0);
         const bloodLayer = carteMonstreLab.createLayer("blood", tileset, 0, 0);
 
-        // Set collision for walls
-        if (murLayer) murLayer.setCollisionByExclusion([-1]);
+        murLayer.setCollisionByProperty({ estSolide: true });
 
 
         // Ajuster le monde et la caméra pour afficher la totalité de la map
@@ -80,7 +80,7 @@ export default class map_monstre extends Phaser.Scene {
                 const randomX = Phaser.Math.Between(50, carteMonstreLab.widthInPixels - 50);
                 const randomY = Phaser.Math.Between(50, carteMonstreLab.heightInPixels - 50);
 
-                const monstre = this.groupe_monstres.create(randomX, randomY, 'monstre');
+                const monstre = this.groupe_monstres.create(randomX, randomY, 'monstres');
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
                 monstre.setDisplaySize(100, 100);
@@ -144,6 +144,22 @@ export default class map_monstre extends Phaser.Scene {
                 });
             }
         });
+
+        // ✅ Créer le bouton_directeur à partir du ping
+        const calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
+        if (calqueBoutons) {
+            const pingBoutonDirecteur = calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
+            if (pingBoutonDirecteur) {
+                const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
+                boutonDirecteur.setInteractive();
+                boutonDirecteur.setDepth(50);
+
+                // Interaction au clic
+                boutonDirecteur.on('pointerdown', () => {
+                    this.scene.start('map_directeur');
+                });
+            }
+        }
 
         // ✅ Créer le joueur - positionné selon la porte d'arrivée
         const { porteDestination } = this.scene.settings.data || {};
@@ -212,12 +228,14 @@ export default class map_monstre extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     let destination = "selection";
                     let porteDestination = "door4";
+                    let offsetX = 0;
 
                     if (doorName === "selection") {
                         destination = "selection";
                         porteDestination = "door4";
+                        let offsetY = -50;
                     }
-                    this.scene.start(destination, { porteDestination: porteDestination });
+                    this.scene.start(destination, { porteDestination: porteDestination, offsetX: offsetX });
                 });
             }
 
