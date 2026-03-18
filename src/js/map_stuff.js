@@ -4,11 +4,12 @@ export default class map_stuff extends Phaser.Scene {
     constructor() {
         super({ key: "map_stuff" });
     }
-    preload() {
+    preload() { 
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
         this.load.image('arme', 'src/assets/images/arme.png');
         this.load.image('ball', 'src/assets/images/ball.png');
+        this.load.image('heart', 'src/assets/images/heart.png');
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
             frameWidth: 44,
             frameHeight: 48
@@ -25,9 +26,6 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
-
-        // Chargement du son stuff
-        this.load.audio('stuff', 'src/assets/son/stuff.mp3');
     }
 
     create() {
@@ -38,8 +36,8 @@ export default class map_stuff extends Phaser.Scene {
         const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
         const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
-            wallLayer.setCollisionByProperty({ estSolide: true });
-            objetsLayer.setCollisionByProperty({ estSolide: true });
+        wallLayer.setCollisionByExclusion([-1]);
+        objetsLayer.setCollisionByExclusion([-1]);
 
         this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
         this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
@@ -105,6 +103,27 @@ export default class map_stuff extends Phaser.Scene {
         player.body.setGravityY(-this.physics.world.gravity.y);
         player.armeEquipee = null;
         player.directionArme = 'droite';
+        player.pointsVie = 3;
+        this.invincible = false;
+
+        // ✅ récupérer les vies depuis le HUD
+        this.game.events.emit('getVie', (vie) => {
+            player.pointsVie = vie;
+        });
+
+        // ✅ récupérer si le joueur a déjà l'arme
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                if (!this.anims.exists("gun_droite")) {
+                    this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
+                }
+                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                armeSprite.setDisplaySize(40, 40);
+                armeSprite.setDepth(99);
+                armeSprite.anims.play('gun_droite');
+                player.armeEquipee = armeSprite;
+            }
+        });
 
         if (wallLayer)   this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
@@ -167,7 +186,6 @@ export default class map_stuff extends Phaser.Scene {
                 );
                 monstre.anims.play('monstre_marche');
 
-                // ✅ event stocké sur le monstre pour pouvoir le stopper
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
                     callback: function() {
@@ -198,7 +216,15 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // Groupe de balles
+        // ✅ si le joueur a déjà l'arme, cacher les armes au sol
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                this.groupe_armes.children.entries.forEach(arme => {
+                    arme.destroy();
+                });
+            }
+        });
+
         this.groupeBullets = this.physics.add.group();
 
         if (wallLayer) {
@@ -212,13 +238,39 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // ✅ overlap balles/monstres avec stop de l'event avant destroy
         this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
             balle.destroy();
             monstre.pointsVie--;
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
+            }
+        });
+
+        this.physics.add.overlap(player, this.groupe_monstres, () => {
+            if (this.invincible) return;
+
+            this.invincible = true;
+            this.game.events.emit('playerHit');
+            player.pointsVie--;
+
+            this.tweens.add({
+                targets: player,
+                alpha: 0,
+                duration: 100,
+                repeat: 5,
+                yoyo: true,
+                onComplete: () => {
+                    player.setAlpha(1);
+                    this.invincible = false;
+                }
+            });
+
+            if (player.pointsVie <= 0) {
+                this.game.events.emit('resetVie');
+                this.game.events.emit('resetArme');
+                this.scene.stop('HUD');
+                this.scene.start('menu');
             }
         });
 
@@ -229,7 +281,6 @@ export default class map_stuff extends Phaser.Scene {
             }
         });
 
-        // Clavier
         this.cursors = this.input.keyboard.createCursorKeys();
         this.boutonFeu = this.input.keyboard.addKey('A');
 
@@ -243,6 +294,8 @@ export default class map_stuff extends Phaser.Scene {
                 player.armeEquipee = armeSprite;
                 this.armeNearby.destroy();
                 this.armeNearby = null;
+                // ✅ signaler au HUD que l'arme est ramassée
+                this.game.events.emit('armeRamassee');
                 return;
             }
 
@@ -330,7 +383,6 @@ export default class map_stuff extends Phaser.Scene {
             this.tirer();
         }
 
-        // Détection proximité armes
         this.armeNearby = null;
         if (this.groupe_armes) {
             this.groupe_armes.children.entries.forEach((arme) => {
@@ -345,7 +397,6 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // Détection proximité portes
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
@@ -359,7 +410,6 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // Flip monstres
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
                 if (monstre.body.velocity.x > 0) monstre.setFlipX(false);
@@ -367,7 +417,6 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // Position arme équipée
         if (player.armeEquipee) {
             switch (player.directionArme) {
                 case 'droite':
