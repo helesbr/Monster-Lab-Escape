@@ -63,6 +63,8 @@ export default class menu extends Phaser.Scene {
             this.game.events.emit('resetVie');
             this.game.events.emit('resetArme');
             this.game.events.emit('resetMonstres');
+            // ✅ MODIFICATION VITESSE : reset boost au nouveau jeu
+            this.game.events.emit('resetBoost');
             this.scene.start('character_select');
             this.scene.launch('HUD');
         });

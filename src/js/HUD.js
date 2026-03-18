@@ -5,48 +5,62 @@ export default class HUD extends Phaser.Scene {
 
     create() {
         this.pointsVie = 3;
+        this.vieMax = 3;
         this.aArme = false;
-        this.money = 0; // ✅ ajout money
+        this.money = 0;
         this.monstresMorts = [];
-        const heartSize = 32;
-        this.heartSize = heartSize;
+        // ✅ MODIFICATION VITESSE : ajout boost
+        this.vitesseBoost = null;
+        this.timerBoost = null;
 
-        this.heartVide = this.add.image(460, 20, 'heart')
-            .setOrigin(1, 0)
-            .setDisplaySize(heartSize, heartSize)
-            .setScrollFactor(0)
-            .setDepth(200)
-            .setAlpha(0.3);
+        this.coeurs = [];
+        for (let i = 0; i < 6; i++) {
+            const ligne = Math.floor(i / 3);
+            const colonne = i % 3;
+            const coeur = this.add.image(this.scale.width - 150 + (colonne * 36), 20 + (ligne * 36), 'heart', 0)
+                .setOrigin(0, 0)
+                .setDisplaySize(32, 32)
+                .setScrollFactor(0)
+                .setDepth(200);
+            if (i >= 3) coeur.setVisible(false);
+            this.coeurs.push(coeur);
+        }
 
-        this.heartPlein = this.add.image(460, 20, 'heart')
-            .setOrigin(1, 0)
-            .setDisplaySize(heartSize, heartSize)
-            .setScrollFactor(0)
-            .setDepth(201);
-
-        // ✅ texte money
-        this.texteMoney = this.add.text(460, 60, 'Money: 0', {
+        this.texteMoney = this.add.text(20, 20, 'Money: 0', {
             fontSize: '16px',
             fill: '#FFD700',
             stroke: '#000000',
             strokeThickness: 3
-        }).setScrollFactor(0).setDepth(200).setOrigin(1, 0);
+        }).setScrollFactor(0).setDepth(200);
 
-        this.updateHeart();
+        this.updateCoeurs();
 
         // vies
         this.game.events.on('playerHit', () => {
             this.pointsVie--;
-            this.updateHeart();
+            this.updateCoeurs();
         });
-
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
-            this.updateHeart();
+            this.vieMax = 3;
+            for (let i = 3; i < 6; i++) {
+                this.coeurs[i].setVisible(false);
+            }
+            this.updateCoeurs();
         });
-
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
+        });
+
+        // creatine
+        this.game.events.on('setVieMax', (max, actuelle) => {
+            this.vieMax = max;
+            this.pointsVie = actuelle;
+            for (let i = 0; i < 6; i++) {
+                if (i < max) this.coeurs[i].setVisible(true);
+                else this.coeurs[i].setVisible(false);
+            }
+            this.updateCoeurs();
         });
 
         // arme
@@ -60,22 +74,20 @@ export default class HUD extends Phaser.Scene {
             this.aArme = false;
         });
 
-        // ✅ événements money
+        // money
         this.game.events.on('addMoney', (montant) => {
             this.money += montant;
             this.texteMoney.setText('Money: ' + this.money);
         });
-
         this.game.events.on('getMoney', (callback) => {
             callback(this.money);
         });
-
         this.game.events.on('resetMoney', () => {
             this.money = 0;
             this.texteMoney.setText('Money: 0');
         });
 
-        // ✅ monstres par index
+        // monstres
         this.game.events.on('monstreMort', (index) => {
             this.monstresMorts.push(index);
         });
@@ -85,10 +97,33 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetMonstres', () => {
             this.monstresMorts = [];
         });
+
+        // ✅ MODIFICATION VITESSE : gestion boost
+        this.game.events.on('setBoostVitesse', (vitesse, duree) => {
+            this.vitesseBoost = vitesse;
+            if (this.timerBoost) this.timerBoost.remove();
+            this.timerBoost = this.time.delayedCall(duree, () => {
+                this.vitesseBoost = null;
+            });
+        });
+        this.game.events.on('getBoostVitesse', (callback) => {
+            callback(this.vitesseBoost);
+        });
+        this.game.events.on('resetBoost', () => {
+            this.vitesseBoost = null;
+            if (this.timerBoost) this.timerBoost.remove();
+        });
     }
 
-    updateHeart() {
-        const ratio = this.pointsVie / 3;
-        this.heartPlein.setDisplaySize(this.heartSize * ratio, this.heartSize);
+    updateCoeurs() {
+        for (let i = 0; i < this.vieMax; i++) {
+            if (i < this.pointsVie) {
+                this.coeurs[i].setFrame(0);
+                this.coeurs[i].setAlpha(1);
+            } else {
+                this.coeurs[i].setFrame(0);
+                this.coeurs[i].setAlpha(0.3);
+            }
+        }
     }
 }
