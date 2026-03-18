@@ -51,8 +51,7 @@ export default class selection extends Phaser.Scene {
         const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
         const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-        murLayer.setCollisionByExclusion([-1]);
-        objectLayer.setCollisionByExclusion([-1]);
+        murLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, 960, 960);
         this.cameras.main.setBounds(0, 0, 960, 960);
