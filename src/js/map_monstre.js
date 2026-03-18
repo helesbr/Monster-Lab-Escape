@@ -151,7 +151,7 @@ export default class map_monstre extends Phaser.Scene {
             const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
-                boutonDirecteur.setInteractive();
+                boutonDirecteur.isableInteractive();
                 boutonDirecteur.setDepth(50);
                 boutonDirecteur.setVisible(false); // Cacher le bouton
                 
