@@ -6,6 +6,7 @@ export default class HUD extends Phaser.Scene {
     create() {
         this.pointsVie = 3;
         this.aArme = false;
+        this.monstresMorts = false;
         const heartSize = 32;
         this.heartSize = heartSize;
 
@@ -24,34 +25,39 @@ export default class HUD extends Phaser.Scene {
 
         this.updateHeart();
 
-        // ✅ reçoit un coup
+        // vies
         this.game.events.on('playerHit', () => {
             this.pointsVie--;
             this.updateHeart();
         });
-
-        // ✅ reset complet (retour menu)
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
             this.updateHeart();
         });
-
-        // ✅ une autre scène demande la vie actuelle
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
         });
 
-        // ✅ gestion arme
+        // arme
         this.game.events.on('armeRamassee', () => {
             this.aArme = true;
         });
-
         this.game.events.on('getArme', (callback) => {
             callback(this.aArme);
         });
-
         this.game.events.on('resetArme', () => {
             this.aArme = false;
+        });
+
+        // ✅ monstres
+        this.game.events.on('tousMonstresMorts', () => {
+            this.monstresMorts = true;
+        });
+        this.game.events.on('getMonstresMorts', (callback) => {
+            callback(this.monstresMorts);
+        });
+        this.game.events.on('resetMonstres', () => {
+            this.monstresMorts = false;
         });
     }
 
