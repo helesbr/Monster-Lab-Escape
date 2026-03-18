@@ -90,12 +90,12 @@ export default class map_monstre extends Phaser.Scene {
                     monstre.setCollideWorldBounds(true);
                     monstre.setDisplaySize(100, 100);
                     monstre.setDepth(50);
-                    monstre.pointsVie = Phaser.Math.Between(1, 3);
+                    monstre.pointsVie = Phaser.Math.Between(3, 6);
                     // ✅ stocker l'index sur le monstre
                     monstre.index = index;
                     monstre.setVelocity(
-                        Phaser.Math.Between(-80, 80),
-                        Phaser.Math.Between(-80, 80)
+                        Phaser.Math.Between(-150, 150),
+                        Phaser.Math.Between(-150, 150)
                     );
 
                     monstre.moveEvent = this.time.addEvent({
@@ -103,8 +103,8 @@ export default class map_monstre extends Phaser.Scene {
                         callback: function() {
                             if (monstre.active) {
                                 monstre.setVelocity(
-                                    Phaser.Math.Between(-80, 80),
-                                    Phaser.Math.Between(-80, 80)
+                                    Phaser.Math.Between(-150, 150),
+                                    Phaser.Math.Between(-150, 150)
                                 );
                             }
                         },
