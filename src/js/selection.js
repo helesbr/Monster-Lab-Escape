@@ -435,7 +435,14 @@ export default class selection extends Phaser.Scene {
           } else if (porte.doorName === "door4") {
               destination = "map_monstre";
               porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
-          }
+          } else if (porte.doorName === "door1") {
+            destination = "map_cuisine";
+             porteDestination = "door_retour2"; // porte d'arrivée dans map_cuisine
+           } else if (porte.doorName === "door12") {
+            destination = "map_cuisine";
+             porteDestination = "door_retour1"; // porte d'arrivée dans map_cuisine
+            }
+          
 
           this.scene.start(destination, { porteDestination: porteDestination });
 

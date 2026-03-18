@@ -131,13 +131,14 @@
   </object>
  </objectgroup>
  <objectgroup id="7" name="door_retour" locked="1">
-  <object id="9" name="door_retour" x="944" y="314">
+  <object id="9" name="door_retour1" x="944" y="314">
    <properties>
-    <property name="estSolide" type="bool" value="false"/>
+    <property name="estSolide" type="bool" value="true"/>
+    <property name="verticale" type="bool" value="true"/>
    </properties>
    <point/>
   </object>
-  <object id="10" name="door_retour" x="350" y="942">
+  <object id="10" name="door_retour2" x="350" y="942">
    <properties>
     <property name="estSolide" type="bool" value="true"/>
     <property name="horizontal" type="bool" value="true"/>
