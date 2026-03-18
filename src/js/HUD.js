@@ -11,26 +11,26 @@ export default class HUD extends Phaser.Scene {
         const heartSize = 32;
         this.heartSize = heartSize;
 
-        this.heartVide = this.add.image(20, 20, 'heart')
-            .setOrigin(0, 0)
+        this.heartVide = this.add.image(460, 20, 'heart')
+            .setOrigin(1, 0)
             .setDisplaySize(heartSize, heartSize)
             .setScrollFactor(0)
             .setDepth(200)
             .setAlpha(0.3);
 
-        this.heartPlein = this.add.image(20, 20, 'heart')
-            .setOrigin(0, 0)
+        this.heartPlein = this.add.image(460, 20, 'heart')
+            .setOrigin(1, 0)
             .setDisplaySize(heartSize, heartSize)
             .setScrollFactor(0)
             .setDepth(201);
 
         // ✅ texte money
-        this.texteMoney = this.add.text(20, 60, 'Money: 0', {
+        this.texteMoney = this.add.text(460, 60, 'Money: 0', {
             fontSize: '16px',
             fill: '#FFD700',
             stroke: '#000000',
             strokeThickness: 3
-        }).setScrollFactor(0).setDepth(200);
+        }).setScrollFactor(0).setDepth(200).setOrigin(1, 0);
 
         this.updateHeart();
 
