@@ -1,235 +1,137 @@
 var player;
 
 export default class map_cuisine extends Phaser.Scene {
-
     constructor() {
-
         super({ key: "map_cuisine" });
-
     }
 
     preload() {
-
         this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
-
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
-
+        this.load.image('ball', 'src/assets/images/ball.png');
         this.load.spritesheet('doors', 'src/assets/images/doors_spritesheet.png', {
             frameWidth: 64,
             frameHeight: 80
         });
-
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
-
             frameWidth: 44,
-
             frameHeight: 48
-
         });
-
-        // Charger les monstres en tant que spritesheet
-
         this.load.spritesheet('monstre', 'src/assets/images/mini_monstres.png', {
-
             frameWidth: 44,
-
             frameHeight: 48
-
         });
-
-        // Charger les images des produits
-
+        this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
+            frameWidth: 64,
+            frameHeight: 64
+        });
         this.load.image('preworkout', 'src/assets/images/prewarkout.png');
-
         this.load.image('creatine', 'src/assets/images/creatine.png');
-
-        // Chargement du son cuisine
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
-
     }
 
-
-
     create() {
-        // Lancer le son de la cuisine
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
-
-        // Arrêter la musique quand on quitte la scène
         this.events.on('shutdown', () => {
-            if (this.son_cuisine) {
-                this.son_cuisine.stop();
-            }
+            if (this.son_cuisine) this.son_cuisine.stop();
         });
 
-        // Charger la carte
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
-        // Create layers
         const solLayer = carteCuisine.createLayer("sol", tileset, 0, 0);
         const wallLayer = carteCuisine.createLayer("Wall", tileset, 0, 0);
         const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
-        // Activer les collisions si les couches existent
-        if (solLayer) solLayer.setCollisionByExclusion([-1]);
-        if (wallLayer) wallLayer.setCollisionByExclusion([-1]);
-        if (objetsLayer) objetsLayer.setCollisionByProperty({ estSolide: true });
-        // Ajuster le monde et la caméra pour afficher la totalité de la map
+        wallLayer.setCollisionByProperty({ estSolide: true });
+        objetsLayer.setCollisionByProperty({ estSolide: true });
+
         this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
         this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
 
-
-
-        // Calculer le zoom pour faire rentrer la map entière
-
         let zoomX = this.scale.width / carteCuisine.widthInPixels;
-
         let zoomY = this.scale.height / carteCuisine.heightInPixels;
-
-        let meilleurZoom = Math.min(zoomX, zoomY);
-
-
-
-        // Appliquer le zoom et centrer la caméra
-
-        this.cameras.main.setZoom(meilleurZoom);
-
+        this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteCuisine.widthInPixels / 2, carteCuisine.heightInPixels / 2);
 
-
-
-        // Créer les animations du joueur s'ils n'existent pas
-
         if (!this.anims.exists("anim_tourne_gauche")) {
-
             this.anims.create({
-
                 key: "anim_tourne_gauche",
-
                 frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
-
                 frameRate: 10,
-
                 repeat: -1
-
             });
-
         }
-
         if (!this.anims.exists("anim_tourne_droite")) {
-
             this.anims.create({
-
                 key: "anim_tourne_droite",
-
                 frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-
                 frameRate: 10,
-
                 repeat: -1
-
             });
-
         }
-
         if (!this.anims.exists("anim_face")) {
-
             this.anims.create({
-
                 key: "anim_face",
-
                 frames: [{ key: "img_perso", frame: 1 }],
-
                 frameRate: 20
-
             });
-
+        }
+        if (!this.anims.exists("monstre_marche")) {
+            this.anims.create({
+                key: "monstre_marche",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 3 }),
+                frameRate: 8,
+                repeat: -1
+            });
+        }
+        if (!this.anims.exists("gun_droite")) {
+            this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_gauche")) {
+            this.anims.create({ key: "gun_gauche", frames: [{ key: "image_gun", frame: 1 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_haut")) {
+            this.anims.create({ key: "gun_haut", frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_bas")) {
+            this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
         }
 
-
-
-        // ✅ Créer les animations des monstres
-
-        this.anims.create({
-
-            key: "monstre_marche",
-
-            frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 3 }),
-
-            frameRate: 8,
-
-            repeat: -1
-
-        });
-
-
-
-        // ✅ Spawn des monstres
-
+        // Spawn des monstres
         const calqueMonstres = carteCuisine.getObjectLayer("Calque monstres");
-
-        this.groupe_monstres = this.physics.add.group(); // Garder en référence pour update()
-
-
-
+        this.groupe_monstres = this.physics.add.group();
         if (calqueMonstres) {
-
             calqueMonstres.objects.forEach((monstreObj) => {
-
                 const monstre = this.groupe_monstres.create(monstreObj.x, monstreObj.y, 'monstre', 0);
-
                 monstre.setBounce(1, 1);
-
                 monstre.setCollideWorldBounds(true);
-
-                monstre.setDisplaySize(40, 40); // Redimensionner pour affichage correct
-
-                monstre.setDepth(50); // Au-dessus de la map
-
-                let velocityX = Phaser.Math.Between(-80, 80);
-
-                let velocityY = Phaser.Math.Between(-80, 80);
-
-                monstre.setVelocity(velocityX, velocityY);
-
+                monstre.setDisplaySize(40, 40);
+                monstre.setDepth(50);
+                monstre.pointsVie = Phaser.Math.Between(1, 3);
+                monstre.setVelocity(
+                    Phaser.Math.Between(-80, 80),
+                    Phaser.Math.Between(-80, 80)
+                );
                 monstre.anims.play('monstre_marche');
 
-
-
-                // IA: Changer de direction aléatoirement
-
-                this.time.addEvent({
-
+                monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-
-                    callback: function () {
-
-                        monstre.setVelocity(
-
-                            Phaser.Math.Between(-80, 80),
-
-                            Phaser.Math.Between(-80, 80)
-
-                        );
-
+                    callback: function() {
+                        if (monstre.active) {
+                            monstre.setVelocity(
+                                Phaser.Math.Between(-80, 80),
+                                Phaser.Math.Between(-80, 80)
+                            );
+                        }
                     },
-
                     loop: true
-
                 });
-
             });
-
-
-
-            // ✅ Ajouter les collisions avec les murs et objets
-
             if (wallLayer) this.physics.add.collider(this.groupe_monstres, wallLayer);
-
             if (objetsLayer) this.physics.add.collider(this.groupe_monstres, objetsLayer);
-
         }
-        // ✅ Créer les animations des portes
+
         if (!this.anims.exists("door_closed")) {
             this.anims.create({
                 key: "door_closed",
@@ -245,13 +147,9 @@ export default class map_cuisine extends Phaser.Scene {
             });
         }
 
-        // ✅ Spawn des portes
         var groupe_portes = this.physics.add.group();
-
-        // Charger les deux couches de portes
         const tabPoints1 = carteCuisine.getObjectLayer("door_retour");
         const tabPoints2 = carteCuisine.getObjectLayer("door retour");
-
         [tabPoints1, tabPoints2].forEach(tabPoints => {
             if (tabPoints) {
                 tabPoints.objects.forEach(point => {
@@ -262,24 +160,17 @@ export default class map_cuisine extends Phaser.Scene {
                     porte.body.setImmovable(true);
                     porte.body.moves = false;
                     porte.estSolide = true;
-
-                    // Vérifier la propriété verticale pour la rotation
                     if (point.properties) {
                         const hasVertical = point.properties.some(prop => prop.name === "verticale" && prop.value === true);
-
-                        if (hasVertical) {
-                            porte.setAngle(90);
-                        }
+                        if (hasVertical) porte.setAngle(90);
                     }
                 });
             }
         });
 
-        // ✅ Créer le joueur - positionné selon la porte d'arrivée
         const { porteDestination } = this.scene.settings.data || {};
         let playerSpawnX = 100;
         let playerSpawnY = 100;
-
         if (porteDestination) {
             const porteArrivee = groupe_portes.children.entries.find(p => p.doorName === porteDestination);
             if (porteArrivee) {
@@ -292,49 +183,94 @@ export default class map_cuisine extends Phaser.Scene {
         player.setCollideWorldBounds(true);
         player.setDepth(100);
         player.body.setGravityY(-this.physics.world.gravity.y);
+        player.armeEquipee = null;
+        player.directionArme = 'droite';
+        player.pointsVie = 3;
+        this.invincible = false;
 
-        // Collisions du joueur avec les murs
+        // ✅ récupérer les vies depuis le HUD
+        this.game.events.emit('getVie', (vie) => {
+            player.pointsVie = vie;
+        });
+
+        // ✅ récupérer si le joueur a déjà l'arme
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                armeSprite.setDisplaySize(40, 40);
+                armeSprite.setDepth(99);
+                armeSprite.anims.play('gun_droite');
+                player.armeEquipee = armeSprite;
+            }
+        });
+
         if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
-        // Suivre le joueur avec la caméra
+        this.doorCollider = this.physics.add.collider(player, groupe_portes);
+        this.groupe_portes = groupe_portes;
         this.cameras.main.startFollow(player);
 
-        // Créer les animations du joueur s'ils n'existent pas
-        if (!this.anims.exists("anim_tourne_gauche")) {
-            this.anims.create({
-                key: "anim_tourne_gauche",
-                frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
-                frameRate: 10,
-                repeat: -1
+        // ✅ groupe de balles
+        this.groupeBullets = this.physics.add.group();
+
+        if (wallLayer) {
+            this.physics.add.collider(this.groupeBullets, wallLayer, (balle) => {
+                balle.destroy();
+            });
+        }
+        if (objetsLayer) {
+            this.physics.add.collider(this.groupeBullets, objetsLayer, (balle) => {
+                balle.destroy();
             });
         }
 
-        if (!this.anims.exists("anim_tourne_droite")) {
-            this.anims.create({
-                key: "anim_tourne_droite",
-                frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-                frameRate: 10,
-                repeat: -1
+        this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
+            balle.destroy();
+            monstre.pointsVie--;
+            if (monstre.pointsVie <= 0) {
+                if (monstre.moveEvent) monstre.moveEvent.remove();
+                monstre.destroy();
+            }
+        });
+
+        // ✅ overlap joueur/monstres
+        this.physics.add.overlap(player, this.groupe_monstres, () => {
+            if (this.invincible) return;
+            this.invincible = true;
+            this.game.events.emit('playerHit');
+            player.pointsVie--;
+
+            this.tweens.add({
+                targets: player,
+                alpha: 0,
+                duration: 100,
+                repeat: 5,
+                yoyo: true,
+                onComplete: () => {
+                    player.setAlpha(1);
+                    this.invincible = false;
+                }
             });
-        }
 
-        if (!this.anims.exists("anim_face")) {
-            this.anims.create({
-                key: "anim_face",
-                frames: [{ key: "img_perso", frame: 1 }],
-                frameRate: 20
-            });
-        }
+            if (player.pointsVie <= 0) {
+                this.game.events.emit('resetVie');
+                this.game.events.emit('resetArme');
+                this.scene.stop('HUD');
+                this.scene.start('menu');
+            }
+        });
 
-        // ✅ Collision avec les portes fermées
-        this.doorCollider = this.physics.add.collider(player, groupe_portes);
+        this.physics.world.on("worldbounds", (body) => {
+            const objet = body.gameObject;
+            if (this.groupeBullets.contains(objet)) {
+                objet.destroy();
+            }
+        });
 
-        // Stocker référence pour utilisation dans update
-        this.groupe_portes = groupe_portes;
-
-        // ✅ Initialiser le clavier une seule fois
         this.cursors = this.input.keyboard.createCursorKeys();
+        this.boutonFeu = this.input.keyboard.addKey('A');
+
         this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
@@ -355,117 +291,97 @@ export default class map_cuisine extends Phaser.Scene {
                         porteDestination = 'door12';
                         offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination: porteDestination, offsetY: offsetY, offsetX: offsetX });
+                    this.scene.start(destination, { porteDestination, offsetY, offsetX });
                 });
             }
-
         });
 
-
-
-        // ✅ Spawn des produits (creatine et pre-workout)
-
         const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
-
         if (calqueProduit) {
-
             calqueProduit.objects.forEach((produitObj) => {
-
-                // Déterminer l'image selon le nom du produit
-
                 const imageKey = produitObj.name === 'creatine' ? 'creatine' : 'preworkout';
-
                 const produit = this.add.image(produitObj.x, produitObj.y, imageKey);
-
-                produit.setDisplaySize(30, 30); // Taille du produit
-
-                produit.setDepth(45); // Au-dessus de la map mais sous les monstres
-
-                // Les produits restent statiques (pas de physique)
-
+                produit.setDisplaySize(30, 30);
+                produit.setDepth(45);
             });
 
-
-
-
-            // ✅ Spawn des creatines (calque séparé)
-
             const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
-
             if (calqueCreatine) {
-
                 calqueCreatine.objects.forEach((creatineObj) => {
-
                     const creatine = this.add.image(creatineObj.x, creatineObj.y, 'creatine');
-
-                    creatine.setDisplaySize(30, 30); // Taille de la creatine
-
-                    creatine.setDepth(45); // Au-dessus de la map mais sous les monstres
-
+                    creatine.setDisplaySize(30, 30);
+                    creatine.setDepth(45);
                 });
             }
         }
 
         this.game.config.maVariable -= 10;
-
     }
+
+    tirer() {
+        if (!player.armeEquipee) return;
+
+        let vx = 0;
+        let vy = 0;
+        let offsetX = 0;
+        let offsetY = 0;
+        const vitesse = 600;
+
+        switch (player.directionArme) {
+            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'gauche': vx = -vitesse; offsetX = -30; break;
+            case 'haut':   vy = -vitesse; offsetY = -30; break;
+            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+        }
+
+        const balle = this.groupeBullets.create(
+            player.x + offsetX,
+            player.y + offsetY,
+            'ball'
+        );
+        balle.setDisplaySize(12, 12);
+        balle.setDepth(90);
+        balle.setCollideWorldBounds(true);
+        balle.body.allowGravity = false;
+        balle.body.onWorldBounds = true;
+        balle.setVelocity(vx, vy);
+    }
+
     update() {
-        // Contrôles du joueur
         if (!this.cursors) {
             this.cursors = this.input.keyboard.createCursorKeys();
         }
-
-        // Gauche / Droite
         const cursors = this.cursors;
+
         if (cursors.right.isDown) {
-
             player.setVelocityX(160);
-
             player.setFlipX(false);
-
             player.anims.play('anim_tourne_droite', true);
-
-        }
-
-        else if (cursors.left.isDown) {
-
+            player.directionArme = 'droite';
+        } else if (cursors.left.isDown) {
             player.setVelocityX(-160);
-
             player.setFlipX(false);
-
             player.anims.play('anim_tourne_gauche', true);
-
+            player.directionArme = 'gauche';
         } else {
-
             player.setVelocityX(0);
-
             player.anims.play('anim_face');
-
         }
-
-
-
-        // Haut / Bas
 
         if (cursors.up.isDown) {
-
             player.setVelocityY(-160);
-
-        }
-
-        else if (cursors.down.isDown) {
-
+            player.directionArme = 'haut';
+        } else if (cursors.down.isDown) {
             player.setVelocityY(160);
-
-        }
-
-        else {
-
+            player.directionArme = 'bas';
+        } else {
             player.setVelocityY(0);
-
         }
 
-        // ✅ Détection de proximité avec les portes
+        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) {
+            this.tirer();
+        }
+
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
@@ -478,34 +394,33 @@ export default class map_cuisine extends Phaser.Scene {
                 }
             });
         }
+
         if (this.groupe_monstres) {
-
             this.groupe_monstres.children.entries.forEach((monstre) => {
-
-                const vx = monstre.body.velocity.x;
-
-
-
-                // Si le monstre se déplace à droite
-
-                if (vx > 0) {
-
-                    monstre.setFlipX(false);
-
-                }
-
-                // Si le monstre se déplace à gauche
-
-                else if (vx < 0) {
-
-                    monstre.setFlipX(true);
-
-                }
-
+                if (monstre.body.velocity.x > 0) monstre.setFlipX(false);
+                else if (monstre.body.velocity.x < 0) monstre.setFlipX(true);
             });
-
         }
 
+        if (player.armeEquipee) {
+            switch (player.directionArme) {
+                case 'droite':
+                    player.armeEquipee.anims.play('gun_droite', true);
+                    player.armeEquipee.setPosition(player.x + 30, player.y);
+                    break;
+                case 'gauche':
+                    player.armeEquipee.anims.play('gun_gauche', true);
+                    player.armeEquipee.setPosition(player.x - 20, player.y);
+                    break;
+                case 'haut':
+                    player.armeEquipee.anims.play('gun_haut', true);
+                    player.armeEquipee.setPosition(player.x, player.y - 30);
+                    break;
+                case 'bas':
+                    player.armeEquipee.anims.play('gun_bas', true);
+                    player.armeEquipee.setPosition(player.x, player.y + 30);
+                    break;
+            }
+        }
     }
 }
-

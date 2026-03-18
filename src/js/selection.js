@@ -7,492 +7,282 @@ var gameOver = false;
 var groupe_portes;
 
 export default class selection extends Phaser.Scene {
-
-  constructor() {
-
-    super({ key: "selection" });
-
-  }
-
-  preload() {
-
-    this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
-
-      frameWidth: 44,
-
-      frameHeight: 48
-
-    });
-    // chargement des musiques 
-    this.load.audio('menu', 'src/assets/son/menu.mp3');
-    this.load.audio('laboratory', 'src/assets/son/laboratory.mp3');
-
-    // chargement tuiles de jeu
-
-    this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
-
-    this.load.image('background', 'src/tilesets/tile-background.png');
-
-
-    // chargement de la carte
-
-    this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");
-
-    this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
-
-    this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
-
-    this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");
-
-    this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
-
-      frameWidth: 64,
-
-      frameHeight: 32
-
-    });
-
-  }
-
-
-  create() {
-    this.son_laboratory = this.sound.add('laboratory');
-
-    // Lancer le son du laboratory
-    this.son_laboratory.play();
-
-    // Arrêter la musique quand on quitte la scène
-    this.events.on('shutdown', () => {
-      if (this.son_laboratory) {
-        this.son_laboratory.stop();
-      }
-    });
-    // Récupération de la carte et du tileset
-
-    const carteDuNiveau = this.add.tilemap("carte");
-
-    const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
-
-    const backgroundTileset = carteDuNiveau.addTilesetImage("background", "background");
-
-
-    // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
-
-    const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
-    const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
-
-    const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
-
-    const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
-
-
-    // Définition des collisions pour les murs uniquement
-
-    murLayer.setCollisionByExclusion([-1]);
-
-    objectLayer.setCollisionByExclusion([-1]);
-
-
-    // Redimensionnement du monde avec les dimensions calculées via tiled
-
-    this.physics.world.setBounds(0, 0, 960, 960);
-
-    // Ajout du champs de la caméra de taille identique à celle du monde
-
-    this.cameras.main.setBounds(0, 0, 960, 960);
-
-
-    /***********************************************************************/
-
-    /** 2. CRÉATION DU PERSONNAGE (PAR-DESSUS LA CARTE)
-
-    /***********************************************************************/
-
-    // Récupérer la porte de destination si elle a été passée
-    const { porteDestination, offsetY = 0, offsetX = 0 } = this.scene.settings.data || {};
-    let playerX = 190;
-    let playerY = 480;
-
-    if (porteDestination) {
-      // Chercher la porte dans les portes de selection
-      const taxiPoints = carteDuNiveau.getObjectLayer("doors");
-      if (taxiPoints) {
-        const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
-        if (door) {
-          playerX = door.x + offsetX; // Ajouter l'offset X
-          playerY = door.y + offsetY; // Ajouter l'offset Y
-        }
-      }
+    constructor() {
+        super({ key: "selection" });
     }
-    //spaw du joueuur à la nouvelle porte
-    player = this.physics.add.sprite(playerX, playerY, 'img_perso');
 
-    player.setCollideWorldBounds(true);
+    preload() {
+        this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
+            frameWidth: 44,
+            frameHeight: 48
+        });
+        this.load.audio('menu', 'src/assets/son/menu.mp3');
+        this.load.audio('laboratory', 'src/assets/son/laboratory.mp3');
+        this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
+        this.load.image('background', 'src/tilesets/tile-background.png');
+        this.load.tilemapTiledJSON("carte", "src/assets/laboratory.tmj");
+        this.load.tilemapTiledJSON("cuisine", "src/assets/map_cuisine.tmj");
+        this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
+        this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");
+        this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
+            frameWidth: 64,
+            frameHeight: 32
+        });
+        // ✅ chargement du gun
+        this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
+            frameWidth: 64,
+            frameHeight: 64
+        });
+    }
 
-    player.setDepth(100); // Force le joueur au-dessus de la map
+    create() {
+        this.son_laboratory = this.sound.add('laboratory');
+        this.son_laboratory.play();
+        this.events.on('shutdown', () => {
+            if (this.son_laboratory) this.son_laboratory.stop();
+        });
 
-    player.body.setGravityY(-this.physics.world.gravity.y);
+        const carteDuNiveau = this.add.tilemap("carte");
+        const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
+        const backgroundTileset = carteDuNiveau.addTilesetImage("background", "background");
 
+        const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
+        const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
+        const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
+        const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-    // Ajout de la collision entre le joueur et les murs
+        murLayer.setCollisionByExclusion([-1]);
+        objectLayer.setCollisionByExclusion([-1]);
 
-    this.physics.add.collider(player, murLayer);
+        this.physics.world.setBounds(0, 0, 960, 960);
+        this.cameras.main.setBounds(0, 0, 960, 960);
 
-    this.physics.add.collider(player, objectLayer);
+        const { porteDestination, offsetY = 0, offsetX = 0 } = this.scene.settings.data || {};
+        let playerX = 190;
+        let playerY = 480;
 
-
-    /***********************************************************************/
-
-    /** CRÉATION DES ANIMATIONS DES PORTES
-
-    /***********************************************************************/
-
-    // Créer les animations des portes
-
-    this.anims.create({
-
-      key: 'door_closed',
-
-
-
-      frames: [{ key: 'porte', frame: 0 }],
-
-      frameRate: 10
-
-    });
-
-
-    this.anims.create({
-
-      key: 'door_open',
-
-      frames: [{ key: 'porte', frame: 1 }],
-
-      frameRate: 10
-
-    });
-
-
-    /***********************************************************************/
-
-    /** CRÉATION DES PORTES
-
-    /***********************************************************************/
-
-    groupe_portes = this.physics.add.group();
-
-    // Récupération du calque d'objets des portes
-
-    const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
-
-
-    // Création des portes sur chaque objet door
-
-    if (doorsObjectsLayer) {
-
-      doorsObjectsLayer.objects.forEach((obj) => {
-
-        if (obj.name.startsWith("door")) {
-
-          const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
-
-          porte.setCollideWorldBounds(true);
-
-          porte.setDepth(50); // Au-dessus des murs mais accessible au joueur
-
-          porte.setDisplaySize(64, 32);  // Taille correcte pour la collision
-
-          porte.body.setImmovable(true);  // La porte ne se déplace pas
-
-          porte.body.moves = false;  // Désactiver complètement les mouvements du body
-
-          porte.isOpen = false;
-
-          porte.estSolide = true;// État initial : fermée
-          porte.nom = obj.name;  // Stocker le nom de la porte
-          porte.play('door_closed'); // Affiche le frame fermé
-
-          porte.doorName = obj.name; // Stocker le nom de la porte
-
-          groupe_portes.add(porte);
-
-
-
-          if (obj.properties) {
-
-            const destProp = obj.properties.find(p => p.name === "destination");
-
-            if (destProp) {
-
-              porte.destination = destProp.value; // ex: "map_cuisine"
-
+        if (porteDestination) {
+            const taxiPoints = carteDuNiveau.getObjectLayer("doors");
+            if (taxiPoints) {
+                const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
+                if (door) {
+                    playerX = door.x + offsetX;
+                    playerY = door.y + offsetY;
+                }
             }
+        }
 
-          }
+        player = this.physics.add.sprite(playerX, playerY, 'img_perso');
+        player.setCollideWorldBounds(true);
+        player.setDepth(100);
+        player.body.setGravityY(-this.physics.world.gravity.y);
+        // ✅ initialiser arme et direction
+        player.armeEquipee = null;
+        player.directionArme = 'droite';
 
+        this.physics.add.collider(player, murLayer);
+        this.physics.add.collider(player, objectLayer);
 
+        this.anims.create({
+            key: 'door_closed',
+            frames: [{ key: 'porte', frame: 0 }],
+            frameRate: 10
+        });
+        this.anims.create({
+            key: 'door_open',
+            frames: [{ key: 'porte', frame: 1 }],
+            frameRate: 10
+        });
 
-          // Vérifier si la porte a la propriété "horizontale"
+        groupe_portes = this.physics.add.group();
+        const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
+        if (doorsObjectsLayer) {
+            doorsObjectsLayer.objects.forEach((obj) => {
+                if (obj.name.startsWith("door")) {
+                    const porte = this.physics.add.sprite(obj.x, obj.y, 'porte');
+                    porte.setCollideWorldBounds(true);
+                    porte.setDepth(50);
+                    porte.setDisplaySize(64, 32);
+                    porte.body.setImmovable(true);
+                    porte.body.moves = false;
+                    porte.isOpen = false;
+                    porte.estSolide = true;
+                    porte.nom = obj.name;
+                    porte.play('door_closed');
+                    porte.doorName = obj.name;
+                    groupe_portes.add(porte);
 
-          if (obj.properties) {
+                    if (obj.properties) {
+                        const destProp = obj.properties.find(p => p.name === "destination");
+                        if (destProp) porte.destination = destProp.value;
+                    }
 
-            const hasHorizontal = obj.properties.some(prop =>
+                    if (obj.properties) {
+                        const hasHorizontal = obj.properties.some(prop =>
+                            prop.name === "horizontal" || prop.name === "orientation"
+                        );
+                        if (!hasHorizontal) porte.setAngle(90);
+                    } else {
+                        porte.setAngle(90);
+                    }
+                }
+            });
+        }
 
-              prop.name === "horizontal" || prop.name === "orientation"
+        this.physics.add.collider(player, groupe_portes);
+        this.cameras.main.startFollow(player);
 
-            );
+        clavier = this.input.keyboard.createCursorKeys();
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
-            if (!hasHorizontal) {
+        this.anims.create({
+            key: "anim_tourne_gauche",
+            frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: "anim_tourne_droite",
+            frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: "anim_face",
+            frames: [{ key: "img_perso", frame: 1 }],
+            frameRate: 20
+        });
 
-              porte.setAngle(90); // Tourner de 90° si n'a pas la propriété horizontale
+        // ✅ animations gun
+        if (!this.anims.exists("gun_droite")) {
+            this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_gauche")) {
+            this.anims.create({ key: "gun_gauche", frames: [{ key: "image_gun", frame: 1 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_haut")) {
+            this.anims.create({ key: "gun_haut", frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
+        }
+        if (!this.anims.exists("gun_bas")) {
+            this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
+        }
 
+        groupe_monstres = this.physics.add.group();
+        groupe_bombes = this.physics.add.group();
+
+        zone_texte_score = this.add.text(16, 16, 'Score: 0', {
+            fontSize: '32px',
+            fill: '#000'
+        });
+
+        let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
+        let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
+        this.cameras.main.setZoom(Math.min(zoomX, zoomY));
+        this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
+
+        // ✅ récupérer si le joueur a déjà l'arme
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                armeSprite.setDisplaySize(40, 40);
+                armeSprite.setDepth(99);
+                armeSprite.anims.play('gun_droite');
+                player.armeEquipee = armeSprite;
             }
+        });
+    }
 
-          } else {
-
-            // Si pas de propriétés, tourner de 90° par défaut
-
-            porte.setAngle(90);
-
-          }
-
+    update() {
+        if (clavier.right.isDown) {
+            player.setVelocityX(160);
+            player.setFlipX(false);
+            player.anims.play('anim_tourne_droite', true);
+            player.directionArme = 'droite';
+        } else if (clavier.left.isDown) {
+            player.setVelocityX(-160);
+            player.setFlipX(false);
+            player.anims.play('anim_tourne_gauche', true);
+            player.directionArme = 'gauche';
+        } else {
+            player.setVelocityX(0);
+            player.setFlipX(false);
+            player.anims.play('anim_face');
         }
 
-      });
-
-    }
-
-
-    // Collider solide entre le joueur et les portes
-    this.physics.add.collider(player, groupe_portes);
-
-
-    // Ancrage de la caméra sur le joueur
-
-    this.cameras.main.startFollow(player);
-
-
-    /***********************************************************************/
-
-    /** 3. ENTRÉES CLAVIER ET ANIMATIONS
-
-    /***********************************************************************/
-
-    clavier = this.input.keyboard.createCursorKeys();
-
-    this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
-
-    this.anims.create({
-
-      key: "anim_tourne_gauche",
-
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
-
-      frameRate: 10,
-
-      repeat: -1
-
-    });
-
-
-    this.anims.create({
-
-      key: "anim_tourne_droite",
-
-      frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
-
-      frameRate: 10,
-
-      repeat: -1
-
-    });
-
-
-    this.anims.create({
-
-      key: "anim_face",
-
-      frames: [{ key: "img_perso", frame: 1 }],
-
-      frameRate: 20
-
-    });
-
-
-    /***********************************************************************/
-
-    /** 4. GROUPES ET INTERFACE
-
-    /***********************************************************************/
-
-    groupe_monstres = this.physics.add.group();
-
-    groupe_bombes = this.physics.add.group();
-
-
-    zone_texte_score = this.add.text(16, 16, 'Score: 0', {
-
-      fontSize: '32px',
-
-      fill: '#000'
-
-    });
-
-    // ✅ Créer l'icône de l'arme
-    this.iconeArme = this.add.image(800, 32, 'image_gun');
-    this.iconeArme.setDisplaySize(32, 32);
-    this.iconeArme.setVisible(false); // Caché par défaut
-    this.iconeArme.setDepth(200);
-    this.iconeArme.setScrollFactor(0); // Fixe à la caméra
-
-    if (this.game.config.aPistole) {
-      this.iconeArme.setVisible(true);
-    }
-
-
-    let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
-
-    let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
-
-
-    // On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
-
-    let meilleurZoom = Math.min(zoomX, zoomY);
-
-    // On applique le zoom et on centre la caméra
-
-    this.cameras.main.setZoom(meilleurZoom);
-
-    this.cameras.main.centerOn(carteDuNiveau.widthInPixels / 2, carteDuNiveau.heightInPixels / 2);
-
-  }
-
-
-  update() {
-
-    // Gauche / Droite
-
-    if (clavier.right.isDown) {
-
-      player.setVelocityX(160);
-
-      player.setFlipX(false);
-
-      player.anims.play('anim_tourne_droite', true);
-
-    }
-
-    else if (clavier.left.isDown) {
-
-      player.setVelocityX(-160);
-
-      player.setFlipX(false);
-
-      player.anims.play('anim_tourne_gauche', true);
-
-    } else {
-
-      player.setVelocityX(0);
-
-      player.setFlipX(false);
-
-      player.anims.play('anim_face');
-
-    }
-
-
-    // Haut / Bas
-
-    if (clavier.up.isDown) {
-
-      player.setVelocityY(-160);
-
-    }
-
-    else if (clavier.down.isDown) {
-
-      player.setVelocityY(160);
-
-    }
-
-    else {
-
-      player.setVelocityY(0);
-
-    }
-
-
-    // Ouverture/Fermeture des portes avec interaction proximité + Enter
-
-    if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-
-      groupe_portes.children.entries.forEach(porte => {
-
-        const distance = Phaser.Math.Distance.Between(
-
-          player.x, player.y,
-
-          porte.x, porte.y
-
-        );
-
-
-
-        if (distance < 100 && porte.estSolide) {
-
-          porte.estSolide = false;
-
-          porte.setFrame(1);
-
-          porte.body.setEnable(false);
-
-          // Déterminer la destination selon le nom de la porte
-          let destination = "map_cuisine"; // défaut
-          let porteDestination = "door_retour"; // porte de destination par défaut
-
-          if (porte.doorName === "door3") {
-            destination = "map_stuff";
-            porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
-          } else if (porte.doorName === "door31") {
-            destination = "map_stuff";
-            porteDestination = "door_retour2"; // porte d'arrivée dans map_stuff
-          } else if (porte.doorName === "door4") {
-            destination = "map_monstre";
-            porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
-          } else if (porte.doorName === "door1") {
-            destination = "map_cuisine";
-            porteDestination = "door_retour2"; // porte d'arrivée dans map_cuisine
-          } else if (porte.doorName === "door12") {
-            destination = "map_cuisine";
-            porteDestination = "door_retour1"; // porte d'arrivée dans map_cuisine
-          }
-
-          this.scene.start(destination, { porteDestination: porteDestination});
-
-
-
-        } else if (distance < 100 && !porte.estSolide) {
-
-          porte.estSolide = true;
-
-          porte.setFrame(0);
-
-          porte.body.setEnable(true);
-
-        }
-        // Si le joueur est proche et la porte est ouverte, fermer
-        else if (distance < 100 && !porte.estSolide) {
-          porte.estSolide = true;
-          porte.setFrame(0);  // Afficher la 1ère image (porte fermée)
-          porte.body.setEnable(true);  // Réactiver la collision
+        if (clavier.up.isDown) {
+            player.setVelocityY(-160);
+            player.directionArme = 'haut';
+        } else if (clavier.down.isDown) {
+            player.setVelocityY(160);
+            player.directionArme = 'bas';
+        } else {
+            player.setVelocityY(0);
         }
 
-      });
+        if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+            groupe_portes.children.entries.forEach(porte => {
+                const distance = Phaser.Math.Distance.Between(
+                    player.x, player.y,
+                    porte.x, porte.y
+                );
 
+                if (distance < 100 && porte.estSolide) {
+                    porte.estSolide = false;
+                    porte.setFrame(1);
+                    porte.body.setEnable(false);
+
+                    let destination = "map_cuisine";
+                    let porteDestination = "door_retour";
+
+                    if (porte.doorName === "door3") {
+                        destination = "map_stuff";
+                        porteDestination = "door_retour1";
+                    } else if (porte.doorName === "door31") {
+                        destination = "map_stuff";
+                        porteDestination = "door_retour2";
+                    } else if (porte.doorName === "door4") {
+                        destination = "map_monstre";
+                        porteDestination = "door_monstre";
+                    } else if (porte.doorName === "door1") {
+                        destination = "map_cuisine";
+                        porteDestination = "door_retour2";
+                    } else if (porte.doorName === "door12") {
+                        destination = "map_cuisine";
+                        porteDestination = "door_retour1";
+                    }
+
+                    this.scene.start(destination, { porteDestination });
+
+                } else if (distance < 100 && !porte.estSolide) {
+                    porte.estSolide = true;
+                    porte.setFrame(0);
+                    porte.body.setEnable(true);
+                }
+            });
+        }
+
+        // ✅ mettre à jour la position de l'arme
+        if (player.armeEquipee) {
+            switch (player.directionArme) {
+                case 'droite':
+                    player.armeEquipee.anims.play('gun_droite', true);
+                    player.armeEquipee.setPosition(player.x + 30, player.y);
+                    break;
+                case 'gauche':
+                    player.armeEquipee.anims.play('gun_gauche', true);
+                    player.armeEquipee.setPosition(player.x - 20, player.y);
+                    break;
+                case 'haut':
+                    player.armeEquipee.anims.play('gun_haut', true);
+                    player.armeEquipee.setPosition(player.x, player.y - 30);
+                    break;
+                case 'bas':
+                    player.armeEquipee.anims.play('gun_bas', true);
+                    player.armeEquipee.setPosition(player.x, player.y + 30);
+                    break;
+            }
+        }
     }
-
-  }
-
 }
 
 
