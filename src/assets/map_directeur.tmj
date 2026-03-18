@@ -246,7 +246,7 @@
          "draworder":"topdown",
          "id":5,
          "locked":true,
-         "name":"door retour",
+         "name":"door_retour",
          "objects":[
                 {
                  "height":0,

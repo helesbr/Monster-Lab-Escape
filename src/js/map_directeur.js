@@ -12,21 +12,18 @@ export default class map_directeur extends Phaser.Scene {
             frameWidth: 44,
             frameHeight: 48
         });
-        this.load.spritesheet('doors', 'src/assets/images/doors_spritesheet.png', {
-            frameWidth: 64,
-            frameHeight: 80
-        });
+        this.load.image('doors', 'src/assets/images/door_solo.png');
+        this.load.image('arthus', 'src/assets/images/arthus1.png');
     }
 
     create() {
         // Pour lire la money au démarrage de la scène si besoin :
         this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
         });
 
         const carteDirecteurLab = this.add.tilemap("directeur");
         const tileset = carteDirecteurLab.addTilesetImage("all-tileset", "allTiles");
-        const yellow = carteDirecteurLab.addTilesetImage("yellow", "tapis_jaune");
+        const yellow = carteDirecteurLab.addTilesetImage("yellow", "tapis_jaune", 32, 32);
         const floorLayer = carteDirecteurLab.createLayer("floor", tileset, 0, 0);
         const yellowLayer = carteDirecteurLab.createLayer("yellow", yellow, 0, 0);
         const carpetLayer = carteDirecteurLab.createLayer("carpet", tileset, 0, 0);
@@ -43,24 +40,37 @@ export default class map_directeur extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteDirecteurLab.widthInPixels / 2, carteDirecteurLab.heightInPixels / 2);
 
-        // ✅ Créer la porte
-        var groupe_portes = this.physics.add.group();
-        const doorsObjectsLayer = carteDirecteurLab.getObjectLayer("doors");
+        // ✅ Créer la porte "door_retour"
+        const groupe_portes = this.physics.add.group();
+        const doorsObjectsLayer = carteDirecteurLab.getObjectLayer("door_retour");
         if (doorsObjectsLayer) {
-            doorsObjectsLayer.objects.forEach((obj) => {
-                if (obj.name.startsWith("door")) {
-                    const porte = this.physics.add.sprite(obj.x, obj.y, 'doors');
-                    porte.setCollideWorldBounds(true);
-                    porte.setDepth(50);
-                    porte.setDisplaySize(64, 32);
-                    porte.body.setImmovable(true);
-                    porte.body.moves = false;
-                    porte.estSolide = true;
-                    porte.nom = obj.name;
-                    porte.doorName = obj.name;
-                    groupe_portes.add(porte);
-                }
-            });
+            const obj = doorsObjectsLayer.objects[0];
+            if (obj) {
+                const porte = this.physics.add.sprite(obj.x, obj.y, 'doors');
+                porte.setCollideWorldBounds(true);
+                porte.setDepth(50);
+                porte.setDisplaySize(64, 32);
+                porte.setRotation(Math.PI / 2);
+                porte.body.setImmovable(true);
+                porte.body.moves = false;
+                porte.estSolide = true;
+                porte.nom = obj.name;
+                porte.doorName = obj.name;
+                groupe_portes.add(porte);
+            }
+        }
+
+        // ✅ Créer l'image Arthus au ping "arthus"
+        const arthusObjectsLayer = carteDirecteurLab.getObjectLayer("arthus");
+        if (arthusObjectsLayer) {
+            const obj = arthusObjectsLayer.objects[0];
+            if (obj) {
+                const arthus = this.physics.add.sprite(obj.x, obj.y, 'arthus');
+                arthus.setCollideWorldBounds(true);
+                arthus.setDepth(50);
+                arthus.body.setImmovable(true);
+                arthus.body.moves = false;
+            }
         }
 
         // ✅ Récupérer la position de spawn du joueur selon la porte de destination
