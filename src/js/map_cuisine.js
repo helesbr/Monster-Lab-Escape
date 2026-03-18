@@ -326,6 +326,15 @@ export default class map_cuisine extends Phaser.Scene {
         }
 
         this.game.config.maVariable -= 10;
+
+        // ✅ immunité de 3 secondes à l'entrée dans la scène
+        this.invincible = true;
+        player.setAlpha(0.5); // effet visuel semi-transparent
+
+        this.time.delayedCall(1500, () => {
+            this.invincible = false;
+            player.setAlpha(1);
+        });
     }
 
     tirer() {
