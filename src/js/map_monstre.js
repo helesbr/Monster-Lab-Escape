@@ -10,11 +10,11 @@ export default class map_monstre extends Phaser.Scene {
 
     preload() {
 
-        this.load.tilemapTiledJSON("monstre", "src/assets/map_monstre.tmj");
+        this.load.tilemapTiledJSON("monstres", "src/assets/map_monstre.tmj");
 
         this.load.image("allTiles", "src/tilesets/all_tilesets.png");
 
-        this.load.spritesheet('monstre', 'src/assets/images/monstre.png', {
+        this.load.spritesheet('monstres', 'src/assets/images/monstre.png', {
 
             frameWidth: 44,
 
@@ -31,14 +31,14 @@ export default class map_monstre extends Phaser.Scene {
         });
 
         // Chargement du son monstre
-        this.load.audio('monstre', 'src/assets/son/monstre.mp3');
+        this.load.audio('monstres', 'src/assets/son/monstre.mp3');
     }
 
 
 
     create() {
         // Lancer le son de monstre
-        this.son_monstre = this.sound.add('monstre');
+        this.son_monstre = this.sound.add('monstres');
         this.son_monstre.play();
 
         // Arrêter la musique quand on quitte la scène
@@ -48,7 +48,7 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
-        const carteMonstreLab = this.add.tilemap("monstre");
+        const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
         // Create layers
@@ -80,7 +80,7 @@ export default class map_monstre extends Phaser.Scene {
                 const randomX = Phaser.Math.Between(50, carteMonstreLab.widthInPixels - 50);
                 const randomY = Phaser.Math.Between(50, carteMonstreLab.heightInPixels - 50);
 
-                const monstre = this.groupe_monstres.create(randomX, randomY, 'monstre');
+                const monstre = this.groupe_monstres.create(randomX, randomY, 'monstres');
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
                 monstre.setDisplaySize(100, 100);
