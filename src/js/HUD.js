@@ -6,22 +6,31 @@ export default class HUD extends Phaser.Scene {
     create() {
         this.pointsVie = 3;
         this.aArme = false;
-        this.monstresMorts = false;
+        this.money = 0; // ✅ ajout money
+        this.monstresMorts = [];
         const heartSize = 32;
         this.heartSize = heartSize;
 
-        this.heartVide = this.add.image(20, 20, 'heart')
-            .setOrigin(0, 0)
+        this.heartVide = this.add.image(460, 20, 'heart')
+            .setOrigin(1, 0)
             .setDisplaySize(heartSize, heartSize)
             .setScrollFactor(0)
             .setDepth(200)
             .setAlpha(0.3);
 
-        this.heartPlein = this.add.image(20, 20, 'heart')
-            .setOrigin(0, 0)
+        this.heartPlein = this.add.image(460, 20, 'heart')
+            .setOrigin(1, 0)
             .setDisplaySize(heartSize, heartSize)
             .setScrollFactor(0)
             .setDepth(201);
+
+        // ✅ texte money
+        this.texteMoney = this.add.text(460, 60, 'Money: 0', {
+            fontSize: '16px',
+            fill: '#FFD700',
+            stroke: '#000000',
+            strokeThickness: 3
+        }).setScrollFactor(0).setDepth(200).setOrigin(1, 0);
 
         this.updateHeart();
 
@@ -30,10 +39,12 @@ export default class HUD extends Phaser.Scene {
             this.pointsVie--;
             this.updateHeart();
         });
+
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
             this.updateHeart();
         });
+
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
         });
@@ -49,15 +60,30 @@ export default class HUD extends Phaser.Scene {
             this.aArme = false;
         });
 
-        // ✅ monstres
-        this.game.events.on('tousMonstresMorts', () => {
-            this.monstresMorts = true;
+        // ✅ événements money
+        this.game.events.on('addMoney', (montant) => {
+            this.money += montant;
+            this.texteMoney.setText('Money: ' + this.money);
+        });
+
+        this.game.events.on('getMoney', (callback) => {
+            callback(this.money);
+        });
+
+        this.game.events.on('resetMoney', () => {
+            this.money = 0;
+            this.texteMoney.setText('Money: 0');
+        });
+
+        // ✅ monstres par index
+        this.game.events.on('monstreMort', (index) => {
+            this.monstresMorts.push(index);
         });
         this.game.events.on('getMonstresMorts', (callback) => {
             callback(this.monstresMorts);
         });
         this.game.events.on('resetMonstres', () => {
-            this.monstresMorts = false;
+            this.monstresMorts = [];
         });
     }
 

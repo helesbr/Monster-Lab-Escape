@@ -33,6 +33,14 @@ export default class map_stuff extends Phaser.Scene {
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
         this.game.config.aPistole = false; // initialisation
 
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
+
         const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
         const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
         const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
@@ -249,6 +257,7 @@ if (!this.game.config.aPistole) {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
+                this.game.events.emit('addMoney', 10); // ✅ +10 à la mort du monstre
             }
         });
 

@@ -27,15 +27,28 @@ export default class map_cuisine extends Phaser.Scene {
         });
         this.load.image('preworkout', 'src/assets/images/prewarkout.png');
         this.load.image('creatine', 'src/assets/images/creatine.png');
+        // Images du shop et noms correspondant à Tiled
+        this.load.image('creatine_shop', 'src/assets/images/creatine.png');
+        this.load.image('preworkout_shop', 'src/assets/images/prewarkout.png');
+        this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
     }
 
     create() {
+
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
         });
+
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
 
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
@@ -117,7 +130,7 @@ export default class map_cuisine extends Phaser.Scene {
 
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function() {
+                    callback: function () {
                         if (monstre.active) {
                             monstre.setVelocity(
                                 Phaser.Math.Between(-80, 80),
@@ -231,6 +244,7 @@ export default class map_cuisine extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
+                this.game.events.emit('addMoney', 10); // ✅ +10 à la mort du monstre
             }
         });
 
@@ -271,7 +285,58 @@ export default class map_cuisine extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.boutonFeu = this.input.keyboard.addKey('A');
 
+        // ✅ Récupération du shop
+        const calqueShops = carteCuisine.getObjectLayer("shops");
+        this.shopNearby = null;
+        this.shop = null;
+        this.menuShopVisible = false;
+        this.menuShop = null;
+
+        if (calqueShops && calqueShops.objects.length > 0) {
+            const shopObj = calqueShops.objects[0];
+            this.shop = {
+                x: shopObj.x,
+                y: shopObj.y,
+                name: shopObj.name || "shop"
+            };
+        }
+
+        // ✅ Récupérer les positions des objets mais ne pas les afficher de suite
+        this.objetsDisponibles = {
+            prewarkout: [],
+            creatine: []
+        };
+
+        const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
+        if (calqueProduit) {
+            calqueProduit.objects.forEach((produitObj) => {
+                console.log("Objet Produit trouvé:", produitObj.name);
+                if (produitObj.name === 'creatine') {
+                    this.objetsDisponibles.creatine.push({ x: produitObj.x, y: produitObj.y });
+                } else if (produitObj.name === 'prewarkout' || produitObj.name === 'preworkout') {
+                    this.objetsDisponibles.prewarkout.push({ x: produitObj.x, y: produitObj.y });
+                }
+            });
+        }
+
+        const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
+        if (calqueCreatine) {
+            calqueCreatine.objects.forEach((creatineObj) => {
+                console.log("Objet Creatine trouvé:", creatineObj.name);
+                this.objetsDisponibles.creatine.push({ x: creatineObj.x, y: creatineObj.y });
+            });
+        }
+
+        console.log("Objets disponibles:", this.objetsDisponibles);
+
         this.input.keyboard.on('keydown-ENTER', () => {
+            // Vérifier d'abord si on veut fermer le menu shop
+            if (this.menuShopVisible) {
+                this.fermerMenuShop();
+                return;
+            }
+
+            // Sinon, continuer avec la détection des portes
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
                 this.doorNearby.estSolide = false;
@@ -294,26 +359,11 @@ export default class map_cuisine extends Phaser.Scene {
                     this.scene.start(destination, { porteDestination, offsetY, offsetX });
                 });
             }
-        });
-
-        const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
-        if (calqueProduit) {
-            calqueProduit.objects.forEach((produitObj) => {
-                const imageKey = produitObj.name === 'creatine' ? 'creatine' : 'preworkout';
-                const produit = this.add.image(produitObj.x, produitObj.y, imageKey);
-                produit.setDisplaySize(30, 30);
-                produit.setDepth(45);
-            });
-
-            const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
-            if (calqueCreatine) {
-                calqueCreatine.objects.forEach((creatineObj) => {
-                    const creatine = this.add.image(creatineObj.x, creatineObj.y, 'creatine');
-                    creatine.setDisplaySize(30, 30);
-                    creatine.setDepth(45);
-                });
+            // Ouvrir le menu shop si on est près du shop
+            else if (this.shopNearby) {
+                this.ouvrirMenuShop();
             }
-        }
+        });
 
         this.game.config.maVariable -= 10;
     }
@@ -328,10 +378,10 @@ export default class map_cuisine extends Phaser.Scene {
         const vitesse = 600;
 
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
 
         const balle = this.groupeBullets.create(
@@ -395,6 +445,18 @@ export default class map_cuisine extends Phaser.Scene {
             });
         }
 
+        // ✅ Vérifier la proximité du shop
+        this.shopNearby = null;
+        if (this.shop) {
+            const distanceShop = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.shop.x, this.shop.y
+            );
+            if (distanceShop < 100) {
+                this.shopNearby = this.shop;
+            }
+        }
+
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
                 if (monstre.body.velocity.x > 0) monstre.setFlipX(false);
@@ -422,5 +484,101 @@ export default class map_cuisine extends Phaser.Scene {
                     break;
             }
         }
+    }
+
+    ouvrirMenuShop() {
+        this.menuShopVisible = true;
+
+        // Créer un fond semi-transparent énorme
+        const fondMenu = this.add.rectangle(240, 240, 1050, 825, 0x000000, 0.7);
+        fondMenu.setDepth(200);
+        fondMenu.setScrollFactor(0);
+
+        // Ajouter un titre
+        const titre = this.add.text(240, 70, 'SHOP', {
+            fontSize: '64px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5);
+        titre.setDepth(201);
+        titre.setScrollFactor(0);
+
+        // Créer les images cliquables du shop (énormes - 2x plus grandes)
+        const imgCreatine = this.add.image(90, 280, 'creatine_shop');
+        imgCreatine.setDisplaySize(340, 340);
+        imgCreatine.setDepth(201);
+        imgCreatine.setScrollFactor(0);
+        imgCreatine.setInteractive();
+        imgCreatine.on('pointerdown', () => {
+            this.spawnObjet('creatine');
+        });
+        imgCreatine.on('pointerover', () => {
+            imgCreatine.setDisplaySize(370, 370);
+        });
+        imgCreatine.on('pointerout', () => {
+            imgCreatine.setDisplaySize(340, 340);
+        });
+
+        const imgPreworkout = this.add.image(390, 280, 'preworkout_shop');
+        imgPreworkout.setDisplaySize(340, 340);
+        imgPreworkout.setDepth(201);
+        imgPreworkout.setScrollFactor(0);
+        imgPreworkout.setInteractive();
+        imgPreworkout.on('pointerdown', () => {
+            this.spawnObjet('prewarkout');
+        });
+        imgPreworkout.on('pointerover', () => {
+            imgPreworkout.setDisplaySize(370, 370);
+        });
+        imgPreworkout.on('pointerout', () => {
+            imgPreworkout.setDisplaySize(340, 340);
+        });
+
+        // Ajouter un message
+        const message = this.add.text(240, 520, 'Cliquez sur un objet\n(ENTRÉE pour fermer)', {
+            fontSize: '20px',
+            fill: '#fff',
+            align: 'center'
+        }).setOrigin(0.5);
+        message.setDepth(201);
+        message.setScrollFactor(0);
+
+        this.menuShop = {
+            fond: fondMenu,
+            titre: titre,
+            imgCreatine: imgCreatine,
+            imgPreworkout: imgPreworkout,
+            message: message
+        };
+    }
+
+    spawnObjet(type) {
+        console.log("spawnObjet appelé avec type:", type);
+        console.log("Objets disponibles pour", type, ":", this.objetsDisponibles[type]);
+
+        // Récupérer la première position disponible pour cet objet
+        if (this.objetsDisponibles[type] && this.objetsDisponibles[type].length > 0) {
+            const position = this.objetsDisponibles[type].shift(); // Récupérer et supprimer de la liste
+            console.log("Création de l'objet à position:", position);
+
+            // Créer l'objet à la position définie dans Tiled
+            const objet = this.add.image(position.x, position.y, type);
+            objet.setDisplaySize(30, 30);
+            objet.setDepth(45);
+        } else {
+            console.log("Pas d'objets disponibles pour:", type);
+        }
+    }
+
+    fermerMenuShop() {
+        if (this.menuShop) {
+            this.menuShop.fond.destroy();
+            this.menuShop.titre.destroy();
+            this.menuShop.imgCreatine.destroy();
+            this.menuShop.imgPreworkout.destroy();
+            this.menuShop.message.destroy();
+            this.menuShop = null;
+        }
+        this.menuShopVisible = false;
     }
 }

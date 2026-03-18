@@ -39,6 +39,14 @@ export default class map_monstre extends Phaser.Scene {
             if (this.son_monstre) this.son_monstre.stop();
         });
 
+        // Pour lire la money au démarrage de la scène si besoin :
+        this.game.events.emit('getMoney', (money) => {
+            console.log('Money actuelle:', money);
+        });
+
+        // Pour ajouter de la money (ex: quand un monstre meurt) :
+        // this.game.events.emit('addMoney', 10);
+
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
@@ -69,14 +77,16 @@ export default class map_monstre extends Phaser.Scene {
             this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
         }
 
-        // Spawn monstres
+        // ✅ spawn monstres selon ceux qui sont encore vivants
         this.groupe_monstres = this.physics.add.group();
         const calqueMonstres = carteMonstreLab.getObjectLayer("monstres");
 
-        // ✅ on vérifie d'abord si les monstres ont déjà été tués
-        this.game.events.emit('getMonstresMorts', (morts) => {
-            if (!morts && calqueMonstres) {
-                calqueMonstres.objects.forEach((monstreObj) => {
+        this.game.events.emit('getMonstresMorts', (monstresMorts) => {
+            if (calqueMonstres) {
+                calqueMonstres.objects.forEach((monstreObj, index) => {
+                    // ✅ si ce monstre a déjà été tué on le skip
+                    if (monstresMorts.includes(index)) return;
+
                     const randomX = Phaser.Math.Between(50, carteMonstreLab.widthInPixels - 50);
                     const randomY = Phaser.Math.Between(50, carteMonstreLab.heightInPixels - 50);
                     const monstre = this.groupe_monstres.create(randomX, randomY, 'monstres');
@@ -84,10 +94,12 @@ export default class map_monstre extends Phaser.Scene {
                     monstre.setCollideWorldBounds(true);
                     monstre.setDisplaySize(100, 100);
                     monstre.setDepth(50);
-                    monstre.pointsVie = Phaser.Math.Between(1, 3);
+                    monstre.pointsVie = Phaser.Math.Between(3, 6);
+                    // ✅ stocker l'index sur le monstre
+                    monstre.index = index;
                     monstre.setVelocity(
-                        Phaser.Math.Between(-80, 80),
-                        Phaser.Math.Between(-80, 80)
+                        Phaser.Math.Between(-150, 150),
+                        Phaser.Math.Between(-150, 150)
                     );
 
                     monstre.moveEvent = this.time.addEvent({
@@ -95,8 +107,8 @@ export default class map_monstre extends Phaser.Scene {
                         callback: function () {
                             if (monstre.active) {
                                 monstre.setVelocity(
-                                    Phaser.Math.Between(-80, 80),
-                                    Phaser.Math.Between(-80, 80)
+                                    Phaser.Math.Between(-150, 150),
+                                    Phaser.Math.Between(-150, 150)
                                 );
                             }
                         },
@@ -162,12 +174,10 @@ export default class map_monstre extends Phaser.Scene {
         player.pointsVie = 3;
         this.invincible = false;
 
-        // ✅ récupérer les vies depuis le HUD
         this.game.events.emit('getVie', (vie) => {
             player.pointsVie = vie;
         });
 
-        // ✅ récupérer si le joueur a déjà l'arme
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -208,19 +218,19 @@ export default class map_monstre extends Phaser.Scene {
             });
         }
 
-        // groupe de balles
         this.groupeBullets = this.physics.add.group();
 
         this.physics.add.collider(this.groupeBullets, murLayer, (balle) => {
             balle.destroy();
         });
 
-        // ✅ overlap balles/monstres avec vérification si tous morts
+        // ✅ overlap balles/monstres avec index
         this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
             balle.destroy();
             monstre.pointsVie--;
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
+                this.game.events.emit('monstreMort', monstre.index);
                 monstre.destroy();
 
                 // ✅ si tous les monstres sont morts on le signale au HUD
@@ -235,7 +245,6 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
-        // overlap joueur/monstres
         this.physics.add.overlap(player, this.groupe_monstres, () => {
             if (this.invincible) return;
             this.invincible = true;
