@@ -7,7 +7,7 @@ export default class map_directeur extends Phaser.Scene {
     preload() { 
         this.load.tilemapTiledJSON("directeur", "src/assets/map_directeur.tmj");
         this.load.image("allTiles", "src/tilesets/all_tilesets.png");
-        this.load.image("tapis_jaune", "src/tilesets/YellowPlastic8d.jpg");
+        this.load.image("tapis_jaune", "src/tilesets/YellowPlastic_d.jpg");
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
             frameWidth: 44,
             frameHeight: 48
@@ -86,6 +86,7 @@ export default class map_directeur extends Phaser.Scene {
         this.invincible = false;
         
         if (wallLayer) this.physics.add.collider(player, wallLayer);
+        if (objectsLayer) this.physics.add.collider(player, objectsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
         this.groupe_portes = groupe_portes;

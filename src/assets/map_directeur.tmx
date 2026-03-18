@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="6" nextobjectid="2">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="7" nextobjectid="3">
  <editorsettings>
   <export target="map_directeur.tmj" format="json"/>
  </editorsettings>
@@ -74579,7 +74579,7 @@
 17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416,17416
 </data>
  </layer>
- <layer id="3" name="carpet" width="30" height="30">
+ <layer id="3" name="carpet" width="30" height="30" locked="1">
   <properties>
    <property name="estSolide" type="bool" value="true"/>
   </properties>
@@ -74616,6 +74616,11 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
+ <objectgroup id="6" name="arthus">
+  <object id="2" name="arthus" x="490.909" y="809.091">
+   <point/>
+  </object>
+ </objectgroup>
  <layer id="4" name="wall" width="30" height="30" locked="1">
   <data encoding="csv">
 17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,17460,
