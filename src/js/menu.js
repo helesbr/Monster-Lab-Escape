@@ -63,7 +63,7 @@ export default class menu extends Phaser.Scene {
             this.game.events.emit('resetVie');
             this.game.events.emit('resetArme');
             this.game.events.emit('resetMonstres');
-            this.scene.start('selection');
+            this.scene.start('character_select');
             this.scene.launch('HUD');
         });
 
