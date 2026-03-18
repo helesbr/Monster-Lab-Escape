@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.0" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="34">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="12">
  <editorsettings>
   <export target="map_cuisine.tmj" format="json"/>
  </editorsettings>
@@ -42007,17 +42007,17 @@
   </tile>
   <tile id="8400">
    <properties>
-    <property name="estSolide" type="bool" value="false"/>
+    <property name="estSolide" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="8401">
    <properties>
-    <property name="estSolide" type="bool" value="false"/>
+    <property name="estSolide" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="8402">
    <properties>
-    <property name="estSolide" type="bool" value="false"/>
+    <property name="estSolide" type="bool" value="true"/>
    </properties>
   </tile>
   <tile id="8403">
@@ -74626,7 +74626,7 @@
   </object>
  </objectgroup>
  <objectgroup id="5" name="Calque Produit" locked="1">
-  <object id="33" name="prewarkout" x="141.125" y="202.105">
+  <object id="7" name="pre workout" x="114.399" y="95.3327">
    <point/>
   </object>
  </objectgroup>
@@ -74647,12 +74647,8 @@
   </object>
  </objectgroup>
  <objectgroup id="6" name="calque crea" locked="1">
-  <object id="31" name="creatine" x="71.4338" y="200.363">
+  <object id="8" name="creatine" x="42" y="158">
    <point/>
   </object>
- </objectgroup>
- <objectgroup id="8" name="shops" locked="1">
-  <object id="29" name="shop" x="59.2377" y="41.8149" width="74.9183" height="81.8875"/>
-  <object id="30" x="1137.71" y="158.548"/>
  </objectgroup>
 </map>
