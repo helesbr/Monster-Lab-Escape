@@ -176,7 +176,11 @@ export default class selection extends Phaser.Scene {
     groupe_monstres = this.physics.add.group();
     groupe_bombes = this.physics.add.group();
 
-
+    // ✅ Écouter si tous les monstres de map_monstre sont morts
+    this.allMonstersDead = false;
+    this.game.events.on('tousMonstresMorts', () => {
+      this.allMonstersDead = true;
+    });
 
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
     let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
@@ -231,7 +235,7 @@ export default class selection extends Phaser.Scene {
 
         if (distance < 100 && porte.estSolide) {
           // Vérifier si c'est la porte 2 (fermée) - bloquée si monstres actifs
-          if (porte.doorName === "door2" && groupe_monstres.countActive(true) > 0) {
+          if (porte.doorName === "door2" && !this.allMonstersDead) {
             const texte = this.add.text(480, 480, "Cette porte est fermée, il faut tuer tous les monstres de la salle monstre", {
               fontSize: '32px',
               fontStyle: 'bold',
@@ -266,9 +270,9 @@ export default class selection extends Phaser.Scene {
           } else if (porte.doorName === "door12") {
             destination = "map_cuisine";
             porteDestination = "door_retour1";
-          } else if (porte.doorName === "door2") {
-            destination = "map_monstre";
-            porteDestination = "door_monstre";
+          } else if (porte.doorName === "door2" && this.allMonstersDead) {
+            destination = "map_directeur";
+            porteDestination = "door_retour";
           }
           this.scene.start(destination, { porteDestination });
           break; // Sortir après lancement de la scène
