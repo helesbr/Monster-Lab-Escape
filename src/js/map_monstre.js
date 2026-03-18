@@ -209,13 +209,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.doorCollider.active = false;
                 this.doorNearby.anims.play('door_open');
                 this.time.delayedCall(500, () => {
-                    let destination = "selection";
-                    let porteDestination = "door4";
-                    if (doorName === "selection") {
-                        destination = "selection";
-                        porteDestination = "door4";
-                    }
-                    this.scene.start(destination, { porteDestination });
+                    this.scene.start("selection", { porteDestination: "door4", offsetX: -50 });
                 });
             }
         });

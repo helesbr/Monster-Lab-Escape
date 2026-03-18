@@ -329,6 +329,7 @@ export default class map_stuff extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     let destination = 'selection';
                     let porteDestination = 'door3';
+                    let offsetX = 0;
                     let offsetY = 0;
                     if (doorName === 'door_retour1') {
                         destination = 'selection';
@@ -337,8 +338,9 @@ export default class map_stuff extends Phaser.Scene {
                     } else if (doorName === 'door_retour2') {
                         destination = 'selection';
                         porteDestination = 'door31';
+                        offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination, offsetY });
+                    this.scene.start(destination, { porteDestination, offsetX, offsetY });
                 });
             }
         });
