@@ -25,7 +25,11 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 64
         });
+
+        this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
+
+
     }
 
     create() {
@@ -100,7 +104,7 @@ export default class map_monstre extends Phaser.Scene {
 
                     monstre.moveEvent = this.time.addEvent({
                         delay: Phaser.Math.Between(2000, 4000),
-                        callback: function() {
+                        callback: function () {
                             if (monstre.active) {
                                 monstre.setVelocity(
                                     Phaser.Math.Between(-150, 150),
@@ -228,6 +232,16 @@ export default class map_monstre extends Phaser.Scene {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 this.game.events.emit('monstreMort', monstre.index);
                 monstre.destroy();
+
+                // ✅ si tous les monstres sont morts on le signale au HUD
+                if (this.groupe_monstres.countActive() === 0) {
+                    this.game.events.emit('tousMonstresMorts');
+                    // Afficher le bouton directeur
+                    if (this.boutonDirecteur) {
+                        this.boutonDirecteur.setVisible(true);
+                        this.boutonDirecteur.setInteractive();
+                    }
+                }
             }
         });
 
@@ -254,7 +268,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
                 this.scene.stop('HUD');
-                this.scene.start('menu');
+                this.scene.start('selection');
             }
         });
 
@@ -286,11 +300,28 @@ export default class map_monstre extends Phaser.Scene {
             }
         });
 
+        // ✅ Créer le bouton_directeur à partir du ping
+        this.calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
+        if (this.calqueBoutons) {
+            const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
+            if (pingBoutonDirecteur) {
+                const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
+                this.boutonDirecteur = boutonDirecteur; // Stocker en propriété pour l'accès global
+                boutonDirecteur.setInteractive();
+                boutonDirecteur.setDepth(50);
+                boutonDirecteur.setVisible(false); // Cacher le bouton
+
+                // Interaction au clic
+                boutonDirecteur.on('pointerdown', () => {
+                    this.scene.start('map_directeur', { porteDestination: 'door_retour' });
+                });
+            }
+        }
         // ✅ immunité de 3 secondes à l'entrée dans la scène
         this.invincible = true;
         player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
         });
@@ -306,10 +337,10 @@ export default class map_monstre extends Phaser.Scene {
         const vitesse = 600;
 
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
 
         const balle = this.groupeBullets.create(

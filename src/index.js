@@ -1,4 +1,5 @@
 import menu from "./js/menu.js";
+import character_select from "./js/character_select.js";
 import selection from "./js/selection.js";
 import map_cuisine from "./js/map_cuisine.js";
 import regles from "./js/Regles.js";
@@ -20,7 +21,7 @@ var config = {
       debug: false // permet de voir les hitbox et les vecteurs d'acceleration quand mis à true
     }
   },
-  scene: [menu, selection, map_cuisine, regles, map_directeur,map_stuff,  map_monstre, HUD] // liste des scènes du jeu
+  scene: [menu, character_select, selection, map_cuisine, regles, map_directeur, map_stuff, map_monstre, HUD] // liste des scènes du jeu
 
 };
 

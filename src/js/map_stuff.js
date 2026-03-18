@@ -4,7 +4,7 @@ export default class map_stuff extends Phaser.Scene {
     constructor() {
         super({ key: "map_stuff" });
     }
-    preload() { 
+    preload() {
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
         this.load.image('arme', 'src/assets/images/arme.png');
@@ -26,9 +26,22 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
+        // Chargement du son stuff
+        this.load.audio('stuff', 'src/assets/son/stuff.mp3');
     }
 
     create() {
+        // Lancer le son de stuff
+        this.son_stuff = this.sound.add('stuff');
+        this.son_stuff.play();
+
+        // Arrêter la musique quand on quitte la scène
+        this.events.on('shutdown', () => {
+            if (this.son_stuff) {
+                this.son_stuff.stop();
+            }
+        });
+
         const carte = this.add.tilemap("stuff");
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
         this.game.config.aPistole = false; // initialisation
@@ -41,8 +54,8 @@ export default class map_stuff extends Phaser.Scene {
         // Pour ajouter de la money (ex: quand un monstre meurt) :
         // this.game.events.emit('addMoney', 10);
 
-        const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
-        const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
+        const solLayer = carte.createLayer("Floor", tileset, 0, 0);
+        const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
         const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
         wallLayer.setCollisionByExclusion([-1]);
@@ -106,9 +119,9 @@ export default class map_stuff extends Phaser.Scene {
             }
         }
         // Seulement si le joueur n'a pas déjà le pistolet
-if (!this.game.config.aPistole) {
-    this.game.config.aPistole = false;
-}
+        if (!this.game.config.aPistole) {
+            this.game.config.aPistole = false;
+        }
 
         player = this.physics.add.sprite(playerSpawnX, playerSpawnY, 'img_perso');
         player.setCollideWorldBounds(true);
@@ -138,7 +151,7 @@ if (!this.game.config.aPistole) {
             }
         });
 
-        if (wallLayer)   this.physics.add.collider(player, wallLayer);
+        if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
@@ -201,7 +214,7 @@ if (!this.game.config.aPistole) {
 
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function() {
+                    callback: function () {
                         if (monstre.active) {
                             monstre.setVelocity(
                                 Phaser.Math.Between(-80, 80),
@@ -312,7 +325,7 @@ if (!this.game.config.aPistole) {
                 this.game.events.emit('armeRamassee');
                 return;
             }
-            
+
 
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
@@ -340,7 +353,7 @@ if (!this.game.config.aPistole) {
         this.invincible = true;
         player.setAlpha(0.5); // effet visuel semi-transparent
 
-        this.time.delayedCall(3000, () => {
+        this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
         });
@@ -356,10 +369,10 @@ if (!this.game.config.aPistole) {
         const vitesse = 600;
 
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
 
         const balle = this.groupeBullets.create(
