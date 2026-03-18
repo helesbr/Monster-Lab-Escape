@@ -544,13 +544,14 @@ export default class map_cuisine extends Phaser.Scene {
         });
 
         // Ajouter un message
-        const message = this.add.text(240, 520, 'Cliquez sur un objet\n(ENTRÉE pour fermer)', {
-            fontSize: '20px',
-            fill: '#fff',
-            align: 'center'
-        }).setOrigin(0.5);
-        message.setDepth(201);
-        message.setScrollFactor(0);
+       // Remplacer le texte message existant par :
+const message = this.add.text(240, 520, 'Cliquez sur un objet pour acheter (80 💰)\n(ENTRÉE pour fermer)', {
+    fontSize: '20px',
+    fill: '#FFD700',
+    align: 'center'
+}).setOrigin(0.5);
+message.setDepth(201);
+message.setScrollFactor(0);
 
         this.menuShop = {
             fond: fondMenu,
@@ -562,22 +563,45 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     spawnObjet(type) {
-        console.log("spawnObjet appelé avec type:", type);
-        console.log("Objets disponibles pour", type, ":", this.objetsDisponibles[type]);
+    console.log("spawnObjet appelé avec type:", type);
+    console.log("Objets disponibles pour", type, ":", this.objetsDisponibles[type]);
 
-        // Récupérer la première position disponible pour cet objet
+    // ✅ Vérifier si le joueur a assez de money
+    this.game.events.emit('getMoney', (money) => {
+        if (money < 80) {
+            // Afficher un message d'erreur
+            if (this.messageErreur) this.messageErreur.destroy();
+            this.messageErreur = this.add.text(240, 430, "Pas assez de money ! (80 requis)", {
+                fontSize: '18px',
+                fill: '#ff4444',
+                stroke: '#000000',
+                strokeThickness: 3,
+                align: 'center'
+            }).setOrigin(0.5).setDepth(202).setScrollFactor(0);
+
+            this.time.delayedCall(2000, () => {
+                if (this.messageErreur) {
+                    this.messageErreur.destroy();
+                    this.messageErreur = null;
+                }
+            });
+            return;
+        }
+
+        // ✅ Débiter 80 de money
+        this.game.events.emit('addMoney', -80);
+
         if (this.objetsDisponibles[type] && this.objetsDisponibles[type].length > 0) {
-            const position = this.objetsDisponibles[type].shift(); // Récupérer et supprimer de la liste
+            const position = this.objetsDisponibles[type].shift();
             console.log("Création de l'objet à position:", position);
-
-            // Créer l'objet à la position définie dans Tiled
             const objet = this.add.image(position.x, position.y, type);
             objet.setDisplaySize(30, 30);
             objet.setDepth(45);
         } else {
             console.log("Pas d'objets disponibles pour:", type);
         }
-    }
+    });
+}
 
     fermerMenuShop() {
         if (this.menuShop) {
