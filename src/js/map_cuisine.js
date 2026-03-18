@@ -71,10 +71,8 @@ export default class map_cuisine extends Phaser.Scene {
         const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
         // Activer les collisions si les couches existent
-        if (solLayer) solLayer.setCollisionByExclusion([-1]);
-        if (wallLayer) wallLayer.setCollisionByExclusion([-1]);
-        if (objetsLayer) objetsLayer.setCollisionByExclusion([-1]);
-
+        wallLayer.setCollisionByProperty({ estSolide: true });
+        objetsLayer.setCollisionByProperty({ estSolide: true });
         // Ajuster le monde et la caméra pour afficher la totalité de la map
         this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
         this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
@@ -406,8 +404,8 @@ export default class map_cuisine extends Phaser.Scene {
                 });
             }
         }
-    
-    this.game.config.maVariable-=10;
+
+        this.game.config.maVariable -= 10;
 
     }
     update() {

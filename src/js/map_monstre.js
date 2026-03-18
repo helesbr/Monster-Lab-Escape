@@ -56,8 +56,7 @@ export default class map_monstre extends Phaser.Scene {
         const murLayer = carteMonstreLab.createLayer("Mur", tileset, 0, 0);
         const bloodLayer = carteMonstreLab.createLayer("blood", tileset, 0, 0);
 
-        // Set collision for walls
-        if (murLayer) murLayer.setCollisionByExclusion([-1]);
+        murLayer.setCollisionByProperty({ estSolide: true });
 
 
         // Ajuster le monde et la caméra pour afficher la totalité de la map
