@@ -35,7 +35,7 @@ export default class map_stuff extends Phaser.Scene {
             const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
             const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
-            wallLayer.setCollisionByExclusion([-1]);
+            wallLayer.setCollisionByProperty({ estSolide: true });
             objetsLayer.setCollisionByProperty({ estSolide: true });
 
             // Caméra et zoom
