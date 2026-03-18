@@ -17,9 +17,13 @@ export default class map_cuisine extends Phaser.Scene{
         this.load.image('porte', 'src/assets/images/wall128x128.png');
 
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
+
             frameWidth: 44,
+
             frameHeight: 48
+
         });
+
         // Charger les monstres en tant que spritesheet
 
         this.load.spritesheet('monstre', 'src/assets/images/mini_monstres.png', {
@@ -41,55 +45,24 @@ export default class map_cuisine extends Phaser.Scene{
  
 
     create() {
+        // Charger la carte
+        const carteCuisine = this.make.tilemap({ key: "cuisine" });
+        const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
 
-        try {
 
-            // Charger la carte
+        // Create layers
+            const solLayer = carteCuisine.createLayer("sol", tileset, 0, 0);
+            const wallLayer = carteCuisine.createLayer("Wall", tileset, 0, 0);
+            const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
-            const carteCuisine = this.make.tilemap({ key: "cuisine" });
-            
-            // Ne pas essayer d'ajouter le tileset s'il n'existe pas
-            let tileset = null;
-            try {
-                tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
-            } catch (e) {
-                console.warn("Tileset 'all_tileset' non trouvé, continue sans lui");
-            }
+        // Activer les collisions si les couches existent
+        if (solLayer) solLayer.setCollisionByExclusion([-1]);
+        if (wallLayer) wallLayer.setCollisionByExclusion([-1]);
+        if (objetsLayer) objetsLayer.setCollisionByExclusion([-1]);
 
-            // Créer seulement les couches qui existent
-            let solLayer = null;
-            let wallLayer = null;
-            let objetsLayer = null;
-            
-            try {
-                solLayer = tileset ? carteCuisine.createLayer("sol", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Floor' non trouvée");
-            }
-            
-            try {
-                wallLayer = tileset ? carteCuisine.createLayer("Wall", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Mur' non trouvée");
-            }
-            
-            try {
-                objetsLayer = tileset ? carteCuisine.createLayer("objets", tileset, 0, 0) : null;
-            } catch (e) {
-                console.warn("Couche 'Object' non trouvée");
-            }
-
-            // Activer les collisions si les couches existent
-            if (wallLayer) wallLayer.setCollisionByExclusion([-1]);
-            if (objetsLayer) objetsLayer.setCollisionByExclusion([-1]);
-
- 
-
-            // Ajuster le monde et la caméra pour afficher la totalité de la map
-
-            this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
-
-            this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
+        // Ajuster le monde et la caméra pour afficher la totalité de la map
+        this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
+        this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
 
            
 
@@ -109,43 +82,83 @@ export default class map_cuisine extends Phaser.Scene{
 
             this.cameras.main.centerOn(carteCuisine.widthInPixels / 2, carteCuisine.heightInPixels / 2);
 
+ 
+
             // ✅ Créer le joueur
+
             player = this.physics.add.sprite(100, 100, 'img_perso');
+
             player.setCollideWorldBounds(true);
+
             player.setDepth(100); // Au-dessus de la map
+
             player.body.setGravityY(-this.physics.world.gravity.y);
-            
+
+           
+
             // Collisions du joueur avec les murs et objets si les couches existent
+
             if (wallLayer) this.physics.add.collider(player, wallLayer);
+
             if (objetsLayer) this.physics.add.collider(player, objetsLayer);
-            
+
+           
+
             // Suivre le joueur avec la caméra
+
             this.cameras.main.startFollow(player);
-            
+
+           
+
             // Créer les animations du joueur s'ils n'existent pas
+
             if (!this.anims.exists("anim_tourne_gauche")) {
+
                 this.anims.create({
+
                     key: "anim_tourne_gauche",
+
                     frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }),
+
                     frameRate: 10,
+
                     repeat: -1
+
                 });
+
             }
+
             if (!this.anims.exists("anim_tourne_droite")) {
+
                 this.anims.create({
+
                     key: "anim_tourne_droite",
+
                     frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }),
+
                     frameRate: 10,
+
                     repeat: -1
+
                 });
+
             }
+
             if (!this.anims.exists("anim_face")) {
+
                 this.anims.create({
+
                     key: "anim_face",
+
                     frames: [{ key: "img_perso", frame: 1 }],
+
                     frameRate: 20
+
                 });
+
             }
+
+ 
 
             // ✅ Créer les animations des monstres
 
@@ -223,44 +236,62 @@ export default class map_cuisine extends Phaser.Scene{
 
                 // ✅ Ajouter les collisions avec les murs et objets
 
-                this.physics.add.collider(this.groupe_monstres, wallLayer);
-
-                this.physics.add.collider(this.groupe_monstres, objetsLayer);
-
-               
-
                 if (wallLayer) this.physics.add.collider(this.groupe_monstres, wallLayer);
+
                 if (objetsLayer) this.physics.add.collider(this.groupe_monstres, objetsLayer);
-                
-                console.log("Monstres spawned!");
 
             }
 
  
             // ✅ Spawn des portes
+
             groupe_portes = this.physics.add.group();
+
             const tab_points = carteCuisine.getObjectLayer("door retour");
-            
+
+           
+
             if (tab_points) {
+
                 tab_points.objects.forEach(point => {
+
                     if (point.name == "door retour") {
+
                         var nouvelle_porte = this.physics.add.sprite(point.x, point.y, "porte");
+
                         groupe_portes.add(nouvelle_porte);
+
                     }
+
                 });
+
             }
 
+ 
+
             // Spawn de la deuxième porte (door allé)
+
             const tab_points_alle = carteCuisine.getObjectLayer("door allé");
-            
+
+           
+
             if (tab_points_alle) {
+
                 tab_points_alle.objects.forEach(point => {
+
                     if (point.name == "door allé") {
+
                         var nouvelle_porte = this.physics.add.sprite(point.x, point.y, "porte");
+
                         groupe_portes.add(nouvelle_porte);
+
                     }
+
                 });
+
             }
+
+ 
 
             // ✅ Spawn des produits (creatine et pre-workout)
 
@@ -283,10 +314,7 @@ export default class map_cuisine extends Phaser.Scene{
                     // Les produits restent statiques (pas de physique)
 
                 });
-
-                console.log("Produits spawned!");
-
-            }
+ 
 
  
 
@@ -305,73 +333,68 @@ export default class map_cuisine extends Phaser.Scene{
                     creatine.setDepth(45); // Au-dessus de la map mais sous les monstres
 
                 });
-
-                console.log("Creatines spawned!");
-
             }
-
- 
-
-            // Gestion du joueur persistant
-            let spawnX = 190;
-            let spawnY = 480;
-            if (window.spawnData && window.spawnData.map_cuisine) {
-                spawnX = window.spawnData.map_cuisine.x;
-                spawnY = window.spawnData.map_cuisine.y;
-            }
-            const player = this.physics.add.sprite(spawnX, spawnY, 'img_perso');
-            player.setCollideWorldBounds(true);
-            player.setDepth(100);
-            player.body.setGravityY(-this.physics.world.gravity.y);
-            this.physics.add.collider(player, wallLayer);
-            this.physics.add.collider(player, objetsLayer);
-            this.cameras.main.startFollow(player);
-
-            console.log("Map cuisine chargée!");
-
-        } catch (error) {
-
-            console.error("Erreur lors du chargement de la map cuisine:", error);
-
         }
 
     }
-
-   
-
     update() {
         // Contrôles du joueur
         if (!this.cursors) {
             this.cursors = this.input.keyboard.createCursorKeys();
         }
-        const cursors = this.cursors;
-        
-        // Gauche / Droite
+
+          // Gauche / Droite
+const cursors = this.cursors;
         if (cursors.right.isDown) {
+
             player.setVelocityX(160);
+
             player.setFlipX(false);
+
             player.anims.play('anim_tourne_droite', true);
-        }
-        else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
-            player.setFlipX(false);
-            player.anims.play('anim_tourne_gauche', true);
-        } else {
-            player.setVelocityX(0);
-            player.anims.play('anim_face');
+
         }
 
+        else if (cursors.left.isDown) {
+
+            player.setVelocityX(-160);
+
+            player.setFlipX(false);
+
+            player.anims.play('anim_tourne_gauche', true);
+
+        } else {
+
+            player.setVelocityX(0);
+
+            player.anims.play('anim_face');
+
+        }
+
+ 
+
         // Haut / Bas
+
         if (cursors.up.isDown) {
+
             player.setVelocityY(-160);
+
         }
+
         else if (cursors.down.isDown) {
+
             player.setVelocityY(160);
+
         }
+
         else {
+
             player.setVelocityY(0);
+
         }
-        
+
+       
+
         // Vérifier la direction de chaque monstre et ajuster le flip
 
         if (this.groupe_monstres) {
@@ -403,5 +426,5 @@ export default class map_cuisine extends Phaser.Scene{
         }
 
     }
-
 }
+

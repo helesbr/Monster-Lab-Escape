@@ -1,20 +1,10 @@
-// chargement des librairies
-
 var player;
-
 var clavier;
-
 var zone_texte_score;
-
 var groupe_monstres;
-
 var groupe_bombes;
-
 var gameOver = false;
-
 var groupe_portes;
-
- 
 
 export default class selection extends Phaser.Scene {
 
@@ -23,8 +13,6 @@ export default class selection extends Phaser.Scene {
     super({ key: "selection" });
 
   }
-
- 
 
   preload() {
 
@@ -42,7 +30,6 @@ export default class selection extends Phaser.Scene {
 
     this.load.image('background', 'src/tilesets/tile-background.png');
 
- 
 
     // chargement de la carte
 
@@ -64,7 +51,6 @@ export default class selection extends Phaser.Scene {
 
   }
 
- 
 
   create() {
 
@@ -76,21 +62,16 @@ export default class selection extends Phaser.Scene {
 
     const backgroundTileset = carteDuNiveau.addTilesetImage("background", "background");
 
- 
 
     // Création des calques dans l'ordre de profondeur (du plus bas au plus haut)
 
     const backgroundLayer = carteDuNiveau.createLayer("background", backgroundTileset, 0, 0);
-
-    const fondLayer = carteDuNiveau.createLayer("Fond", tileset, 0, 0);
-
     const floorLayer = carteDuNiveau.createLayer("Floor", tileset, 0, 0);
 
     const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
 
     const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
- 
 
     // Définition des collisions pour les murs uniquement
 
@@ -98,7 +79,6 @@ export default class selection extends Phaser.Scene {
 
     objectLayer.setCollisionByExclusion([-1]);
 
- 
 
     // Redimensionnement du monde avec les dimensions calculées via tiled
 
@@ -108,7 +88,6 @@ export default class selection extends Phaser.Scene {
 
     this.cameras.main.setBounds(0, 0, 960, 960);
 
- 
 
     /***********************************************************************/
 
@@ -116,7 +95,24 @@ export default class selection extends Phaser.Scene {
 
     /***********************************************************************/
 
-    player = this.physics.add.sprite(190, 480, 'img_perso');
+    // Récupérer la porte de destination si elle a été passée
+    const { porteDestination, offsetY = 0 } = this.scene.settings.data || {};
+    let playerX = 190;
+    let playerY = 480;
+    
+    if (porteDestination) {
+        // Chercher la porte dans les portes de selection
+        const taxiPoints = carteDuNiveau.getObjectLayer("doors");
+        if (taxiPoints) {
+            const door = taxiPoints.objects.find(obj => obj.name === porteDestination);
+            if (door) {
+                playerX = door.x;
+                playerY = door.y + offsetY; // Ajouter l'offset Y
+            }
+        }
+    }
+
+    player = this.physics.add.sprite(playerX, playerY, 'img_perso');
 
     player.setCollideWorldBounds(true);
 
@@ -124,7 +120,6 @@ export default class selection extends Phaser.Scene {
 
     player.body.setGravityY(-this.physics.world.gravity.y);
 
- 
 
     // Ajout de la collision entre le joueur et les murs
 
@@ -132,7 +127,6 @@ export default class selection extends Phaser.Scene {
 
     this.physics.add.collider(player, objectLayer);
 
- 
 
     /***********************************************************************/
 
@@ -146,14 +140,14 @@ export default class selection extends Phaser.Scene {
 
       key: 'door_closed',
 
-      
+
+
       frames: [{ key: 'porte', frame: 0 }],
 
       frameRate: 10
 
     });
 
- 
 
     this.anims.create({
 
@@ -165,7 +159,6 @@ export default class selection extends Phaser.Scene {
 
     });
 
- 
 
     /***********************************************************************/
 
@@ -179,7 +172,6 @@ export default class selection extends Phaser.Scene {
 
     const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
 
- 
 
     // Création des portes sur chaque objet door
 
@@ -207,16 +199,26 @@ export default class selection extends Phaser.Scene {
           porte.nom = obj.name;  // Stocker le nom de la porte
           porte.play('door_closed'); // Affiche le frame fermé
 
+          porte.doorName = obj.name; // Stocker le nom de la porte
+
           groupe_portes.add(porte);
 
-          
+
+
           if (obj.properties) {
+
             const destProp = obj.properties.find(p => p.name === "destination");
+
             if (destProp) {
+
               porte.destination = destProp.value; // ex: "map_cuisine"
+
             }
+
           }
-          
+
+
+
           // Vérifier si la porte a la propriété "horizontale"
 
           if (obj.properties) {
@@ -247,19 +249,15 @@ export default class selection extends Phaser.Scene {
 
     }
 
-   
 
     // Collider solide entre le joueur et les portes
-
     this.physics.add.collider(player, groupe_portes);
 
-   
 
     // Ancrage de la caméra sur le joueur
 
     this.cameras.main.startFollow(player);
 
- 
 
     /***********************************************************************/
 
@@ -269,7 +267,7 @@ export default class selection extends Phaser.Scene {
 
     clavier = this.input.keyboard.createCursorKeys();
 
-this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+    this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
     this.anims.create({
 
@@ -283,7 +281,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     });
 
- 
 
     this.anims.create({
 
@@ -297,7 +294,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     });
 
- 
 
     this.anims.create({
 
@@ -309,7 +305,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     });
 
- 
 
     /***********************************************************************/
 
@@ -321,7 +316,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     groupe_bombes = this.physics.add.group();
 
- 
 
     zone_texte_score = this.add.text(16, 16, 'Score: 0', {
 
@@ -331,13 +325,11 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     });
 
- 
 
     let zoomX = this.scale.width / carteDuNiveau.widthInPixels;
 
     let zoomY = this.scale.height / carteDuNiveau.heightInPixels;
 
- 
 
     // On prend la valeur la plus petite pour être sûr que tout rentre sans être coupé
 
@@ -351,7 +343,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
   }
 
- 
 
   update() {
 
@@ -385,7 +376,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     }
 
- 
 
     // Haut / Bas
 
@@ -407,7 +397,6 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
     }
 
- 
 
     // Ouverture/Fermeture des portes avec interaction proximité + Enter
 
@@ -423,38 +412,43 @@ this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER)
 
         );
 
- 
 
-        // Si le joueur est proche et la porte est fermée (solide), ouvrir
+
         if (distance < 100 && porte.estSolide) {
+
           porte.estSolide = false;
-          porte.setFrame(1);  // Afficher la 2ème image (porte ouverte)
-          porte.body.setEnable(false);  // Désactiver la collision
-          // Si c'est la porte1, changer de map et définir la position de spawn
-          if (porte.name === "door1") {
-            if (!window.spawnData) window.spawnData = {};
-            window.spawnData.map_cuisine = { x: 100, y: 100 }; // Choisis la position de spawn souhaitée
-            this.scene.start("map_cuisine");
-          }
-        if (distance < 100 && porte.estSolide) {
-          porte.estSolide = false;
+
           porte.setFrame(1);
+
           porte.body.setEnable(false);
 
-          // Debug: afficher le nom de la porte
-          console.log("Porte ouverte:", porte.nom);
-
-          // Téléporter selon le nom de la porte
-          if (porte.nom === "door1") {
-            this.scene.start("map_cuisine");
-          } else if (porte.nom === "door 3") {
-            this.scene.start("map_stuff");
+          // Déterminer la destination selon le nom de la porte
+          let destination = "map_cuisine"; // défaut
+          let porteDestination = "door_retour"; // porte de destination par défaut
+          
+          if (porte.doorName === "door3") {
+              destination = "map_stuff";
+              porteDestination = "door_retour1"; // porte d'arrivée dans map_stuff
+          } else if (porte.doorName === "door31") {
+              destination = "map_stuff";
+              porteDestination = "door_retour2"; // porte d'arrivée dans map_stuff
+          } else if (porte.doorName === "door4") {
+              destination = "map_monstre";
+              porteDestination = "door_monstre"; // porte d'arrivée dans map_monstre
           }
 
+          this.scene.start(destination, { porteDestination: porteDestination });
+
+
+
         } else if (distance < 100 && !porte.estSolide) {
+
           porte.estSolide = true;
+
           porte.setFrame(0);
+
           porte.body.setEnable(true);
+
         }
         // Si le joueur est proche et la porte est ouverte, fermer
         else if (distance < 100 && !porte.estSolide) {
