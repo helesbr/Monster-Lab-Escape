@@ -74555,7 +74555,7 @@
   </object>
  </objectgroup>
  <objectgroup id="6" name="door_retour" locked="1">
-  <object id="6" name="door_retour2" x="947.687" y="534.985">
+  <object id="6" name="door_retour2" x="945" y="545">
    <properties>
     <property name="estSolide" type="bool" value="true"/>
     <property name="verticale" type="bool" value="true"/>

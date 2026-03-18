@@ -146,13 +146,14 @@ export default class map_monstre extends Phaser.Scene {
         });
 
         // ✅ Créer le bouton_directeur à partir du ping
-        const calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
-        if (calqueBoutons) {
-            const pingBoutonDirecteur = calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
+        this.calqueBoutons = carteMonstreLab.getObjectLayer("bouton");
+        if (this.calqueBoutons) {
+            const pingBoutonDirecteur = this.calqueBoutons.objects.find(obj => obj.name === "bouton_directeur");
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
                 boutonDirecteur.setInteractive();
                 boutonDirecteur.setDepth(50);
+                boutonDirecteur.setVisible(false); // Cacher le bouton
                 
                 // Interaction au clic
                 boutonDirecteur.on('pointerdown', () => {
@@ -160,6 +161,7 @@ export default class map_monstre extends Phaser.Scene {
                 });
             }
         }
+
 
         // ✅ Créer le joueur - positionné selon la porte d'arrivée
         const { porteDestination } = this.scene.settings.data || {};
