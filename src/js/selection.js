@@ -58,8 +58,7 @@ export default class selection extends Phaser.Scene {
         const murLayer = carteDuNiveau.createLayer("Mur", tileset, 0, 0);
         const objectLayer = carteDuNiveau.createLayer("Object", tileset, 0, 0);
 
-        murLayer.setCollisionByExclusion([-1]);
-        objectLayer.setCollisionByExclusion([-1]);
+        murLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, 960, 960);
         this.cameras.main.setBounds(0, 0, 960, 960);
@@ -231,6 +230,19 @@ export default class selection extends Phaser.Scene {
                 );
 
                 if (distance < 100 && porte.estSolide) {
+                    // Vérifier si c'est la porte 2 (fermée) en premier
+                    if (porte.doorName === "door2") {
+                        const texte = this.add.text(480, 480, "Cette porte est fermée, il faut tuer tous les monstres de la salle monstre", {
+                            fontSize: '32px',
+                            fontStyle: 'bold',
+                            align: 'center',
+                            fill: '#ffffff',
+                            wordWrap: { width: 400 }
+                        }).setOrigin(0.5);
+                        this.time.delayedCall(4000, () => texte.destroy());
+                        return;
+                    }
+
                     porte.estSolide = false;
                     porte.setFrame(1);
                     porte.body.setEnable(false);
@@ -254,7 +266,6 @@ export default class selection extends Phaser.Scene {
                         destination = "map_cuisine";
                         porteDestination = "door_retour1";
                     }
-
                     this.scene.start(destination, { porteDestination });
 
                 } else if (distance < 100 && !porte.estSolide) {

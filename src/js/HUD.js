@@ -7,6 +7,7 @@ export default class HUD extends Phaser.Scene {
         this.pointsVie = 3;
         this.aArme = false;
         this.money = 0; // ✅ ajout money
+        this.monstresMorts = [];
         const heartSize = 32;
         this.heartSize = heartSize;
 
@@ -33,6 +34,7 @@ export default class HUD extends Phaser.Scene {
 
         this.updateHeart();
 
+        // vies
         this.game.events.on('playerHit', () => {
             this.pointsVie--;
             this.updateHeart();
@@ -47,14 +49,13 @@ export default class HUD extends Phaser.Scene {
             callback(this.pointsVie);
         });
 
+        // arme
         this.game.events.on('armeRamassee', () => {
             this.aArme = true;
         });
-
         this.game.events.on('getArme', (callback) => {
             callback(this.aArme);
         });
-
         this.game.events.on('resetArme', () => {
             this.aArme = false;
         });
@@ -72,6 +73,17 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetMoney', () => {
             this.money = 0;
             this.texteMoney.setText('Money: 0');
+        });
+
+        // ✅ monstres par index
+        this.game.events.on('monstreMort', (index) => {
+            this.monstresMorts.push(index);
+        });
+        this.game.events.on('getMonstresMorts', (callback) => {
+            callback(this.monstresMorts);
+        });
+        this.game.events.on('resetMonstres', () => {
+            this.monstresMorts = [];
         });
     }
 
