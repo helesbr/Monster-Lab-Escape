@@ -29,7 +29,7 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
-        this.load.image('bouton_directeur', 'src/assets/images/bouton.png');
+        this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
 
         // Chargement du son monstre
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');

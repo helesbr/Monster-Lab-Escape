@@ -74553,11 +74553,6 @@
    <point/>
   </object>
  </objectgroup>
- <objectgroup id="6" name="bouton">
-  <object id="14" name="bouton_directeur" x="882.508" y="403.121">
-   <point/>
-  </object>
- </objectgroup>
  <objectgroup id="4" name="monstres" locked="1">
   <object id="1" name="monstre" x="870.059" y="853.287">
    <point/>
@@ -74661,4 +74656,9 @@
 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 </data>
  </layer>
+ <objectgroup id="6" name="bouton">
+  <object id="14" name="bouton_directeur" x="882.508" y="403.121">
+   <point/>
+  </object>
+ </objectgroup>
 </map>

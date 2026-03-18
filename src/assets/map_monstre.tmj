@@ -81,29 +81,6 @@
         }, 
         {
          "draworder":"topdown",
-         "id":6,
-         "name":"bouton",
-         "objects":[
-                {
-                 "height":0,
-                 "id":14,
-                 "name":"bouton_directeur",
-                 "point":true,
-                 "rotation":0,
-                 "type":"",
-                 "visible":true,
-                 "width":0,
-                 "x":882.508157185416,
-                 "y":403.121010072351
-                }],
-         "opacity":1,
-         "type":"objectgroup",
-         "visible":true,
-         "x":0,
-         "y":0
-        }, 
-        {
-         "draworder":"topdown",
          "id":4,
          "locked":true,
          "name":"monstres",
@@ -327,6 +304,29 @@
          "type":"tilelayer",
          "visible":true,
          "width":30,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "id":6,
+         "name":"bouton",
+         "objects":[
+                {
+                 "height":0,
+                 "id":14,
+                 "name":"bouton_directeur",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":882.508157185416,
+                 "y":403.121010072351
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
          "x":0,
          "y":0
         }],
