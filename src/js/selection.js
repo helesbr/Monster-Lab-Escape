@@ -111,7 +111,7 @@ export default class selection extends Phaser.Scene {
             }
         }
     }
-
+//spaw du joueuur à la nouvelle porte
     player = this.physics.add.sprite(playerX, playerY, 'img_perso');
 
     player.setCollideWorldBounds(true);
