@@ -272,7 +272,7 @@ export default class map_directeur extends Phaser.Scene {
                     player.x, player.y,
                     door.x, door.y
                 );
-                if (distance < 100 && door.estSolide) {
+                if (distance < 50 && door.estSolide) {
                     this.doorNearby = door;
                 }
             });

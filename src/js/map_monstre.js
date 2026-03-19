@@ -506,7 +506,7 @@ export default class map_monstre extends Phaser.Scene {
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
                 const distance = Phaser.Math.Distance.Between(player.x, player.y, door.x, door.y);
-                if (distance < 100 && door.estSolide) this.doorNearby = door;
+                if (distance < 50 && door.estSolide) this.doorNearby = door;
             });
         }
 
