@@ -27,7 +27,7 @@ var config = {
       debug: false
     }
   },
-  scene: [menu, character_select,regles, selection, map_cuisine, map_directeur, map_stuff, map_monstre, HUD]
+  scene: [menu, map_directeur,character_select,regles, selection, map_cuisine, map_stuff, map_monstre, HUD]
 };
 
 // création et lancement du jeu
