@@ -769,6 +769,8 @@ export default class map_directeur extends Phaser.Scene {
                     this.porteFin.destroy();
                     this.porteFin = null;
                 }
+                this.scene.stop('HUD');
+                this.scene.start('fin');
             });
         } else {
             // Code incorrect
