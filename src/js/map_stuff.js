@@ -328,10 +328,13 @@ export default class map_stuff extends Phaser.Scene {
         });
 
         // ✅ KeyCodes explicite pour éviter tout conflit
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
-        this.input.keyboard.on('keydown-S', () => {
+        this.input.keyboard.on('keydown-SPACE', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
                 this.armeNearby.collectee = true;
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -403,25 +406,26 @@ export default class map_stuff extends Phaser.Scene {
 
     update() {
         // ✅ guard unifié cursors + boutonFeu
-        if (!this.cursors || !this.boutonFeu) {
-            this.cursors = this.input.keyboard.createCursorKeys();
+        if (!this.keyD || !this.boutonFeu) {
+            this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+            this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+            this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+            this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
             this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
             return;
         }
-
-        const cursors = this.cursors;
 
         let vitesse = 160;
         this.game.events.emit('getBoostVitesse', (boost) => {
             if (boost) vitesse = boost;
         });
 
-        if (cursors.right.isDown) {
+        if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
-        } else if (cursors.left.isDown) {
+        } else if (this.keyQ.isDown) {
             player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
@@ -431,10 +435,10 @@ export default class map_stuff extends Phaser.Scene {
             player.anims.play('anim_face');
         }
 
-        if (cursors.up.isDown) {
+        if (this.keyZ.isDown) {
             player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
-        } else if (cursors.down.isDown) {
+        } else if (this.keyS.isDown) {
             player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
