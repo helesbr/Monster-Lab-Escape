@@ -28,15 +28,19 @@ export default class map_stuff extends Phaser.Scene {
         });
         this.load.audio('stuff', 'src/assets/son/stuff.mp3');
         this.load.audio('tkprime', 'src/assets/son/tkprime.mp3');
+        this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
+        this.load.audio('gunshot', 'src/assets/son/gunshot.mp3');
     }
 
     create() {
         this.son_stuff = this.sound.add('stuff');
         this.son_stuff.play();
         this.son_tkprime = this.sound.add('tkprime');
+        this.son_ronnie = this.sound.add('ronnie');
         this.events.on('shutdown', () => {
             if (this.son_stuff) this.son_stuff.stop();
             if (this.son_tkprime) this.son_tkprime.stop();
+            if (this.son_ronnie) this.son_ronnie.stop();
         });
 
         const carte = this.add.tilemap("stuff");
@@ -273,6 +277,7 @@ export default class map_stuff extends Phaser.Scene {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
                 this.game.events.emit('addMoney', 10);
+                this.son_ronnie.play();  
             }
         });
 
