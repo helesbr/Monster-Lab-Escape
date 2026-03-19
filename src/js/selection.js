@@ -227,7 +227,10 @@ export default class selection extends Phaser.Scene {
           else if (porte.doorName === "door12") { destination = "map_cuisine"; porteDestination = "door_retour1"; }
           else if (porte.doorName === "door2" && this.allMonstersDead) { destination = "map_directeur"; porteDestination = "door_retour"; }
 
-          this.scene.start(destination, { porteDestination, offsetX, offsetY });
+          this.cameras.main.fade(500, 0, 0, 0);
+          this.time.delayedCall(500, () => {
+            this.scene.start(destination, { porteDestination, offsetX, offsetY });
+          });
           break;
 
         } else if (distance < 100 && !porte.estSolide) {

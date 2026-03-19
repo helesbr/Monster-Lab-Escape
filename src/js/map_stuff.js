@@ -340,7 +340,10 @@ export default class map_stuff extends Phaser.Scene {
                         porteDestination = 'door31';
                         offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination, offsetX, offsetY });
+                    this.cameras.main.fade(500, 0, 0, 0);
+                    this.time.delayedCall(500, () => {
+                        this.scene.start(destination, { porteDestination, offsetX, offsetY });
+                    });
                 });
             }
         });

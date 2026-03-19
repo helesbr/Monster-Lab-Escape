@@ -337,7 +337,10 @@ export default class map_cuisine extends Phaser.Scene {
                         porteDestination = 'door12';
                         offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination, offsetY, offsetX });
+                    this.cameras.main.fade(500, 0, 0, 0);
+                    this.time.delayedCall(500, () => {
+                        this.scene.start(destination, { porteDestination, offsetY, offsetX });
+                    });
                 });
             } else if (this.shopNearby) {
                 this.ouvrirMenuShop();

@@ -208,6 +208,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.doorNearby.estSolide = false;
                 this.doorCollider.active = false;
                 this.doorNearby.anims.play('door_open');
+                this.cameras.main.fade(500, 0, 0, 0);
                 this.time.delayedCall(500, () => {
                     this.scene.start("selection", { porteDestination: "door4", offsetX: -50 });
                 });
@@ -224,7 +225,10 @@ export default class map_monstre extends Phaser.Scene {
                 boutonDirecteur.setDepth(50);
                 boutonDirecteur.setVisible(false);
                 boutonDirecteur.on('pointerdown', () => {
-                    this.scene.start('map_directeur', { porteDestination: 'door_retour' });
+                    this.cameras.main.fade(500, 0, 0, 0);
+                    this.time.delayedCall(500, () => {
+                        this.scene.start('map_directeur', { porteDestination: 'door_retour' });
+                    });
                 });
             }
         }
