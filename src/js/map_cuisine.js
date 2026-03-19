@@ -32,15 +32,18 @@ export default class map_cuisine extends Phaser.Scene {
         this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
         this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
+        this.load.audio('tkprime2', 'src/assets/son/tkprime2.mp3');
     }
 
     create() {
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
         this.son_ronnie = this.sound.add('ronnie');
+        this.son_tkprime2 = this.sound.add('tkprime2');
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
             if (this.son_ronnie) this.son_ronnie.stop();
+            if (this.son_tkprime2) this.son_tkprime2.stop();
         });
 
         this.game.events.emit('getMoney', (money) => {
@@ -49,8 +52,8 @@ export default class map_cuisine extends Phaser.Scene {
 
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
-        const solLayer    = carteCuisine.createLayer("sol",    tileset, 0, 0);
-        const wallLayer   = carteCuisine.createLayer("Wall",   tileset, 0, 0);
+        const solLayer = carteCuisine.createLayer("sol", tileset, 0, 0);
+        const wallLayer = carteCuisine.createLayer("Wall", tileset, 0, 0);
         const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
         wallLayer.setCollisionByProperty({ estSolide: true });
@@ -151,7 +154,7 @@ export default class map_cuisine extends Phaser.Scene {
                     loop: true
                 });
             });
-            if (wallLayer)   this.physics.add.collider(this.groupe_monstres, wallLayer);
+            if (wallLayer) this.physics.add.collider(this.groupe_monstres, wallLayer);
             if (objetsLayer) this.physics.add.collider(this.groupe_monstres, objetsLayer);
         }
 
@@ -223,7 +226,7 @@ export default class map_cuisine extends Phaser.Scene {
             }
         });
 
-        if (wallLayer)   this.physics.add.collider(player, wallLayer);
+        if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
@@ -359,10 +362,10 @@ export default class map_cuisine extends Phaser.Scene {
         let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
         const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
@@ -451,14 +454,17 @@ export default class map_cuisine extends Phaser.Scene {
             switch (player.directionArme) {
                 case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
                 case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
-                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
-                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
+                case 'haut': player.armeEquipee.anims.play('gun_haut', true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas': player.armeEquipee.anims.play('gun_bas', true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
 
     ouvrirMenuShop() {
         this.menuShopVisible = true;
+        this.son_tkprime2.setVolume(1.3);
+        this.son_tkprime2.play();
+        this.son_cuisine.setVolume(0.3);
 
         const fondMenu = this.add.rectangle(240, 240, 1050, 825, 0x000000, 0.7);
         fondMenu.setDepth(200);
@@ -472,7 +478,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgCreatine.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
         imgCreatine.on('pointerdown', () => this.spawnObjet('creatine'));
         imgCreatine.on('pointerover', () => imgCreatine.setDisplaySize(370, 370));
-        imgCreatine.on('pointerout',  () => imgCreatine.setDisplaySize(340, 340));
+        imgCreatine.on('pointerout', () => imgCreatine.setDisplaySize(340, 340));
 
         const prixCreatine = this.add.text(90, 460, '30 💰', {
             fontSize: '24px', fill: '#FFD700', stroke: '#000', strokeThickness: 3
@@ -486,7 +492,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgPreworkout.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
         imgPreworkout.on('pointerdown', () => this.spawnObjet('prewarkout'));
         imgPreworkout.on('pointerover', () => imgPreworkout.setDisplaySize(370, 370));
-        imgPreworkout.on('pointerout',  () => imgPreworkout.setDisplaySize(340, 340));
+        imgPreworkout.on('pointerout', () => imgPreworkout.setDisplaySize(340, 340));
 
         const prixPreworkout = this.add.text(390, 460, '30 💰', {
             fontSize: '24px', fill: '#FFD700', stroke: '#000', strokeThickness: 3
@@ -563,6 +569,8 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     fermerMenuShop() {
+        if (this.son_tkprime2) this.son_tkprime2.stop();
+        if (this.son_cuisine) this.son_cuisine.setVolume(1.0);
         if (this.menuShop) {
             this.menuShop.fond.destroy();
             this.menuShop.titre.destroy();
@@ -576,7 +584,7 @@ export default class map_cuisine extends Phaser.Scene {
             this.menuShop = null;
         }
         if (this.texteMoneyShop) { this.texteMoneyShop.destroy(); this.texteMoneyShop = null; }
-        if (this.texteErreur)    { this.texteErreur.destroy();    this.texteErreur = null; }
+        if (this.texteErreur) { this.texteErreur.destroy(); this.texteErreur = null; }
         this.menuShopVisible = false;
     }
 }
