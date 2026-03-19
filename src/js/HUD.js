@@ -12,6 +12,27 @@ export default class HUD extends Phaser.Scene {
         this.vitesseBoost = null;
         this.timerBoost = null;
 
+        // Supprimer tous les anciens listeners pour éviter les doublons
+        this.game.events.off('playerHit');
+        this.game.events.off('resetVie');
+        this.game.events.off('getVie');
+        this.game.events.off('getVieMax');
+        this.game.events.off('setVieMax');
+        this.game.events.off('armeRamassee');
+        this.game.events.off('getArme');
+        this.game.events.off('resetArme');
+        this.game.events.off('setBoostVitesse');
+        this.game.events.off('getBoostVitesse');
+        this.game.events.off('resetBoostVitesse');
+        this.game.events.off('addMoney');
+        this.game.events.off('getMoney');
+        this.game.events.off('resetMoney');
+        this.game.events.off('monstreMort');
+        this.game.events.off('getMonstresMorts');
+        this.game.events.off('resetMonstres');
+        this.game.events.off('resetBoost');
+        this.game.events.off('tousMonstresMorts');
+
         this.coeurs = [];
         for (let i = 0; i < 9; i++) {
             const ligne = Math.floor(i / 3);
@@ -72,29 +93,30 @@ export default class HUD extends Phaser.Scene {
 
         // === BOOST VITESSE (preworkout) ===
         this.boostVitesse = false;
-        this.boostVitesseExpire = 0; // timestamp d'expiration
+        this.boostVitesseExpire = 0;
 
-        this.game.events.on('setBoostVitesse', (duree) => {
+        this.game.events.on('setBoostVitesse', (vitesse, duree) => {
             this.boostVitesse = true;
             this.boostVitesseExpire = Date.now() + duree;
+            this.vitesseBoost = vitesse;
+            if (this.timerBoost) this.timerBoost.remove();
+            this.timerBoost = this.time.delayedCall(duree, () => {
+                this.vitesseBoost = null;
+                this.boostVitesse = false;
+            });
         });
         this.game.events.on('getBoostVitesse', (callback) => {
-            // Si le boost a expiré, on le reset
             if (this.boostVitesse && Date.now() > this.boostVitesseExpire) {
                 this.boostVitesse = false;
+                this.vitesseBoost = null;
             }
-            const tempsRestant = this.boostVitesse ? this.boostVitesseExpire - Date.now() : 0;
-            callback(this.boostVitesse, tempsRestant);
+            callback(this.vitesseBoost);
         });
         this.game.events.on('resetBoostVitesse', () => {
             this.boostVitesse = false;
             this.boostVitesseExpire = 0;
-        });
-
-        // === VIE MAX (creatine) ===
-        // déjà géré via setVieMax, mais on expose aussi getVieMax
-        this.game.events.on('getVieMax', (callback) => {
-            callback(this.vieMax);
+            this.vitesseBoost = null;
+            if (this.timerBoost) this.timerBoost.remove();
         });
 
         // money
@@ -121,16 +143,12 @@ export default class HUD extends Phaser.Scene {
             this.monstresMorts = [];
         });
 
-        // boost vitesse
-        this.game.events.on('setBoostVitesse', (vitesse, duree) => {
-            this.vitesseBoost = vitesse;
+        // reset boost
+        this.game.events.on('resetBoost', () => {
+            this.vitesseBoost = null;
+            this.boostVitesse = false;
+            this.boostVitesseExpire = 0;
             if (this.timerBoost) this.timerBoost.remove();
-            this.timerBoost = this.time.delayedCall(duree, () => {
-                this.vitesseBoost = null;
-            });
-        });
-        this.game.events.on('getBoostVitesse', (callback) => {
-            callback(this.vitesseBoost);
         });
         this.game.events.on('resetBoost', () => {
             this.vitesseBoost = null;
