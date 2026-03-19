@@ -194,7 +194,7 @@ export default class map_cuisine extends Phaser.Scene {
         player.directionArme = 'droite';
         player.pointsVie = 3;
         player.vitesseBase = 160;
-        player.vitesseBoost = null;
+        player.vitesseBoost = null; // reset local d'abord
         this.invincible = false;
 
         this.game.events.emit('getVie', (vie) => {
@@ -208,6 +208,30 @@ export default class map_cuisine extends Phaser.Scene {
                 armeSprite.setDepth(99);
                 armeSprite.anims.play('gun_droite');
                 player.armeEquipee = armeSprite;
+            }
+        });
+
+        // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+        this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+            if (actif && tempsRestant > 0) {
+                player.vitesseBoost = player.vitesseBase * 2.5;
+                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+                this.time.delayedCall(tempsRestant, () => {
+                    player.vitesseBoost = null;
+                    this.game.events.emit('resetBoostVitesse');
+                });
+            }
+        });
+
+        // ✅ Récupérer la vie max persistée (creatine)
+        this.game.events.emit('getVieMax', (vieMax) => {
+            if (vieMax > 3) {
+                // Réappliquer l'affichage des coeurs supplémentaires via getVie
+                this.game.events.emit('getVie', (vie) => {
+                    // setVieMax met à jour le HUD
+                    this.game.events.emit('setVieMax', vieMax, vie);
+                    player.pointsVie = vie;
+                });
             }
         });
 
@@ -602,15 +626,18 @@ export default class map_cuisine extends Phaser.Scene {
                 // ✅ overlap joueur/objet → effet selon le type
                 this.physics.add.overlap(player, objet, () => {
                     if (type === 'prewarkout') {
-                        // ✅ vitesse x2.5 pendant 10 secondes
+                        const duree = 10000;
                         player.vitesseBoost = (player.vitesseBase || 160) * 2.5;
+                        // ✅ Persister dans le HUD
+                        this.game.events.emit('setBoostVitesse', duree);
                         if (this.timerBoostVitesse) this.timerBoostVitesse.remove();
-                        this.timerBoostVitesse = this.time.delayedCall(10000, () => {
+                        this.timerBoostVitesse = this.time.delayedCall(duree, () => {
                             player.vitesseBoost = null;
+                            this.game.events.emit('resetBoostVitesse');
                         });
                     } else if (type === 'creatine') {
-                        // ✅ +3 vies jusqu'à max 6
                         player.pointsVie = Math.min(player.pointsVie + 3, 6);
+                        // ✅ Persister dans le HUD (setVieMax s'en charge déjà)
                         this.game.events.emit('setVieMax', 6, player.pointsVie);
                     }
                     objet.destroy();

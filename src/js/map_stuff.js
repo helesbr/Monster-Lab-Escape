@@ -389,6 +389,7 @@ export default class map_stuff extends Phaser.Scene {
     }
 
     update() {
+        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
         const cursors = this.cursors;
 
         if (cursors.right.isDown) {

@@ -25,6 +25,7 @@ export default class selection extends Phaser.Scene {
     this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
       frameWidth: 64,
       frameHeight: 32
+      
     });
     // ✅ chargement du gun
     this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
@@ -84,6 +85,9 @@ export default class selection extends Phaser.Scene {
     // ✅ initialiser arme et direction
     player.armeEquipee = null;
     player.directionArme = 'droite';
+    player.vitesseBase = 160;
+    player.vitesseBoost = null;
+    player.pointsVie = 3;
 
     this.physics.add.collider(player, murLayer);
     this.physics.add.collider(player, objectLayer);
@@ -195,16 +199,48 @@ export default class selection extends Phaser.Scene {
         player.armeEquipee = armeSprite;
       }
     });
+
+    // ✅ Récupérer la vie persistée
+    this.game.events.emit('getVie', (vie) => {
+      player.pointsVie = vie;
+    });
+
+    // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+    this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+      if (actif && tempsRestant > 0) {
+        player.vitesseBoost = player.vitesseBase * 2.5;
+        console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+        this.time.delayedCall(tempsRestant, () => {
+          player.vitesseBoost = null;
+          this.game.events.emit('resetBoostVitesse');
+        });
+      }
+    });
+
+    // ✅ Récupérer la vie max persistée (creatine)
+    this.game.events.emit('getVieMax', (vieMax) => {
+      if (vieMax > 3) {
+        // Réappliquer l'affichage des coeurs supplémentaires via getVie
+        this.game.events.emit('getVie', (vie) => {
+          // setVieMax met à jour le HUD
+          this.game.events.emit('setVieMax', vieMax, vie);
+          player.pointsVie = vie;
+        });
+      }
+    });
   }
 
   update() {
+    // ✅ vitesse avec boost preworkout
+    const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+
     if (clavier.right.isDown) {
-      player.setVelocityX(160);
+      player.setVelocityX(vitesse);
       player.setFlipX(false);
       player.anims.play('anim_tourne_droite', true);
       player.directionArme = 'droite';
     } else if (clavier.left.isDown) {
-      player.setVelocityX(-160);
+      player.setVelocityX(-vitesse);
       player.setFlipX(false);
       player.anims.play('anim_tourne_gauche', true);
       player.directionArme = 'gauche';
@@ -215,10 +251,10 @@ export default class selection extends Phaser.Scene {
     }
 
     if (clavier.up.isDown) {
-      player.setVelocityY(-160);
+      player.setVelocityY(-vitesse);
       player.directionArme = 'haut';
     } else if (clavier.down.isDown) {
-      player.setVelocityY(160);
+      player.setVelocityY(vitesse);
       player.directionArme = 'bas';
     } else {
       player.setVelocityY(0);

@@ -172,6 +172,8 @@ export default class map_monstre extends Phaser.Scene {
         player.armeEquipee = null;
         player.directionArme = 'droite';
         player.pointsVie = 3;
+        player.vitesseBase = 160;
+        player.vitesseBoost = null; // reset local d'abord
         this.invincible = false;
 
         this.game.events.emit('getVie', (vie) => {
@@ -185,6 +187,30 @@ export default class map_monstre extends Phaser.Scene {
                 armeSprite.setDepth(99);
                 armeSprite.anims.play('gun_droite');
                 player.armeEquipee = armeSprite;
+            }
+        });
+
+        // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+        this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+            if (actif && tempsRestant > 0) {
+                player.vitesseBoost = player.vitesseBase * 2.5;
+                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+                this.time.delayedCall(tempsRestant, () => {
+                    player.vitesseBoost = null;
+                    this.game.events.emit('resetBoostVitesse');
+                });
+            }
+        });
+
+        // ✅ Récupérer la vie max persistée (creatine)
+        this.game.events.emit('getVieMax', (vieMax) => {
+            if (vieMax > 3) {
+                // Réappliquer l'affichage des coeurs supplémentaires via getVie
+                this.game.events.emit('getVie', (vie) => {
+                    // setVieMax met à jour le HUD
+                    this.game.events.emit('setVieMax', vieMax, vie);
+                    player.pointsVie = vie;
+                });
             }
         });
 
@@ -359,6 +385,9 @@ export default class map_monstre extends Phaser.Scene {
     update() {
         const cursors = this.cursors;
 
+        // ✅ vitesse avec boost preworkout
+        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
@@ -373,12 +402,12 @@ export default class map_monstre extends Phaser.Scene {
         }
 
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
@@ -388,10 +417,10 @@ export default class map_monstre extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
