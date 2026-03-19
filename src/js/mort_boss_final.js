@@ -6,25 +6,28 @@ export default class mort_boss_final extends Phaser.Scene {
     }
 
     preload() {
-            this.load.image('mort_boss_final', 'src/assets/images/mort_boss_final.png');
+            this.load.image('mort_boss_final', 'src/assets/images/image_fin.png');
     }
 
     create() {
-        this.add.image(400, 300, 'mort_boss_final');
+        const img = this.add.image(240, 200, 'mort_boss_final');
+        img.setDisplaySize(460, 300);
 
-        const bouton = this.add.text(400, 530, 'Retour au menu', {
-            fontSize: '28px',
-            fontStyle: 'bold',
-            fill: '#ffffff',
-            backgroundColor: '#333333',
-            padding: { x: 20, y: 10 },
-            stroke: '#000000',
-            strokeThickness: 3
-        }).setOrigin(0.5).setDepth(200).setInteractive({ useHandCursor: true });
-
-        bouton.on('pointerover', () => bouton.setStyle({ fill: '#ffff00' }));
-        bouton.on('pointerout', () => bouton.setStyle({ fill: '#ffffff' }));
-        bouton.on('pointerdown', () => {
+        const boutonRetour = this.add.rectangle(this.scale.width / 2, this.scale.height - 80, 200, 60, 0x00aa00);
+        boutonRetour.setInteractive();
+        boutonRetour.setDepth(1);
+        boutonRetour.on('pointerover', () => {
+            boutonRetour.setFillStyle(0x00ff00);
+        });
+        boutonRetour.on('pointerout', () => {
+            boutonRetour.setFillStyle(0x00aa00);
+        });
+        this.add.text(this.scale.width / 2, this.scale.height - 80, 'RETOUR', {
+            fontSize: '32px',
+            fill: '#fff',
+            fontStyle: 'bold'
+        }).setOrigin(0.5).setDepth(2);
+        boutonRetour.on('pointerdown', () => {
             this.scene.start('menu');
         });
     }
