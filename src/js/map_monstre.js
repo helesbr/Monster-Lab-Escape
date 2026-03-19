@@ -60,9 +60,7 @@ export default class map_monstre extends Phaser.Scene {
             if (this.son_monstre) this.son_monstre.stop();
         });
 
-        this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
-        });
+
 
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
@@ -177,7 +175,7 @@ export default class map_monstre extends Phaser.Scene {
         this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
             if (actif && tempsRestant > 0) {
                 player.vitesseBoost = player.vitesseBase * 2.5;
-                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+
                 this.time.delayedCall(tempsRestant, () => {
                     player.vitesseBoost = null;
                     this.game.events.emit('resetBoostVitesse');
@@ -249,7 +247,7 @@ export default class map_monstre extends Phaser.Scene {
                 if (this.son_rage_quit) {
                     this.son_rage_quit.play();
                     this.son_rage_quit.once('complete', () => {
-                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                        this.scene.start('laboratory', { spawnX: 100, spawnY: 50 });
                         this.scene.launch('HUD');
                     });
                 }
@@ -276,7 +274,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.doorNearby.anims.play('door_open');
                 this.cameras.main.fade(500, 0, 0, 0);
                 this.time.delayedCall(500, () => {
-                    this.scene.start("selection", { porteDestination: "door4", offsetX: -50 });
+                    this.scene.start("laboratory", { porteDestination: "door4", offsetX: -50 });
                 });
             }
         });

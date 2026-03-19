@@ -150,10 +150,6 @@ export default class HUD extends Phaser.Scene {
             this.boostVitesseExpire = 0;
             if (this.timerBoost) this.timerBoost.remove();
         });
-        this.game.events.on('resetBoost', () => {
-            this.vitesseBoost = null;
-            if (this.timerBoost) this.timerBoost.remove();
-        });
     }
 
     updateCoeurs() {

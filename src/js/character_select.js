@@ -12,9 +12,17 @@ export default class character_select extends Phaser.Scene {
             frameHeight: 48
         });
         this.load.image("helias_sprite", "src/assets/images/helias.png");
+        this.load.audio('heliasxgetout', 'src/assets/son/heliasxgetout.mp3');
     }
 
     create() {
+        // Son
+        this.son_heliasxgetout = this.sound.add('heliasxgetout');
+        this.son_heliasxgetout.play();
+        this.events.on('shutdown', () => {
+            if (this.son_heliasxgetout) this.son_heliasxgetout.stop();
+        });
+
         // Fond de sécurité
         this.cameras.main.setBackgroundColor(0x2c3e50);
 
@@ -69,7 +77,7 @@ export default class character_select extends Phaser.Scene {
 
         dudeFrame.on('pointerdown', () => {
             this.game.config.personnageSelectionne = 'dude';
-            this.scene.start('selection');
+            this.scene.start('laboratory');
         });
 
         // Personnage 2: Helias
@@ -101,7 +109,7 @@ export default class character_select extends Phaser.Scene {
 
         heliasFrame.on('pointerdown', () => {
             this.game.config.personnageSelectionne = 'helias';
-            this.scene.start('selection');
+            this.scene.start('laboratory');
         });
     }
 

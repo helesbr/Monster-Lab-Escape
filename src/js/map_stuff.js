@@ -52,9 +52,7 @@ export default class map_stuff extends Phaser.Scene {
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
         this.game.config.aPistole = false;
 
-        this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
-        });
+
 
         const solLayer = carte.createLayer("Floor", tileset, 0, 0);
         const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
@@ -363,16 +361,16 @@ export default class map_stuff extends Phaser.Scene {
                 this.doorCollider.active = false;
                 this.doorNearby.anims.play('door_open');
                 this.time.delayedCall(500, () => {
-                    let destination = 'selection';
+                    let destination = 'laboratory';
                     let porteDestination = 'door3';
                     let offsetX = 0;
                     let offsetY = 0;
                     if (doorName === 'door_retour1') {
-                        destination = 'selection';
+                        destination = 'laboratory';
                         porteDestination = 'door3';
                         offsetY = -50;
                     } else if (doorName === 'door_retour2') {
-                        destination = 'selection';
+                        destination = 'laboratory';
                         porteDestination = 'door31';
                         offsetX = 50;
                     }
