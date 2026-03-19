@@ -304,7 +304,7 @@ export default class map_cuisine extends Phaser.Scene {
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
         this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         const calqueShops = carteCuisine.getObjectLayer("shops");
         this.shopNearby = null;
@@ -401,7 +401,7 @@ export default class map_cuisine extends Phaser.Scene {
             this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
             this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
             this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
             return;
         }
 

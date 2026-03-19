@@ -332,9 +332,9 @@ export default class map_stuff extends Phaser.Scene {
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
         this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.input.keyboard.on('keydown-SPACE', () => {
+        this.input.keyboard.on('keydown-E', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
                 this.armeNearby.collectee = true;
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -411,7 +411,7 @@ export default class map_stuff extends Phaser.Scene {
             this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
             this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
             this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
             return;
         }
 

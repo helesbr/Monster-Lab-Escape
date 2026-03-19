@@ -34,6 +34,11 @@ export default class selection extends Phaser.Scene {
   }
 
   create() {
+    // Relancer le HUD s'il n'est pas actif
+    if (!this.scene.isActive('HUD')) {
+      this.scene.launch('HUD');
+    }
+
     this.son_laboratory = this.sound.add('laboratory');
     this.son_laboratory.play();
     this.events.on('shutdown', () => {

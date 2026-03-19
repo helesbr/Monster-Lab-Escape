@@ -257,7 +257,7 @@ export default class map_monstre extends Phaser.Scene {
         this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
         this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
         this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-        this.boutonFeu = this.input.keyboard.addKey('A');
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {

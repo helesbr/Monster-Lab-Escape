@@ -218,9 +218,10 @@ export default class map_directeur extends Phaser.Scene {
                     this.game.events.emit('resetVie');
                     this.game.events.emit('resetArme');
                     this.game.events.emit('resetMonstres');
+                    this.game.events.emit('resetBoost');
+                    this.game.events.emit('resetMoney');
                     this.scene.stop('HUD');
                     this.scene.start('selection');
-                    this.scene.launch('HUD');
                 }
             },
             callbackScope: this,
