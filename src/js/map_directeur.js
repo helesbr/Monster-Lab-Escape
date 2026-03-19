@@ -226,40 +226,66 @@ export default class map_directeur extends Phaser.Scene {
             strokeThickness: 4
         }).setOrigin(0.5, 0).setDepth(200).setScrollFactor(0);
 
-        this.timerCompteur = this.time.addEvent({
-            delay: 1000,
-            callback: function () {
-                this.tempsRestant--;
-                const minutes = Math.floor(this.tempsRestant / 60);
-                const secondes = this.tempsRestant % 60;
-                this.texteTimer.setText(minutes + ':' + (secondes < 10 ? '0' : '') + secondes);
+        // ✅ Message d'arrivée (bloque le joueur et retarde le chrono)
+        this.playerBlocked = true;
+        this.messageArrivee = this.add.text(this.scale.width / 2, this.scale.height / 2 + 85,
+            "Bienvenue dans le bureau du directeur !\nRésous les énigmes pour t'échapper !",
+            {
+                fontSize: '22px',
+                fontStyle: 'bold',
+                fill: '#ffffff',
+                align: 'center',
+                wordWrap: { width: 400 },
+                stroke: '#000000',
+                strokeThickness: 4
+            }
+        ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
 
-                if (this.tempsRestant <= 10) {
-                    this.texteTimer.setFill('#ff0000');
-                    this.tweens.add({
-                        targets: this.texteTimer,
-                        scale: 1.3,
-                        duration: 200,
-                        yoyo: true
-                    });
-                }
+        this.time.delayedCall(5000, () => {
+            this.messageArrivee.destroy();
+            this.playerBlocked = false;
+            // ✅ Lancer le chrono après le message
+            this.timerCompteur = this.time.addEvent({
+                delay: 1000,
+                callback: function () {
+                    this.tempsRestant--;
+                    const minutes = Math.floor(this.tempsRestant / 60);
+                    const secondes = this.tempsRestant % 60;
+                    this.texteTimer.setText(minutes + ':' + (secondes < 10 ? '0' : '') + secondes);
 
-                if (this.tempsRestant <= 0) {
-                    this.timerCompteur.remove();
-                    this.game.events.emit('resetVie');
-                    this.game.events.emit('resetArme');
-                    this.game.events.emit('resetMonstres');
-                    this.game.events.emit('resetBoost');
-                    this.game.events.emit('resetMoney');
-                    this.scene.stop('HUD');
-                    this.scene.start('menu');
-                }
-            },
+                    if (this.tempsRestant <= 10) {
+                        this.texteTimer.setFill('#ff0000');
+                        this.tweens.add({
+                            targets: this.texteTimer,
+                            scale: 1.3,
+                            duration: 200,
+                            yoyo: true
+                        });
+                    }
+
+                    if (this.tempsRestant <= 0) {
+                        this.timerCompteur.remove();
+                        this.game.events.emit('resetVie');
+                        this.game.events.emit('resetArme');
+                        this.game.events.emit('resetMonstres');
+                        this.game.events.emit('resetBoost');
+                        this.game.events.emit('resetMoney');
+                        this.scene.stop('HUD');
+                        this.scene.start('menu');
+                    }
+                },
             callbackScope: this,
             repeat: 119
+            });
         });
     }
     update() {
+
+        // ✅ Bloquer le joueur pendant le message d'arrivée
+        if (this.playerBlocked) {
+            player.setVelocity(0, 0);
+            return;
+        }
 
         // ✅ vitesse avec boost preworkout
         const vitesse = player.vitesseBoost || player.vitesseBase || 160;
