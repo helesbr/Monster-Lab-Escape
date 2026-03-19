@@ -187,10 +187,34 @@ export default class map_directeur extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         
+        // ✅ Récupérer les objets interactifs depuis le calque "objets"
+        const objetsLayer = carteDirecteurLab.getObjectLayer("objets");
+        this.halteres = null;
+        if (objetsLayer) {
+            const halteresObj = objetsLayer.objects.find(o => o.name === "halteres");
+            if (halteresObj) {
+                this.halteres = { x: halteresObj.x, y: halteresObj.y };
+            }
+            const benchObj = objetsLayer.objects.find(o => o.name === "bench");
+            if (benchObj) {
+                this.bench = { x: benchObj.x, y: benchObj.y };
+            }
+            const echecObj = objetsLayer.objects.find(o => o.name === "echec");
+            if (echecObj) {
+                this.echec = { x: echecObj.x, y: echecObj.y };
+            }
+        }
+
         // ✅ Variables d'interaction
         this.doorNearby = null;
         this.arthusNearby = null;
         this.arthusDialogueShowing = false;
+        this.halteresNearby = false;
+        this.halteresDialogueShowing = false;
+        this.benchNearby = false;
+        this.benchDialogueShowing = false;
+        this.echecNearby = false;
+        this.echecDialogueShowing = false;
 
         // ✅ Minuteur de 2 minutes
         this.tempsRestant = 120;
@@ -266,16 +290,52 @@ export default class map_directeur extends Phaser.Scene {
             }
         }
 
+        // ✅ Détection de proximité avec les haltères
+        this.halteresNearby = false;
+        if (this.halteres) {
+            const distHalteres = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.halteres.x, this.halteres.y
+            );
+            if (distHalteres < 100) {
+                this.halteresNearby = true;
+            }
+        }
+
+        // ✅ Détection de proximité avec le bench
+        this.benchNearby = false;
+        if (this.bench) {
+            const distBench = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.bench.x, this.bench.y
+            );
+            if (distBench < 100) {
+                this.benchNearby = true;
+            }
+        }
+
+        // ✅ Détection de proximité avec les échecs
+        this.echecNearby = false;
+        if (this.echec) {
+            const distEchec = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.echec.x, this.echec.y
+            );
+            if (distEchec < 100) {
+                this.echecNearby = true;
+            }
+        }
+
         // ✅ Gestion des interactions au ENTER
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
-            if (this.arthusNearby && !this.arthusDialogueShowing) {
-                // Afficher le dialogue d'Arthus
-                this.arthusDialogueShowing = true;
-                const dialogue = this.add.text(240, 150, 
-                    "salam j'ai mal",
+            if (this.halteresNearby && !this.halteresDialogueShowing) {
+                this.halteresDialogueShowing = true;
+                const dialogueHalteres = this.add.text(240, 100,
+                    "3 rangées, mais la rangée du milieu a disparu. Combien reste-t-il ?",
                     {
                         fontSize: '20px',
-                        fill: '#ffffff',
+                        fontStyle: 'bold',
+                        fill: '#ff0000',
                         align: 'center',
                         wordWrap: { width: 400 },
                         stroke: '#000000',
@@ -283,8 +343,69 @@ export default class map_directeur extends Phaser.Scene {
                     }
                 ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
 
-                // Fermer le dialogue après 4 secondes
-                this.time.delayedCall(4000, () => {
+                this.time.delayedCall(5000, () => {
+                    dialogueHalteres.destroy();
+                    this.halteresDialogueShowing = false;
+                });
+            }
+            else if (this.benchNearby && !this.benchDialogueShowing) {
+                this.benchDialogueShowing = true;
+                const dialogueBench = this.add.text(240, 100,
+                    "Le patron fait 4 séries de 2 exercices. Mais il dit que seul le total d'une série compte.",
+                    {
+                        fontSize: '20px',
+                        fontStyle: 'bold',
+                        fill: '#ff0000',
+                        align: 'center',
+                        wordWrap: { width: 400 },
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
+
+                this.time.delayedCall(5000, () => {
+                    dialogueBench.destroy();
+                    this.benchDialogueShowing = false;
+                });
+            }
+            else if (this.echecNearby && !this.echecDialogueShowing) {
+                this.echecDialogueShowing = true;
+                const dialogueEchec = this.add.text(240, 100,
+                    "Blanc a perdu toutes ses pièces sauf le double de 2. Noir n'a plus que la moitié de ça.",
+                    {
+                        fontSize: '20px',
+                        fontStyle: 'bold',
+                        fill: '#ff0000',
+                        align: 'center',
+                        wordWrap: { width: 400 },
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
+
+                this.time.delayedCall(5000, () => {
+                    dialogueEchec.destroy();
+                    this.echecDialogueShowing = false;
+                });
+            }
+            else if (this.arthusNearby && !this.arthusDialogueShowing) {
+                // Afficher le dialogue d'Arthus
+                this.arthusDialogueShowing = true;
+                const dialogue = this.add.text(240, 150,
+                    "Salam j'ai mal... le patron est obsédé par ses chiffres. Il dit toujours : 'l'ordre c'est la clé'. Commence par ce qui se soulève, puis où on s'allonge, puis le jeu du roi... et moi je suis le dernier.",
+                    {
+                        fontSize: '20px',
+                        fontStyle: 'bold',
+                        fill: '#ff0000',
+                        align: 'center',
+                        wordWrap: { width: 400 },
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
+
+                // Fermer le dialogue après 5 secondes
+                this.time.delayedCall(5000, () => {
                     dialogue.destroy();
                     this.arthusDialogueShowing = false;
                 });
