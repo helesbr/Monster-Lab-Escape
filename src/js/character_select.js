@@ -12,9 +12,17 @@ export default class character_select extends Phaser.Scene {
             frameHeight: 48
         });
         this.load.image("helias_sprite", "src/assets/images/helias.png");
+        this.load.audio('heliasxgetout', 'src/assets/son/heliasxgetout.mp3');
     }
 
     create() {
+        // Son
+        this.son_heliasxgetout = this.sound.add('heliasxgetout');
+        this.son_heliasxgetout.play();
+        this.events.on('shutdown', () => {
+            if (this.son_heliasxgetout) this.son_heliasxgetout.stop();
+        });
+
         // Fond de sécurité
         this.cameras.main.setBackgroundColor(0x2c3e50);
 
