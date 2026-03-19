@@ -138,7 +138,7 @@ export default class map_cuisine extends Phaser.Scene {
 
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function() {
+                    callback: function () {
                         if (monstre.active) {
                             monstre.setVelocity(
                                 Phaser.Math.Between(-80, 80),

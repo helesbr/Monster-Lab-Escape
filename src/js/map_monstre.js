@@ -26,13 +26,26 @@ export default class map_monstre extends Phaser.Scene {
             frameHeight: 64
         });
         this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
+        this.load.audio('herve', 'src/assets/son/Herve.mp3');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
     }
 
     create() {
+        // Créer les sons
+        this.son_herve = this.sound.add('herve');
         this.son_monstre = this.sound.add('monstres');
-        this.son_monstre.play();
+
+        // Jouer Herve d'abord
+        this.son_herve.play();
+
+        // Quand Herve se termine, jouer monstre
+        this.son_herve.once('complete', () => {
+            this.son_monstre.play();
+        });
+
+        // Nettoyer les sons au shutdown de la scène
         this.events.on('shutdown', () => {
+            if (this.son_herve) this.son_herve.stop();
             if (this.son_monstre) this.son_monstre.stop();
         });
 
@@ -43,9 +56,9 @@ export default class map_monstre extends Phaser.Scene {
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
 
-        const sangLayer  = carteMonstreLab.createLayer("blood1", tileset, 0, 0);
-        const murLayer   = carteMonstreLab.createLayer("Mur",    tileset, 0, 0);
-        const bloodLayer = carteMonstreLab.createLayer("blood",  tileset, 0, 0);
+        const sangLayer = carteMonstreLab.createLayer("blood1", tileset, 0, 0);
+        const murLayer = carteMonstreLab.createLayer("Mur", tileset, 0, 0);
+        const bloodLayer = carteMonstreLab.createLayer("blood", tileset, 0, 0);
 
         murLayer.setCollisionByProperty({ estSolide: true });
 
@@ -59,8 +72,8 @@ export default class map_monstre extends Phaser.Scene {
 
         if (!this.anims.exists("gun_droite")) this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
         if (!this.anims.exists("gun_gauche")) this.anims.create({ key: "gun_gauche", frames: [{ key: "image_gun", frame: 1 }], frameRate: 10 });
-        if (!this.anims.exists("gun_haut"))   this.anims.create({ key: "gun_haut",   frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
-        if (!this.anims.exists("gun_bas"))    this.anims.create({ key: "gun_bas",    frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
+        if (!this.anims.exists("gun_haut")) this.anims.create({ key: "gun_haut", frames: [{ key: "image_gun", frame: 3 }], frameRate: 10 });
+        if (!this.anims.exists("gun_bas")) this.anims.create({ key: "gun_bas", frames: [{ key: "image_gun", frame: 2 }], frameRate: 10 });
 
         this.groupe_monstres = this.physics.add.group();
         const calqueMonstres = carteMonstreLab.getObjectLayer("monstres");
@@ -94,7 +107,7 @@ export default class map_monstre extends Phaser.Scene {
         this.physics.add.collider(this.groupe_monstres, murLayer);
 
         if (!this.anims.exists("door_closed")) this.anims.create({ key: "door_closed", frames: [{ key: 'doors', frame: 0 }], frameRate: 10 });
-        if (!this.anims.exists("door_open"))   this.anims.create({ key: "door_open",   frames: this.anims.generateFrameNumbers('doors', { start: 1, end: 4 }), frameRate: 10 });
+        if (!this.anims.exists("door_open")) this.anims.create({ key: "door_open", frames: this.anims.generateFrameNumbers('doors', { start: 1, end: 4 }), frameRate: 10 });
 
         var groupe_portes = this.physics.add.group();
         const tabPoints1 = carteMonstreLab.getObjectLayer("door_retour");
@@ -151,7 +164,7 @@ export default class map_monstre extends Phaser.Scene {
 
         if (!this.anims.exists("anim_tourne_gauche")) this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
         if (!this.anims.exists("anim_tourne_droite")) this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
-        if (!this.anims.exists("anim_face"))          this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
+        if (!this.anims.exists("anim_face")) this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
 
         this.groupeBullets = this.physics.add.group();
         this.physics.add.collider(this.groupeBullets, murLayer, (balle) => balle.destroy());
@@ -243,10 +256,10 @@ export default class map_monstre extends Phaser.Scene {
         let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
         const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
@@ -312,8 +325,8 @@ export default class map_monstre extends Phaser.Scene {
             switch (player.directionArme) {
                 case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
                 case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
-                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
-                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
+                case 'haut': player.armeEquipee.anims.play('gun_haut', true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas': player.armeEquipee.anims.play('gun_bas', true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }

@@ -27,13 +27,16 @@ export default class map_stuff extends Phaser.Scene {
             frameHeight: 80
         });
         this.load.audio('stuff', 'src/assets/son/stuff.mp3');
+        this.load.audio('tkprime', 'src/assets/son/tkprime.mp3');
     }
 
     create() {
         this.son_stuff = this.sound.add('stuff');
         this.son_stuff.play();
+        this.son_tkprime = this.sound.add('tkprime');
         this.events.on('shutdown', () => {
             if (this.son_stuff) this.son_stuff.stop();
+            if (this.son_tkprime) this.son_tkprime.stop();
         });
 
         const carte = this.add.tilemap("stuff");
@@ -44,8 +47,8 @@ export default class map_stuff extends Phaser.Scene {
             console.log('Money actuelle:', money);
         });
 
-        const solLayer    = carte.createLayer("Floor",  tileset, 0, 0);
-        const wallLayer   = carte.createLayer("Mur",    tileset, 0, 0);
+        const solLayer = carte.createLayer("Floor", tileset, 0, 0);
+        const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
         const objetsLayer = carte.createLayer("Object", tileset, 0, 0);
 
         wallLayer.setCollisionByExclusion([-1]);
@@ -158,7 +161,7 @@ export default class map_stuff extends Phaser.Scene {
             }
         });
 
-        if (wallLayer)   this.physics.add.collider(player, wallLayer);
+        if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
@@ -220,7 +223,7 @@ export default class map_stuff extends Phaser.Scene {
 
                 monstre.moveEvent = this.time.addEvent({
                     delay: Phaser.Math.Between(2000, 4000),
-                    callback: function() {
+                    callback: function () {
                         if (monstre.active) {
                             monstre.setVelocity(
                                 Phaser.Math.Between(-80, 80),
@@ -317,6 +320,7 @@ export default class map_stuff extends Phaser.Scene {
                 player.armeEquipee = armeSprite;
                 this.armeNearby.destroy();
                 this.armeNearby = null;
+                this.son_tkprime.play();
                 this.game.events.emit('armeRamassee');
                 return;
             }
@@ -361,10 +365,10 @@ export default class map_stuff extends Phaser.Scene {
         let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
         const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
@@ -452,8 +456,8 @@ export default class map_stuff extends Phaser.Scene {
             switch (player.directionArme) {
                 case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
                 case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
-                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
-                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
+                case 'haut': player.armeEquipee.anims.play('gun_haut', true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas': player.armeEquipee.anims.play('gun_bas', true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
