@@ -34,7 +34,7 @@ export default class regles extends Phaser.Scene {
 
         // Texte des contrôles - positionnés sous chaque touche
         // ESPACE pour tirer - sous la barre espace (haut droite)
-        this.add.text(350, 170, 'ESPACE pour tirer', {
+        this.add.text(335, 180, 'ESPACE pour tirer', {
             fontSize: '16px',
             fill: '#fff'
         }).setOrigin(0.5).setDepth(2);
@@ -46,10 +46,17 @@ export default class regles extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(2);
 
         // E pour ramasser - sous la touche E (bas droite)
-        this.add.text(330, 355, 'E pour ramasser', {
+        this.add.text(335, 370, 'E pour ramasser', {
             fontSize: '16px',
             fill: '#fff'
         }).setOrigin(0.5).setDepth(2);
+
+        // Touche deplacement
+        this.add.text(135, 195, 'Déplacement', {
+            fontSize: '16px',
+            fill: '#fff'
+        }).setOrigin(0.5).setDepth(2);
+
 
         // Événement au clic du bouton
         boutonRetour.on('pointerdown', () => {
