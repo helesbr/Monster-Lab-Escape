@@ -187,6 +187,23 @@ export default class map_directeur extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         
+        // ✅ Créer la porte "porte_fin"
+        const porteFinLayer = carteDirecteurLab.getObjectLayer("porte_fin");
+        this.porteFin = null;
+        if (porteFinLayer) {
+            const obj = porteFinLayer.objects[0];
+            if (obj) {
+                this.porteFin = this.physics.add.sprite(obj.x, obj.y, 'doors');
+                this.porteFin.setCollideWorldBounds(true);
+                this.porteFin.setDepth(50);
+                this.porteFin.setDisplaySize(64, 32);
+                this.porteFin.setRotation(Math.PI / 2);
+                this.porteFin.body.setImmovable(true);
+                this.porteFin.body.moves = false;
+                this.physics.add.collider(player, this.porteFin);
+            }
+        }
+
         // ✅ Récupérer les objets interactifs depuis le calque "objets"
         const objetsLayer = carteDirecteurLab.getObjectLayer("objets");
         this.halteres = null;
@@ -215,6 +232,11 @@ export default class map_directeur extends Phaser.Scene {
         this.benchDialogueShowing = false;
         this.echecNearby = false;
         this.echecDialogueShowing = false;
+        this.porteFinNearby = false;
+        this.codeInputActive = false;
+        this.codeEntered = '';
+        this.correctCode = '2845';
+        this.porteFinOuverte = false;
 
         // ✅ Minuteur de 2 minutes
         this.tempsRestant = 120;
@@ -326,6 +348,18 @@ export default class map_directeur extends Phaser.Scene {
             }
         }
 
+        // ✅ Détection de proximité avec porte_fin
+        this.porteFinNearby = false;
+        if (this.porteFin && !this.porteFinOuverte) {
+            const distPorteFin = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.porteFin.x, this.porteFin.y
+            );
+            if (distPorteFin < 100) {
+                this.porteFinNearby = true;
+            }
+        }
+
         // ✅ Gestion des interactions au ENTER
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
             if (this.halteresNearby && !this.halteresDialogueShowing) {
@@ -388,6 +422,9 @@ export default class map_directeur extends Phaser.Scene {
                     this.echecDialogueShowing = false;
                 });
             }
+            else if (this.porteFinNearby && !this.codeInputActive && !this.porteFinOuverte) {
+                this.showCodeInput();
+            }
             else if (this.arthusNearby && !this.arthusDialogueShowing) {
                 // Afficher le dialogue d'Arthus
                 this.arthusDialogueShowing = true;
@@ -412,6 +449,11 @@ export default class map_directeur extends Phaser.Scene {
             }
         }
 
+        // ✅ Gestion du code input actif
+        if (this.codeInputActive) {
+            return;
+        }
+
         if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
@@ -433,5 +475,137 @@ export default class map_directeur extends Phaser.Scene {
             player.setVelocityY(0);
         }
 
+    }
+
+    showCodeInput() {
+        this.codeInputActive = true;
+        this.codeEntered = '';
+        player.setVelocity(0, 0);
+
+        // Fond sombre
+        this.codeOverlay = this.add.rectangle(240, 240, 480, 480, 0x000000, 0.7)
+            .setDepth(300).setScrollFactor(0);
+
+        // Panneau
+        this.codePanel = this.add.rectangle(240, 220, 360, 200, 0x222222, 0.95)
+            .setDepth(301).setScrollFactor(0).setStrokeStyle(3, 0xff0000);
+
+        // Titre
+        this.codeTitle = this.add.text(240, 155, 'Entrez le code :', {
+            fontSize: '22px', fontStyle: 'bold', fill: '#ffffff',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
+
+        // Affichage du code (4 tirets)
+        this.codeDisplay = this.add.text(240, 210, '_ _ _ _', {
+            fontSize: '36px', fontStyle: 'bold', fill: '#00ff00',
+            fontFamily: 'monospace', stroke: '#000000', strokeThickness: 2
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
+
+        // Instruction
+        this.codeHint = this.add.text(240, 265, 'Tapez 4 chiffres puis ENTER\nESCHAP pour annuler', {
+            fontSize: '14px', fill: '#aaaaaa', align: 'center',
+            stroke: '#000000', strokeThickness: 2
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
+
+        // Écouter les touches numériques
+        this.codeKeys = [];
+        for (let i = 0; i <= 9; i++) {
+            const key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ZERO + i);
+            this.codeKeys.push(key);
+        }
+        this.codeKeyBackspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
+        this.codeKeyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
+
+        this.codeInputHandler = this.time.addEvent({
+            delay: 100,
+            loop: true,
+            callback: () => {
+                // Chiffres 0-9
+                for (let i = 0; i <= 9; i++) {
+                    if (Phaser.Input.Keyboard.JustDown(this.codeKeys[i]) && this.codeEntered.length < 4) {
+                        this.codeEntered += i.toString();
+                        this.updateCodeDisplay();
+                    }
+                }
+                // Backspace
+                if (Phaser.Input.Keyboard.JustDown(this.codeKeyBackspace) && this.codeEntered.length > 0) {
+                    this.codeEntered = this.codeEntered.slice(0, -1);
+                    this.updateCodeDisplay();
+                }
+                // Echap → fermer
+                if (Phaser.Input.Keyboard.JustDown(this.codeKeyEsc)) {
+                    this.closeCodeInput();
+                }
+                // Enter → valider
+                if (Phaser.Input.Keyboard.JustDown(this.enterKey) && this.codeEntered.length === 4) {
+                    this.validateCode();
+                }
+            }
+        });
+    }
+
+    updateCodeDisplay() {
+        let display = '';
+        for (let i = 0; i < 4; i++) {
+            display += (i < this.codeEntered.length) ? this.codeEntered[i] : '_';
+            if (i < 3) display += ' ';
+        }
+        this.codeDisplay.setText(display);
+    }
+
+    closeCodeInput() {
+        if (this.codeInputHandler) this.codeInputHandler.remove();
+        if (this.codeOverlay) this.codeOverlay.destroy();
+        if (this.codePanel) this.codePanel.destroy();
+        if (this.codeTitle) this.codeTitle.destroy();
+        if (this.codeDisplay) this.codeDisplay.destroy();
+        if (this.codeHint) this.codeHint.destroy();
+        if (this.codeResultText) { this.codeResultText.destroy(); this.codeResultText = null; }
+
+        // Supprimer les listeners de touches
+        if (this.codeKeys) {
+            this.codeKeys.forEach(k => k.destroy());
+            this.codeKeys = null;
+        }
+        if (this.codeKeyBackspace) { this.codeKeyBackspace.destroy(); this.codeKeyBackspace = null; }
+        if (this.codeKeyEsc) { this.codeKeyEsc.destroy(); this.codeKeyEsc = null; }
+
+        this.codeInputActive = false;
+    }
+
+    validateCode() {
+        if (this.codeInputHandler) this.codeInputHandler.remove();
+
+        if (this.codeEntered === this.correctCode) {
+            // Code correct → ouvrir la porte
+            this.codeDisplay.setFill('#00ff00');
+            this.codeResultText = this.add.text(240, 265, 'Code correct ! La porte s\'ouvre...', {
+                fontSize: '18px', fontStyle: 'bold', fill: '#00ff00',
+                stroke: '#000000', strokeThickness: 3, align: 'center'
+            }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
+            if (this.codeHint) this.codeHint.destroy();
+
+            this.time.delayedCall(1500, () => {
+                this.closeCodeInput();
+                this.porteFinOuverte = true;
+                if (this.porteFin) {
+                    this.porteFin.destroy();
+                    this.porteFin = null;
+                }
+            });
+        } else {
+            // Code incorrect
+            this.codeDisplay.setFill('#ff0000');
+            this.codeResultText = this.add.text(240, 265, 'Code incorrect !', {
+                fontSize: '18px', fontStyle: 'bold', fill: '#ff0000',
+                stroke: '#000000', strokeThickness: 3, align: 'center'
+            }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
+            if (this.codeHint) this.codeHint.destroy();
+
+            this.time.delayedCall(1500, () => {
+                this.closeCodeInput();
+            });
+        }
     }
 }
