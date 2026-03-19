@@ -33,4 +33,4 @@ var config = {
 // création et lancement du jeu
 var game = new Phaser.Game(config);
 game.scene.start("map_directeur"); // Démarrer avec le menu
-game.scene.start("menu"); // Démarrer avec le menu
+
