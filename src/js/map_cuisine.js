@@ -246,7 +246,7 @@ export default class map_cuisine extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
-                this.game.events.emit(' addMoney', 10);
+                this.game.events.emit('addMoney', 10);
                 this.son_ronnie.play();
             }
         });
