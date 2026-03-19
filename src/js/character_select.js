@@ -11,7 +11,7 @@ export default class character_select extends Phaser.Scene {
             frameWidth: 44,
             frameHeight: 48
         });
-        this.load.image("helias_sprite", "src/assets/images/helias-perso.png");
+        this.load.image("helias_sprite", "src/assets/images/helias.png");
     }
 
     create() {
