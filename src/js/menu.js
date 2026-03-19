@@ -9,6 +9,7 @@ export default class menu extends Phaser.Scene {
         this.load.image("mogger", "src/assets/images/mogger.png");
         this.load.audio('menu', 'src/assets/son/menu.mp3');
         this.load.image('heart', 'src/assets/images/heart.png');
+        this.load.image('boutonjouer', 'src/assets/images/boutonjouer.png');
     }
 
     create() {
@@ -41,20 +42,16 @@ export default class menu extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(1);
 
-        const boutonJouer = this.add.rectangle(240, 215, 200, 60, 0x00aa00);
+        const boutonJouer = this.add.image(240, 215, 'boutonjouer');
+        boutonJouer.setDisplaySize(430, 200);
         boutonJouer.setInteractive();
+        boutonJouer.setDepth(1);
         boutonJouer.on('pointerover', () => {
-            boutonJouer.setFillStyle(0x00ff00);
+            boutonJouer.setDisplaySize(450, 258);
         });
         boutonJouer.on('pointerout', () => {
-            boutonJouer.setFillStyle(0x00aa00);
+            boutonJouer.setDisplaySize(430, 200);
         });
-
-        this.add.text(240, 215, 'JOUER', {
-            fontSize: '32px',
-            fill: '#fff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
 
         boutonJouer.on('pointerdown', () => {
             if (this.scene.isActive('HUD')) {
