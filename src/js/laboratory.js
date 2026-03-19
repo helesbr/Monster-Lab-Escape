@@ -1,7 +1,5 @@
 var player;
-var clavier;
 var groupe_monstres;
-var gameOver = false;
 var groupe_portes;
 
 export default class laboratory extends Phaser.Scene {
@@ -49,9 +47,7 @@ export default class laboratory extends Phaser.Scene {
       if (this.son_laboratory) this.son_laboratory.stop();
     });
 
-    this.game.events.emit('getMoney', (money) => {
-      console.log('Money actuelle:', money);
-    });
+
 
     const carteDuNiveau = this.add.tilemap("carte");
     const tileset = carteDuNiveau.addTilesetImage("all_tilset", "allTiles");
@@ -204,7 +200,7 @@ export default class laboratory extends Phaser.Scene {
     this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
       if (actif && tempsRestant > 0) {
         player.vitesseBoost = player.vitesseBase * 2.5;
-        console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+
         this.time.delayedCall(tempsRestant, () => {
           player.vitesseBoost = null;
           this.game.events.emit('resetBoostVitesse');

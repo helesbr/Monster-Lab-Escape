@@ -52,9 +52,7 @@ export default class map_stuff extends Phaser.Scene {
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
         this.game.config.aPistole = false;
 
-        this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
-        });
+
 
         const solLayer = carte.createLayer("Floor", tileset, 0, 0);
         const wallLayer = carte.createLayer("Mur", tileset, 0, 0);

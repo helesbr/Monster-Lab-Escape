@@ -3,9 +3,6 @@ export default class fin extends Phaser.Scene {
         super({ key: "fin" });
     }
 
-    preload() {
-    }
-
     create() {
         const centerX = this.scale.width / 2;
         const centerY = this.scale.height / 2;

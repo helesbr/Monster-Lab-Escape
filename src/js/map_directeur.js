@@ -123,7 +123,7 @@ export default class map_directeur extends Phaser.Scene {
         this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
             if (actif && tempsRestant > 0) {
                 player.vitesseBoost = player.vitesseBase * 2.5;
-                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+
                 this.time.delayedCall(tempsRestant, () => {
                     player.vitesseBoost = null;
                     this.game.events.emit('resetBoostVitesse');

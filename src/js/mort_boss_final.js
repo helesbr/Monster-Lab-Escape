@@ -1,5 +1,3 @@
-var player;
-
 export default class mort_boss_final extends Phaser.Scene {
     constructor() {
         super({ key: "mort_boss_final" });

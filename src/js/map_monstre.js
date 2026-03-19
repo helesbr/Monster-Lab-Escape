@@ -60,9 +60,7 @@ export default class map_monstre extends Phaser.Scene {
             if (this.son_monstre) this.son_monstre.stop();
         });
 
-        this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
-        });
+
 
         const carteMonstreLab = this.add.tilemap("monstres");
         const tileset = carteMonstreLab.addTilesetImage("all_tilset", "allTiles");
@@ -177,7 +175,7 @@ export default class map_monstre extends Phaser.Scene {
         this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
             if (actif && tempsRestant > 0) {
                 player.vitesseBoost = player.vitesseBase * 2.5;
-                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+
                 this.time.delayedCall(tempsRestant, () => {
                     player.vitesseBoost = null;
                     this.game.events.emit('resetBoostVitesse');
