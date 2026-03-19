@@ -31,9 +31,7 @@ export default class map_cuisine extends Phaser.Scene {
         });
         this.load.image('preworkout', 'src/assets/images/prewarkout.png');
         this.load.image('creatine', 'src/assets/images/creatine.png');
-        this.load.image('creatine_shop', 'src/assets/images/creatine.png');
-        this.load.image('preworkout_shop', 'src/assets/images/prewarkout.png');
-        this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
+
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
         this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
         this.load.audio('tkprime2', 'src/assets/son/tkprime2.mp3');
@@ -50,9 +48,7 @@ export default class map_cuisine extends Phaser.Scene {
             if (this.son_tkprime2) this.son_tkprime2.stop();
         });
 
-        this.game.events.emit('getMoney', (money) => {
-            console.log('Money actuelle:', money);
-        });
+
 
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
@@ -324,7 +320,7 @@ export default class map_cuisine extends Phaser.Scene {
             this.shop = { x: shopObj.x, y: shopObj.y, name: shopObj.name || "shop" };
         }
 
-        this.objetsDisponibles = { prewarkout: [], creatine: [] };
+        this.objetsDisponibles = { preworkout: [], creatine: [] };
 
         const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
         if (calqueProduit) {
@@ -332,7 +328,7 @@ export default class map_cuisine extends Phaser.Scene {
                 if (produitObj.name === 'creatine') {
                     this.objetsDisponibles.creatine.push({ x: produitObj.x, y: produitObj.y });
                 } else if (produitObj.name === 'prewarkout' || produitObj.name === 'preworkout') {
-                    this.objetsDisponibles.prewarkout.push({ x: produitObj.x, y: produitObj.y });
+                    this.objetsDisponibles.preworkout.push({ x: produitObj.x, y: produitObj.y });
                 }
             });
         }
@@ -379,7 +375,6 @@ export default class map_cuisine extends Phaser.Scene {
             }
         });
 
-        this.game.config.maVariable -= 10;
     }
 
     tirer() {
@@ -501,7 +496,7 @@ export default class map_cuisine extends Phaser.Scene {
             fontSize: '64px', fill: '#fff', fontStyle: 'bold'
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        const imgCreatine = this.add.image(90, 280, 'creatine_shop');
+        const imgCreatine = this.add.image(90, 280, 'creatine');
         imgCreatine.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
         imgCreatine.on('pointerdown', () => this.spawnObjet('creatine'));
         imgCreatine.on('pointerover', () => imgCreatine.setDisplaySize(370, 370));
@@ -515,9 +510,9 @@ export default class map_cuisine extends Phaser.Scene {
             fontSize: '18px', fill: '#fff', stroke: '#000', strokeThickness: 2
         }).setOrigin(0.5).setDepth(201).setScrollFactor(0);
 
-        const imgPreworkout = this.add.image(390, 280, 'preworkout_shop');
+        const imgPreworkout = this.add.image(390, 280, 'preworkout');
         imgPreworkout.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
-        imgPreworkout.on('pointerdown', () => this.spawnObjet('prewarkout'));
+        imgPreworkout.on('pointerdown', () => this.spawnObjet('preworkout'));
         imgPreworkout.on('pointerover', () => imgPreworkout.setDisplaySize(370, 370));
         imgPreworkout.on('pointerout', () => imgPreworkout.setDisplaySize(340, 340));
 
@@ -572,7 +567,7 @@ export default class map_cuisine extends Phaser.Scene {
                 objet.body.moves = false;
 
                 this.physics.add.overlap(player, objet, () => {
-                    if (type === 'prewarkout') {
+                    if (type === 'preworkout') {
                         this.game.events.emit('setBoostVitesse', 160 * 2.5, 90000);
                     } else if (type === 'creatine') {
                         this.game.events.emit('getVie', (vieActuelle) => {
