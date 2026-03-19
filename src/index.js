@@ -1,6 +1,6 @@
 import menu from "./js/menu.js";
 import character_select from "./js/character_select.js";
-import selection from "./js/selection.js";
+import laboratory from "./js/laboratory.js";
 import map_cuisine from "./js/map_cuisine.js";
 import regles from "./js/Regles.js";
 import map_directeur from "./js/map_directeur.js";

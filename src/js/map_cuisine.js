@@ -356,16 +356,16 @@ export default class map_cuisine extends Phaser.Scene {
                 this.doorCollider.active = false;
                 this.doorNearby.anims.play('door_open');
                 this.time.delayedCall(500, () => {
-                    let destination = "selection";
+                    let destination = "laboratory";
                     let porteDestination = "door1";
                     let offsetY = 0;
                     let offsetX = 0;
                     if (doorName === "door_retour2") {
-                        destination = "selection";
+                        destination = "laboratory";
                         porteDestination = "door1";
                         offsetY = 50;
                     } else if (doorName === 'door_retour1') {
-                        destination = 'selection';
+                        destination = 'laboratory';
                         porteDestination = 'door12';
                         offsetX = 50;
                     }
