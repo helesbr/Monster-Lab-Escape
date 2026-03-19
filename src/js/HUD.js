@@ -70,6 +70,33 @@ export default class HUD extends Phaser.Scene {
             this.aArme = false;
         });
 
+        // === BOOST VITESSE (preworkout) ===
+        this.boostVitesse = false;
+        this.boostVitesseExpire = 0; // timestamp d'expiration
+
+        this.game.events.on('setBoostVitesse', (duree) => {
+            this.boostVitesse = true;
+            this.boostVitesseExpire = Date.now() + duree;
+        });
+        this.game.events.on('getBoostVitesse', (callback) => {
+            // Si le boost a expiré, on le reset
+            if (this.boostVitesse && Date.now() > this.boostVitesseExpire) {
+                this.boostVitesse = false;
+            }
+            const tempsRestant = this.boostVitesse ? this.boostVitesseExpire - Date.now() : 0;
+            callback(this.boostVitesse, tempsRestant);
+        });
+        this.game.events.on('resetBoostVitesse', () => {
+            this.boostVitesse = false;
+            this.boostVitesseExpire = 0;
+        });
+
+        // === VIE MAX (creatine) ===
+        // déjà géré via setVieMax, mais on expose aussi getVieMax
+        this.game.events.on('getVieMax', (callback) => {
+            callback(this.vieMax);
+        });
+
         // money
         this.game.events.on('addMoney', (montant) => {
             this.money = Math.max(0, this.money + montant);
