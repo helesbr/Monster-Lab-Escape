@@ -280,6 +280,17 @@ export default class map_cuisine extends Phaser.Scene {
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.scene.stop('HUD');
+                
+                // Jouer le son et attendre sa fin
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('menu');
+                    });
+                } else {
+                    // Fallback si le son n'existe pas
+                    this.scene.start('menu');
+                }
             }
         });
 
