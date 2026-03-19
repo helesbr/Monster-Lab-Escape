@@ -37,7 +37,7 @@ export default class map_monstre extends Phaser.Scene {
         this.load.audio('herve', 'src/assets/son/Herve.mp3');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
         this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
-        this.load.image('mort_boss_final', 'src/assets/images/mort_boss_final.png');
+        this.load.image('mort_boss_final', 'src/assets/images/image_fin.png');
     }
 
     create() {
@@ -426,8 +426,7 @@ export default class map_monstre extends Phaser.Scene {
                 if (this.son_rage_quit) {
                     this.son_rage_quit.play();
                     this.son_rage_quit.once('complete', () => {
-                        this.scene.start('mort_boss_final', { spawnX: 100, spawnY: 50 });
-                        this.scene.launch('HUD');
+                        this.scene.start('mort_boss_final');
                     });
                 }
             }
@@ -453,8 +452,7 @@ export default class map_monstre extends Phaser.Scene {
                 if (this.son_rage_quit) {
                     this.son_rage_quit.play();
                     this.son_rage_quit.once('complete', () => {
-                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
-                        this.scene.launch('HUD');
+                        this.scene.start('mort_boss_final');
                     });
                 }
             }

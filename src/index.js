@@ -8,6 +8,7 @@ import map_stuff from "./js/map_stuff.js";
 import map_monstre from "./js/map_monstre.js";
 import HUD from './js/HUD.js';
 import fin from './js/fin.js';
+import mort_boss_final from './js/mort_boss_final.js';
 
 // configuration générale du jeu
 var config = {
@@ -28,9 +29,9 @@ var config = {
       debug: false
     }
   },
-  scene: [ map_directeur ,menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre, HUD, fin]
+  scene: [ menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre,map_directeur, HUD, mort_boss_final]
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("map_directeur"); // Démarrer avec le menu
+game.scene.start("menu"); // Démarrer avec le menu
