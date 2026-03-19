@@ -29,7 +29,7 @@ var config = {
       debug: false
     }
   },
-  scene: [ menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre,map_directeur, HUD, mort_boss_final]
+  scene: [ menu, character_select,regles, selection, map_cuisine, map_stuff, map_directeur , HUD, mort_boss_final]
 };
 
 // création et lancement du jeu
