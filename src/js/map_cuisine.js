@@ -31,13 +31,16 @@ export default class map_cuisine extends Phaser.Scene {
         this.load.image('preworkout_shop', 'src/assets/images/prewarkout.png');
         this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
+        this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
     }
 
     create() {
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
+        this.son_ronnie = this.sound.add('ronnie');
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
+            if (this.son_ronnie) this.son_ronnie.stop();
         });
 
         this.game.events.emit('getMoney', (money) => {
@@ -243,7 +246,8 @@ export default class map_cuisine extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
-                this.game.events.emit('addMoney', 10);
+                this.game.events.emit(' addMoney', 10);
+                this.son_ronnie.play();
             }
         });
 
