@@ -28,9 +28,17 @@ var config = {
       debug: false
     }
   },
+<<<<<<< HEAD
   scene: [ mort_boss_final,menu, map_directeur, character_select,regles, selection, map_cuisine, map_stuff, map_monstre, HUD]
+=======
+  scene: [ menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre,map_directeur, HUD]
+>>>>>>> 9a41eedb211d3c0b7b0aaacd5e7357f1f8bd067a
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
+<<<<<<< HEAD
 game.scene.start("mort_boss_final"); // Démarrer avec le menu
+=======
+game.scene.start("menu"); // Démarrer avec le menu
+>>>>>>> 9a41eedb211d3c0b7b0aaacd5e7357f1f8bd067a

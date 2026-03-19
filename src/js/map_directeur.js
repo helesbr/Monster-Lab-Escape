@@ -440,7 +440,7 @@ export default class map_directeur extends Phaser.Scene {
                 this.arthusDialogueShowing = true;
                 this.showEnigmePopup(
                     '👤 ARTHUS',
-                    "Salam j'ai mal... le patron dit toujours :\n'l'ordre c'est la clé'.\nCommence par ce qui se soulève, puis où on s'allonge,\npuis le jeu du roi... et moi je suis le dernier.\nMon chiffre ? Regarde combien on est ici.",
+                    "J'ai compté ses pompes ce matin... il s'est arrêté à 10. Mais il en avait déjà fait la moitié avant ma pause.",
                     '5',
                     'arthus',
                     3,
