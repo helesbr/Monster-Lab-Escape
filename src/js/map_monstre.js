@@ -249,7 +249,7 @@ export default class map_monstre extends Phaser.Scene {
                 if (this.son_rage_quit) {
                     this.son_rage_quit.play();
                     this.son_rage_quit.once('complete', () => {
-                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                        this.scene.start('laboratory', { spawnX: 100, spawnY: 50 });
                         this.scene.launch('HUD');
                     });
                 }
@@ -276,7 +276,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.doorNearby.anims.play('door_open');
                 this.cameras.main.fade(500, 0, 0, 0);
                 this.time.delayedCall(500, () => {
-                    this.scene.start("selection", { porteDestination: "door4", offsetX: -50 });
+                    this.scene.start("laboratory", { porteDestination: "door4", offsetX: -50 });
                 });
             }
         });
