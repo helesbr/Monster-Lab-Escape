@@ -32,15 +32,18 @@ export default class map_cuisine extends Phaser.Scene {
         this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
         this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
+        this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
     }
 
     create() {
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
         this.son_ronnie = this.sound.add('ronnie');
+        this.son_rage_quit = this.sound.add('rage_quit');
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
             if (this.son_ronnie) this.son_ronnie.stop();
+            if (this.son_rage_quit) this.son_rage_quit.stop();
         });
 
         this.game.events.emit('getMoney', (money) => {
@@ -273,7 +276,17 @@ export default class map_cuisine extends Phaser.Scene {
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.scene.stop('HUD');
-                this.scene.start('menu');
+                
+                // Jouer le son et attendre sa fin
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('menu');
+                    });
+                } else {
+                    // Fallback si le son n'existe pas
+                    this.scene.start('menu');
+                }
             }
         });
 
