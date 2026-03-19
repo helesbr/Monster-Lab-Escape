@@ -28,12 +28,14 @@ export default class map_monstre extends Phaser.Scene {
         this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
         this.load.audio('herve', 'src/assets/son/Herve.mp3');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
+        this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
     }
 
     create() {
         // Créer les sons
         this.son_herve = this.sound.add('herve');
         this.son_monstre = this.sound.add('monstres');
+        this.son_rage_quit = this.sound.add('rage_quit');
 
         // Jouer Herve d'abord
         this.son_herve.play();
@@ -185,6 +187,9 @@ export default class map_monstre extends Phaser.Scene {
                         this.boutonDirecteur.setVisible(true);
                         this.boutonDirecteur.setInteractive();
                     }
+                    if (this.texteBouton) {
+                        this.texteBouton.setVisible(true);
+                    }
                 }
             }
         });
@@ -205,8 +210,15 @@ export default class map_monstre extends Phaser.Scene {
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
                 this.scene.stop('HUD');
-                this.scene.start('selection', { spawnX: 100, spawnY: 50 });
-                this.scene.launch('HUD');
+                
+                // Jouer le son et attendre sa fin
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                        this.scene.launch('HUD');
+                    });
+                } 
             }
         });
 
@@ -237,6 +249,21 @@ export default class map_monstre extends Phaser.Scene {
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
                 this.boutonDirecteur = boutonDirecteur;
+                
+                // Créer le texte pour le bouton centré et en gras
+                const texteBouton = this.add.text(carteMonstreLab.widthInPixels / 2, 100, 'Félicitations, clic pour aller dans le bureau du directeur', {
+                    fontSize: '18px',
+                    fontStyle: 'bold',
+                    fill: '#ffffff',
+                    align: 'center',
+                    stroke: '#000000',
+                    strokeThickness: 3
+                });
+                texteBouton.setOrigin(0.5, 0.5);
+                texteBouton.setDepth(51);
+                texteBouton.setVisible(false);
+                this.texteBouton = texteBouton;
+                
                 boutonDirecteur.setInteractive();
                 boutonDirecteur.setDepth(50);
                 boutonDirecteur.setVisible(false);
