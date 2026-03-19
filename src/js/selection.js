@@ -25,6 +25,7 @@ export default class selection extends Phaser.Scene {
     this.load.spritesheet('porte', 'src/assets/images/doors_spritesheet.png', {
       frameWidth: 64,
       frameHeight: 32
+
     });
     this.load.spritesheet("image_gun", "src/assets/images/gun.png", {
       frameWidth: 64,
@@ -55,6 +56,7 @@ export default class selection extends Phaser.Scene {
     murLayer.setCollisionByProperty({ estSolide: true });
 
     this.physics.world.setBounds(0, 0, 960, 960);
+    this.physics.world.OVERLAP_BIAS = 16;
     this.cameras.main.setBounds(0, 0, 960, 960);
 
     const { porteDestination, offsetY = 0, offsetX = 0 } = this.scene.settings.data || {};
@@ -78,6 +80,9 @@ export default class selection extends Phaser.Scene {
     player.body.setGravityY(-this.physics.world.gravity.y);
     player.armeEquipee = null;
     player.directionArme = 'droite';
+    player.vitesseBase = 160;
+    player.vitesseBoost = null;
+    player.pointsVie = 3;
 
     this.physics.add.collider(player, murLayer);
     this.physics.add.collider(player, objectLayer);
@@ -112,9 +117,15 @@ export default class selection extends Phaser.Scene {
             const hasHorizontal = obj.properties.some(prop =>
               prop.name === "horizontal" || prop.name === "orientation"
             );
-            if (!hasHorizontal) porte.setAngle(90);
+            if (!hasHorizontal) {
+              porte.setAngle(90);
+              porte.body.setSize(32, 64);
+              porte.body.setOffset(16, -16);
+            }
           } else {
             porte.setAngle(90);
+            porte.body.setSize(32, 64);
+            porte.body.setOffset(16, -16);
           }
         }
       });
@@ -154,6 +165,35 @@ export default class selection extends Phaser.Scene {
         armeSprite.setDepth(99);
         armeSprite.anims.play('gun_droite');
         player.armeEquipee = armeSprite;
+      }
+    });
+
+    // ✅ Récupérer la vie persistée
+    this.game.events.emit('getVie', (vie) => {
+      player.pointsVie = vie;
+    });
+
+    // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+    this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+      if (actif && tempsRestant > 0) {
+        player.vitesseBoost = player.vitesseBase * 2.5;
+        console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+        this.time.delayedCall(tempsRestant, () => {
+          player.vitesseBoost = null;
+          this.game.events.emit('resetBoostVitesse');
+        });
+      }
+    });
+
+    // ✅ Récupérer la vie max persistée (creatine)
+    this.game.events.emit('getVieMax', (vieMax) => {
+      if (vieMax > 3) {
+        // Réappliquer l'affichage des coeurs supplémentaires via getVie
+        this.game.events.emit('getVie', (vie) => {
+          // setVieMax met à jour le HUD
+          this.game.events.emit('setVieMax', vieMax, vie);
+          player.pointsVie = vie;
+        });
       }
     });
   }

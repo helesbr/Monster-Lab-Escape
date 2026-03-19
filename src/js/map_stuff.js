@@ -60,6 +60,7 @@ export default class map_stuff extends Phaser.Scene {
         objetsLayer.setCollisionByExclusion([-1]);
 
         this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+        this.physics.world.OVERLAP_BIAS = 16;
         this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
         let zoomX = this.scale.width / carte.widthInPixels;
         let zoomY = this.scale.height / carte.heightInPixels;
@@ -119,7 +120,11 @@ export default class map_stuff extends Phaser.Scene {
                 porte.estSolide = true;
                 if (point.properties) {
                     const hasVertical = point.properties.some(prop => prop.name === "verticale" && prop.value === true);
-                    if (hasVertical) porte.setAngle(90);
+                    if (hasVertical) {
+                        porte.setAngle(90);
+                        porte.body.setSize(32, 64);
+                        porte.body.setOffset(16, -16);
+                    }
                 }
             });
         }
@@ -326,7 +331,7 @@ export default class map_stuff extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
-        this.input.keyboard.on('keydown-ENTER', () => {
+        this.input.keyboard.on('keydown-S', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
                 this.armeNearby.collectee = true;
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -338,9 +343,10 @@ export default class map_stuff extends Phaser.Scene {
                 this.armeNearby = null;
                 this.son_tkprime.play();
                 this.game.events.emit('armeRamassee');
-                return;
             }
+        });
 
+        this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
                 this.doorNearby.estSolide = false;

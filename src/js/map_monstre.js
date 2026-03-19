@@ -65,6 +65,7 @@ export default class map_monstre extends Phaser.Scene {
         murLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
+        this.physics.world.OVERLAP_BIAS = 16;
         this.cameras.main.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
 
         let zoomX = this.scale.width / carteMonstreLab.widthInPixels;
@@ -120,6 +121,8 @@ export default class map_monstre extends Phaser.Scene {
                     const porte = groupe_portes.create(point.x, point.y, 'doors');
                     porte.anims.play('door_closed');
                     porte.setAngle(90);
+                    porte.body.setSize(32, 64);
+                    porte.body.setOffset(16, -16);
                     porte.setDepth(40);
                     porte.doorName = point.name;
                     porte.body.setCollideWorldBounds(false);
@@ -145,6 +148,8 @@ export default class map_monstre extends Phaser.Scene {
         player.armeEquipee = null;
         player.directionArme = 'droite';
         player.pointsVie = 3;
+        player.vitesseBase = 160;
+        player.vitesseBoost = null; // reset local d'abord
         this.invincible = false;
 
         this.game.events.emit('getVie', (vie) => { player.pointsVie = vie; });
@@ -155,6 +160,30 @@ export default class map_monstre extends Phaser.Scene {
                 armeSprite.setDepth(99);
                 armeSprite.anims.play('gun_droite');
                 player.armeEquipee = armeSprite;
+            }
+        });
+
+        // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+        this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+            if (actif && tempsRestant > 0) {
+                player.vitesseBoost = player.vitesseBase * 2.5;
+                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+                this.time.delayedCall(tempsRestant, () => {
+                    player.vitesseBoost = null;
+                    this.game.events.emit('resetBoostVitesse');
+                });
+            }
+        });
+
+        // ✅ Récupérer la vie max persistée (creatine)
+        this.game.events.emit('getVieMax', (vieMax) => {
+            if (vieMax > 3) {
+                // Réappliquer l'affichage des coeurs supplémentaires via getVie
+                this.game.events.emit('getVie', (vie) => {
+                    // setVieMax met à jour le HUD
+                    this.game.events.emit('setVieMax', vieMax, vie);
+                    player.pointsVie = vie;
+                });
             }
         });
 

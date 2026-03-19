@@ -94,7 +94,50 @@ export default class map_directeur extends Phaser.Scene {
         player.setDepth(100);
         player.body.setGravityY(-this.physics.world.gravity.y);
         player.pointsVie = 3;
+        player.vitesseBase = 160;
+        player.vitesseBoost = null;
+        player.armeEquipee = null;
+        player.directionArme = 'droite';
         this.invincible = false;
+        
+        // ✅ Récupérer la vie persistée
+        this.game.events.emit('getVie', (vie) => {
+            player.pointsVie = vie;
+        });
+
+        // ✅ Récupérer l'arme persistée
+        this.game.events.emit('getArme', (aArme) => {
+            if (aArme) {
+                const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
+                armeSprite.setDisplaySize(40, 40);
+                armeSprite.setDepth(99);
+                player.armeEquipee = armeSprite;
+            }
+        });
+
+        // ✅ Récupérer le boost vitesse APRÈS avoir défini vitesseBase
+        this.game.events.emit('getBoostVitesse', (actif, tempsRestant) => {
+            if (actif && tempsRestant > 0) {
+                player.vitesseBoost = player.vitesseBase * 2.5;
+                console.log('Boost vitesse récupéré, temps restant:', tempsRestant);
+                this.time.delayedCall(tempsRestant, () => {
+                    player.vitesseBoost = null;
+                    this.game.events.emit('resetBoostVitesse');
+                });
+            }
+        });
+
+        // ✅ Récupérer la vie max persistée (creatine)
+        this.game.events.emit('getVieMax', (vieMax) => {
+            if (vieMax > 3) {
+                // Réappliquer l'affichage des coeurs supplémentaires via getVie
+                this.game.events.emit('getVie', (vie) => {
+                    // setVieMax met à jour le HUD
+                    this.game.events.emit('setVieMax', vieMax, vie);
+                    player.pointsVie = vie;
+                });
+            }
+        });
         
         if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objectsLayer) this.physics.add.collider(player, objectsLayer);
@@ -130,11 +173,20 @@ export default class map_directeur extends Phaser.Scene {
 
         // ✅ Initialiser le clavier
         this.cursors = this.input.keyboard.createCursorKeys();
-
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        
+        // ✅ Variables d'interaction
+        this.doorNearby = null;
+        this.arthusNearby = null;
+        this.arthusDialogueShowing = false;
     }
     update() { 
         const cursors = this.cursors;
 
+        // ✅ vitesse avec boost preworkout
+        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+
+        // ✅ Détection de proximité avec les portes
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
@@ -148,12 +200,49 @@ export default class map_directeur extends Phaser.Scene {
             });
         }
 
+        // ✅ Détection de proximité avec Arthus
+        this.arthusNearby = null;
+        if (this.arthus) {
+            const distance = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.arthus.x, this.arthus.y
+            );
+            if (distance < 100) {
+                this.arthusNearby = this.arthus;
+            }
+        }
+
+        // ✅ Gestion des interactions au ENTER
+        if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+            if (this.arthusNearby && !this.arthusDialogueShowing) {
+                // Afficher le dialogue d'Arthus
+                this.arthusDialogueShowing = true;
+                const dialogue = this.add.text(240, 150, 
+                    "salam j'ai mal",
+                    {
+                        fontSize: '20px',
+                        fill: '#ffffff',
+                        align: 'center',
+                        wordWrap: { width: 400 },
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
+
+                // Fermer le dialogue après 4 secondes
+                this.time.delayedCall(4000, () => {
+                    dialogue.destroy();
+                    this.arthusDialogueShowing = false;
+                });
+            }
+        }
+
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
         } else {
@@ -162,9 +251,9 @@ export default class map_directeur extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
         } else {
             player.setVelocityY(0);
         }

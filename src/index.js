@@ -27,9 +27,9 @@ var config = {
       debug: false
     }
   },
-  scene: [menu, character_select, selection, map_cuisine, regles, map_directeur, map_stuff, map_monstre, HUD]
+  scene: [map_directeur,menu, character_select, selection, map_cuisine, regles,  map_stuff, map_monstre, HUD]
 };
 
 // création et lancement du jeu
 var game = new Phaser.Game(config);
-game.scene.start("menu"); // Démarrer avec le menu
+game.scene.start("map_directeur"); // Démarrer avec le menu

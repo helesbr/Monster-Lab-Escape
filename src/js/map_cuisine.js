@@ -60,6 +60,7 @@ export default class map_cuisine extends Phaser.Scene {
         objetsLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
+        this.physics.world.OVERLAP_BIAS = 16;
         this.cameras.main.setBounds(0, 0, carteCuisine.widthInPixels, carteCuisine.heightInPixels);
 
         let zoomX = this.scale.width / carteCuisine.widthInPixels;
@@ -188,7 +189,11 @@ export default class map_cuisine extends Phaser.Scene {
                     porte.estSolide = true;
                     if (point.properties) {
                         const hasVertical = point.properties.some(prop => prop.name === "verticale" && prop.value === true);
-                        if (hasVertical) porte.setAngle(90);
+                        if (hasVertical) {
+                            porte.setAngle(90);
+                            porte.body.setSize(32, 64);
+                            porte.body.setOffset(16, -16);
+                        }
                     }
                 });
             }
