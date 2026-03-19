@@ -32,18 +32,18 @@ export default class map_cuisine extends Phaser.Scene {
         this.load.image('prewarkout', 'src/assets/images/prewarkout.png');
         this.load.audio('cuisine', 'src/assets/son/cuisine.mp3');
         this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
-        this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
+        this.load.audio('tkprime2', 'src/assets/son/tkprime2.mp3');
     }
 
     create() {
         this.son_cuisine = this.sound.add('cuisine');
         this.son_cuisine.play();
         this.son_ronnie = this.sound.add('ronnie');
-        this.son_rage_quit = this.sound.add('rage_quit');
+        this.son_tkprime2 = this.sound.add('tkprime2');
         this.events.on('shutdown', () => {
             if (this.son_cuisine) this.son_cuisine.stop();
             if (this.son_ronnie) this.son_ronnie.stop();
-            if (this.son_rage_quit) this.son_rage_quit.stop();
+            if (this.son_tkprime2) this.son_tkprime2.stop();
         });
 
         this.game.events.emit('getMoney', (money) => {
@@ -52,8 +52,8 @@ export default class map_cuisine extends Phaser.Scene {
 
         const carteCuisine = this.add.tilemap("cuisine");
         const tileset = carteCuisine.addTilesetImage("all_tileset", "allTiles");
-        const solLayer    = carteCuisine.createLayer("sol",    tileset, 0, 0);
-        const wallLayer   = carteCuisine.createLayer("Wall",   tileset, 0, 0);
+        const solLayer = carteCuisine.createLayer("sol", tileset, 0, 0);
+        const wallLayer = carteCuisine.createLayer("Wall", tileset, 0, 0);
         const objetsLayer = carteCuisine.createLayer("objets", tileset, 0, 0);
 
         wallLayer.setCollisionByProperty({ estSolide: true });
@@ -155,7 +155,7 @@ export default class map_cuisine extends Phaser.Scene {
                     loop: true
                 });
             });
-            if (wallLayer)   this.physics.add.collider(this.groupe_monstres, wallLayer);
+            if (wallLayer) this.physics.add.collider(this.groupe_monstres, wallLayer);
             if (objetsLayer) this.physics.add.collider(this.groupe_monstres, objetsLayer);
         }
 
@@ -231,7 +231,7 @@ export default class map_cuisine extends Phaser.Scene {
             }
         });
 
-        if (wallLayer)   this.physics.add.collider(player, wallLayer);
+        if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objetsLayer) this.physics.add.collider(player, objetsLayer);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
@@ -280,17 +280,6 @@ export default class map_cuisine extends Phaser.Scene {
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.scene.stop('HUD');
-                
-                // Jouer le son et attendre sa fin
-                if (this.son_rage_quit) {
-                    this.son_rage_quit.play();
-                    this.son_rage_quit.once('complete', () => {
-                        this.scene.start('menu');
-                    });
-                } else {
-                    // Fallback si le son n'existe pas
-                    this.scene.start('menu');
-                }
             }
         });
 
@@ -300,7 +289,10 @@ export default class map_cuisine extends Phaser.Scene {
         });
 
         // ✅ KeyCodes explicite pour éviter tout conflit
-        this.cursors = this.input.keyboard.createCursorKeys();
+        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
         this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
         const calqueShops = carteCuisine.getObjectLayer("shops");
@@ -377,10 +369,10 @@ export default class map_cuisine extends Phaser.Scene {
         let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
         switch (player.directionArme) {
-            case 'droite': vx = vitesse;  offsetX = 30;  break;
+            case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
-            case 'haut':   vy = -vitesse; offsetY = -30; break;
-            case 'bas':    vy = vitesse;  offsetY = 30;  break;
+            case 'haut': vy = -vitesse; offsetY = -30; break;
+            case 'bas': vy = vitesse; offsetY = 30; break;
         }
         const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
@@ -393,25 +385,26 @@ export default class map_cuisine extends Phaser.Scene {
 
     update() {
         // ✅ guard unifié cursors + boutonFeu
-        if (!this.cursors || !this.boutonFeu) {
-            this.cursors = this.input.keyboard.createCursorKeys();
+        if (!this.keyD || !this.boutonFeu) {
+            this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+            this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+            this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+            this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
             this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
             return;
         }
-
-        const cursors = this.cursors;
 
         let vitesse = 160;
         this.game.events.emit('getBoostVitesse', (boost) => {
             if (boost) vitesse = boost;
         });
 
-        if (cursors.right.isDown) {
+        if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
-        } else if (cursors.left.isDown) {
+        } else if (this.keyQ.isDown) {
             player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
@@ -421,10 +414,10 @@ export default class map_cuisine extends Phaser.Scene {
             player.anims.play('anim_face');
         }
 
-        if (cursors.up.isDown) {
+        if (this.keyZ.isDown) {
             player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
-        } else if (cursors.down.isDown) {
+        } else if (this.keyS.isDown) {
             player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
@@ -469,14 +462,17 @@ export default class map_cuisine extends Phaser.Scene {
             switch (player.directionArme) {
                 case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
                 case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
-                case 'haut':   player.armeEquipee.anims.play('gun_haut',   true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
-                case 'bas':    player.armeEquipee.anims.play('gun_bas',    true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
+                case 'haut': player.armeEquipee.anims.play('gun_haut', true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas': player.armeEquipee.anims.play('gun_bas', true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
 
     ouvrirMenuShop() {
         this.menuShopVisible = true;
+        this.son_tkprime2.setVolume(1.3);
+        this.son_tkprime2.play();
+        this.son_cuisine.setVolume(0.3);
 
         const fondMenu = this.add.rectangle(240, 240, 1050, 825, 0x000000, 0.7);
         fondMenu.setDepth(200);
@@ -490,7 +486,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgCreatine.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
         imgCreatine.on('pointerdown', () => this.spawnObjet('creatine'));
         imgCreatine.on('pointerover', () => imgCreatine.setDisplaySize(370, 370));
-        imgCreatine.on('pointerout',  () => imgCreatine.setDisplaySize(340, 340));
+        imgCreatine.on('pointerout', () => imgCreatine.setDisplaySize(340, 340));
 
         const prixCreatine = this.add.text(90, 460, '30 💰', {
             fontSize: '24px', fill: '#FFD700', stroke: '#000', strokeThickness: 3
@@ -504,7 +500,7 @@ export default class map_cuisine extends Phaser.Scene {
         imgPreworkout.setDisplaySize(340, 340).setDepth(201).setScrollFactor(0).setInteractive();
         imgPreworkout.on('pointerdown', () => this.spawnObjet('prewarkout'));
         imgPreworkout.on('pointerover', () => imgPreworkout.setDisplaySize(370, 370));
-        imgPreworkout.on('pointerout',  () => imgPreworkout.setDisplaySize(340, 340));
+        imgPreworkout.on('pointerout', () => imgPreworkout.setDisplaySize(340, 340));
 
         const prixPreworkout = this.add.text(390, 460, '30 💰', {
             fontSize: '24px', fill: '#FFD700', stroke: '#000', strokeThickness: 3
@@ -581,6 +577,8 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     fermerMenuShop() {
+        if (this.son_tkprime2) this.son_tkprime2.stop();
+        if (this.son_cuisine) this.son_cuisine.setVolume(1.0);
         if (this.menuShop) {
             this.menuShop.fond.destroy();
             this.menuShop.titre.destroy();
@@ -594,7 +592,7 @@ export default class map_cuisine extends Phaser.Scene {
             this.menuShop = null;
         }
         if (this.texteMoneyShop) { this.texteMoneyShop.destroy(); this.texteMoneyShop = null; }
-        if (this.texteErreur)    { this.texteErreur.destroy();    this.texteErreur = null; }
+        if (this.texteErreur) { this.texteErreur.destroy(); this.texteErreur = null; }
         this.menuShopVisible = false;
     }
 }
