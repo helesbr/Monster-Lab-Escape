@@ -165,6 +165,29 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
+         "id":8,
+         "name":"porte_fin",
+         "objects":[
+                {
+                 "height":0,
+                 "id":3,
+                 "name":"porte_fin",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":730,
+                 "y":34
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "data":[17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460, 17460,
             17460, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17460,
             17460, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 17460,
@@ -278,8 +301,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":8,
- "nextobjectid":3,
+ "nextlayerid":9,
+ "nextobjectid":4,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",

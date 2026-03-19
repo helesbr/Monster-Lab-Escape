@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="8" nextobjectid="3">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="4">
  <editorsettings>
   <export target="map_directeur.tmj" format="json"/>
  </editorsettings>
@@ -74655,6 +74655,11 @@
    <properties>
     <property name="estSolide" type="bool" value="true"/>
    </properties>
+   <point/>
+  </object>
+ </objectgroup>
+ <objectgroup id="8" name="porte_fin">
+  <object id="3" name="porte_fin" x="730" y="34">
    <point/>
   </object>
  </objectgroup>
