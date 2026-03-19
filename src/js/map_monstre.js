@@ -26,6 +26,10 @@ export default class map_monstre extends Phaser.Scene {
             frameHeight: 64
         });
         this.load.image('bouton_directeur', 'src/assets/images/bouton.jpg');
+        this.load.image('boss_helias', 'src/assets/images/HeliasBoss.png');
+        this.load.image('boss_arthus', 'src/assets/images/Arthus.png');
+        this.load.image('boss_mehdi', 'src/assets/images/Mehdi.png');
+        this.load.image('boss_elias', 'src/assets/images/Elias.png');
         this.load.audio('herve', 'src/assets/son/Herve.mp3');
         this.load.audio('monstres', 'src/assets/son/monstre.mp3');
         this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
@@ -108,6 +112,7 @@ export default class map_monstre extends Phaser.Scene {
         });
 
         this.physics.add.collider(this.groupe_monstres, murLayer);
+        this.murLayer = murLayer;
 
         if (!this.anims.exists("door_closed")) this.anims.create({ key: "door_closed", frames: [{ key: 'doors', frame: 0 }], frameRate: 10 });
         if (!this.anims.exists("door_open")) this.anims.create({ key: "door_open", frames: this.anims.generateFrameNumbers('doors', { start: 1, end: 4 }), frameRate: 10 });
@@ -209,13 +214,8 @@ export default class map_monstre extends Phaser.Scene {
                 monstre.destroy();
                 if (this.groupe_monstres.countActive() === 0) {
                     this.game.events.emit('tousMonstresMorts');
-                    if (this.boutonDirecteur) {
-                        this.boutonDirecteur.setVisible(true);
-                        this.boutonDirecteur.setInteractive();
-                    }
-                    if (this.texteBouton) {
-                        this.texteBouton.setVisible(true);
-                    }
+                    // Spawn les boss après tous les monstres normaux tués
+                    this.spawnBosses();
                 }
             }
         });
@@ -236,7 +236,7 @@ export default class map_monstre extends Phaser.Scene {
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
                 this.scene.stop('HUD');
-                
+
                 // Jouer le son et attendre sa fin
                 if (this.son_rage_quit) {
                     this.son_rage_quit.play();
@@ -244,13 +244,14 @@ export default class map_monstre extends Phaser.Scene {
                         this.scene.start('selection', { spawnX: 100, spawnY: 50 });
                         this.scene.launch('HUD');
                     });
-                } 
+                }
             }
         });
 
         this.physics.world.on("worldbounds", (body) => {
             const objet = body.gameObject;
             if (this.groupeBullets.contains(objet)) objet.destroy();
+            if (this.groupeBossBullets && this.groupeBossBullets.contains(objet)) objet.destroy();
         });
 
         this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
@@ -278,7 +279,7 @@ export default class map_monstre extends Phaser.Scene {
             if (pingBoutonDirecteur) {
                 const boutonDirecteur = this.physics.add.sprite(pingBoutonDirecteur.x, pingBoutonDirecteur.y, 'bouton_directeur');
                 this.boutonDirecteur = boutonDirecteur;
-                
+
                 // Créer le texte pour le bouton centré et en gras
                 const texteBouton = this.add.text(carteMonstreLab.widthInPixels / 2, 100, 'Félicitations, clic pour aller dans le bureau du directeur', {
                     fontSize: '18px',
@@ -292,7 +293,7 @@ export default class map_monstre extends Phaser.Scene {
                 texteBouton.setDepth(51);
                 texteBouton.setVisible(false);
                 this.texteBouton = texteBouton;
-                
+
                 boutonDirecteur.setInteractive();
                 boutonDirecteur.setDepth(50);
                 boutonDirecteur.setVisible(false);
@@ -308,6 +309,163 @@ export default class map_monstre extends Phaser.Scene {
         this.invincible = true;
         player.setAlpha(0.5);
         this.time.delayedCall(1000, () => { this.invincible = false; player.setAlpha(1); });
+
+        // Groupe pour les boss et leurs balles
+        this.groupe_boss = this.physics.add.group();
+        this.groupeBossBullets = this.physics.add.group();
+        this.bossPhaseActive = false;
+    }
+
+    spawnBosses() {
+        this.bossPhaseActive = true;
+
+        const bossData = [
+            { key: 'boss_helias', nom: 'Helias', pv: 10 },
+            { key: 'boss_arthus', nom: 'Arthus', pv: 8 },
+            { key: 'boss_mehdi', nom: 'Mehdi', pv: 8 },
+            { key: 'boss_elias', nom: 'Elias', pv: 10 }
+        ];
+
+        const mapW = this.physics.world.bounds.width;
+        const mapH = this.physics.world.bounds.height;
+
+        bossData.forEach((data, i) => {
+            const spawnX = Phaser.Math.Between(80, mapW - 80);
+            const spawnY = Phaser.Math.Between(80, mapH - 80);
+
+            const boss = this.groupe_boss.create(spawnX, spawnY, data.key);
+            boss.setDisplaySize(70, 70);
+            boss.setDepth(60);
+            boss.setCollideWorldBounds(true);
+            boss.setBounce(1, 1);
+            boss.pointsVie = data.pv;
+            boss.nom = data.nom;
+            boss.body.allowGravity = false;
+            boss.setVelocity(Phaser.Math.Between(-100, 100), Phaser.Math.Between(-100, 100));
+
+            // Changement de direction aléatoire
+            boss.moveEvent = this.time.addEvent({
+                delay: Phaser.Math.Between(1500, 3000),
+                callback: () => {
+                    if (boss.active) boss.setVelocity(Phaser.Math.Between(-120, 120), Phaser.Math.Between(-120, 120));
+                },
+                loop: true
+            });
+
+            // Tir vers le joueur
+            boss.shootEvent = this.time.addEvent({
+                delay: Phaser.Math.Between(2000, 3500),
+                callback: () => {
+                    if (boss.active && player.active) this.bossTirer(boss);
+                },
+                loop: true
+            });
+        });
+
+        // Collisions boss avec murs
+        if (this.murLayer) {
+            this.physics.add.collider(this.groupe_boss, this.murLayer);
+            this.physics.add.collider(this.groupeBossBullets, this.murLayer, (balle) => balle.destroy());
+        }
+
+        // Balles joueur vs boss
+        this.physics.add.overlap(this.groupeBullets, this.groupe_boss, (balle, boss) => {
+            balle.destroy();
+            boss.pointsVie--;
+
+            // Flash blanc quand touché
+            boss.setTint(0xff0000);
+            this.time.delayedCall(100, () => { if (boss.active) boss.clearTint(); });
+
+            if (boss.pointsVie <= 0) {
+                if (boss.moveEvent) boss.moveEvent.remove();
+                if (boss.shootEvent) boss.shootEvent.remove();
+                boss.destroy();
+                this.game.events.emit('addMoney', 25);
+
+                // Tous les boss morts -> bouton directeur
+                if (this.groupe_boss.countActive() === 0) {
+                    this.bossPhaseActive = false;
+                    if (this.boutonDirecteur) {
+                        this.boutonDirecteur.setVisible(true);
+                        this.boutonDirecteur.setInteractive();
+                    }
+                    if (this.texteBouton) {
+                        this.texteBouton.setVisible(true);
+                    }
+                }
+            }
+        });
+
+        // Balles boss vs joueur
+        this.physics.add.overlap(player, this.groupeBossBullets, (p, balle) => {
+            balle.destroy();
+            if (this.invincible) return;
+            this.invincible = true;
+            this.game.events.emit('playerHit');
+            player.pointsVie--;
+
+            this.tweens.add({
+                targets: player, alpha: 0, duration: 100, repeat: 5, yoyo: true,
+                onComplete: () => { player.setAlpha(1); this.invincible = false; }
+            });
+
+            if (player.pointsVie <= 0) {
+                this.game.events.emit('resetVie');
+                this.game.events.emit('resetArme');
+                this.game.events.emit('resetMonstres');
+                this.scene.stop('HUD');
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                        this.scene.launch('HUD');
+                    });
+                }
+            }
+        });
+
+        // Contact direct boss vs joueur
+        this.physics.add.overlap(player, this.groupe_boss, () => {
+            if (this.invincible) return;
+            this.invincible = true;
+            this.game.events.emit('playerHit');
+            player.pointsVie--;
+
+            this.tweens.add({
+                targets: player, alpha: 0, duration: 100, repeat: 5, yoyo: true,
+                onComplete: () => { player.setAlpha(1); this.invincible = false; }
+            });
+
+            if (player.pointsVie <= 0) {
+                this.game.events.emit('resetVie');
+                this.game.events.emit('resetArme');
+                this.game.events.emit('resetMonstres');
+                this.scene.stop('HUD');
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('selection', { spawnX: 100, spawnY: 50 });
+                        this.scene.launch('HUD');
+                    });
+                }
+            }
+        });
+    }
+
+    bossTirer(boss) {
+        const angle = Phaser.Math.Angle.Between(boss.x, boss.y, player.x, player.y);
+        const vitesse = 300;
+        const balle = this.groupeBossBullets.create(boss.x, boss.y, 'ball');
+        balle.setDisplaySize(10, 10);
+        balle.setTint(0xff0000);
+        balle.setDepth(90);
+        balle.body.allowGravity = false;
+        balle.setCollideWorldBounds(true);
+        balle.body.onWorldBounds = true;
+        balle.setVelocity(Math.cos(angle) * vitesse, Math.sin(angle) * vitesse);
+        // Détruire la balle après 3 secondes
+        this.time.delayedCall(3000, () => { if (balle.active) balle.destroy(); });
     }
 
     tirer() {
