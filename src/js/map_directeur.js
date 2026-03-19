@@ -198,6 +198,7 @@ export default class map_directeur extends Phaser.Scene {
                 this.porteFin.setDepth(50);
                 this.porteFin.setDisplaySize(64, 32);
                 this.porteFin.setRotation(Math.PI / 2);
+                this.porteFin.setVisible(false);
                 this.porteFin.body.setImmovable(true);
                 this.porteFin.body.moves = false;
                 this.physics.add.collider(player, this.porteFin);
