@@ -327,10 +327,10 @@ export default class map_monstre extends Phaser.Scene {
         this.bossPhaseActive = true;
 
         const bossData = [
-            { key: 'boss_helias', nom: 'Helias', pv: 10 },
-            { key: 'boss_arthus', nom: 'Arthus', pv: 8 },
-            { key: 'boss_mehdi', nom: 'Mehdi', pv: 8 },
-            { key: 'boss_elias', nom: 'Elias', pv: 10 }
+            { key: 'boss_helias', nom: 'Helias', pv: 20 },
+            { key: 'boss_arthus', nom: 'Arthus', pv: 20 },
+            { key: 'boss_mehdi', nom: 'Mehdi', pv: 20 },
+            { key: 'boss_elias', nom: 'Elias', pv: 20 }
         ];
 
         const mapW = this.physics.world.bounds.width;
@@ -341,7 +341,7 @@ export default class map_monstre extends Phaser.Scene {
             const spawnY = Phaser.Math.Between(80, mapH - 80);
 
             const boss = this.groupe_boss.create(spawnX, spawnY, data.key);
-            boss.setDisplaySize(70, 70);
+            boss.setDisplaySize(100, 150);
             boss.setDepth(60);
             boss.setCollideWorldBounds(true);
             boss.setBounce(1, 1);
@@ -462,9 +462,9 @@ export default class map_monstre extends Phaser.Scene {
 
     bossTirer(boss) {
         const angle = Phaser.Math.Angle.Between(boss.x, boss.y, player.x, player.y);
-        const vitesse = 300;
+        const vitesse = 450;
         const balle = this.groupeBossBullets.create(boss.x, boss.y, 'ball');
-        balle.setDisplaySize(10, 10);
+        balle.setDisplaySize(18, 18);
         balle.setTint(0xff0000);
         balle.setDepth(90);
         balle.body.allowGravity = false;
@@ -506,7 +506,7 @@ export default class map_monstre extends Phaser.Scene {
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
                 const distance = Phaser.Math.Distance.Between(player.x, player.y, door.x, door.y);
-                if (distance < 100 && door.estSolide) this.doorNearby = door;
+                if (distance < 50 && door.estSolide) this.doorNearby = door;
             });
         }
 

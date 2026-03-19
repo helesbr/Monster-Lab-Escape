@@ -142,6 +142,19 @@ export default class selection extends Phaser.Scene {
     this.physics.add.collider(player, groupe_portes);
     this.cameras.main.startFollow(player);
 
+    // Afficher le nom de chaque map centré sur chaque salle
+    const labelStyle = {
+      fontSize: '24px',
+      fill: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 4
+    };
+    this.add.text(167, 182, 'CUISINE', labelStyle).setOrigin(0.5).setDepth(150);
+    this.add.text(660, 168, 'DIRECTEUR', labelStyle).setOrigin(0.5).setDepth(150);
+    this.add.text(160, 794, 'ÉQUIPEMENT', labelStyle).setOrigin(0.5).setDepth(150);
+    this.add.text(801, 794, 'MONSTRE', labelStyle).setOrigin(0.5).setDepth(150);
+
     this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
     this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
