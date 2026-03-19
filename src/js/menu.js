@@ -11,6 +11,7 @@ export default class menu extends Phaser.Scene {
         this.load.image('heart', 'src/assets/images/heart.png');
         this.load.image('boutonjouer', 'src/assets/images/boutonjouer.png');
         this.load.image('boutontouche', 'src/assets/images/boutontouche.png');
+        this.load.image('regle', 'src/assets/images/regle.png');
     }
 
     create() {

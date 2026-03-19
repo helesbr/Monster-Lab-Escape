@@ -2,10 +2,6 @@ export default class regles extends Phaser.Scene {
     constructor() {
         super({ key: "regles" });
     }
-    preload() {
-        this.load.image("regle", "src/assets/images/regle.png");
-    }
-
     create() {
         // Fond noir
         this.cameras.main.setBackgroundColor(0x000000);
