@@ -10,6 +10,7 @@ export default class menu extends Phaser.Scene {
         this.load.audio('menu', 'src/assets/son/menu.mp3');
         this.load.image('heart', 'src/assets/images/heart.png');
         this.load.image('boutonjouer', 'src/assets/images/boutonjouer.png');
+        this.load.image('boutontouche', 'src/assets/images/boutontouche.png');
     }
 
     create() {
@@ -66,20 +67,16 @@ export default class menu extends Phaser.Scene {
             this.scene.launch('HUD');
         });
 
-        const boutonRegle = this.add.rectangle(240, 295, 200, 60, 0x00aa00);
+        const boutonRegle = this.add.image(240, 310, 'boutontouche');
+        boutonRegle.setDisplaySize(450, 200);
         boutonRegle.setInteractive();
+        boutonRegle.setDepth(1);
         boutonRegle.on('pointerover', () => {
-            boutonRegle.setFillStyle(0x00ff00);
+            boutonRegle.setDisplaySize(470, 210);
         });
         boutonRegle.on('pointerout', () => {
-            boutonRegle.setFillStyle(0x00aa00);
+            boutonRegle.setDisplaySize(450, 200);
         });
-
-        this.add.text(240, 295, 'TOUCHES', {
-            fontSize: '32px',
-            fill: '#fff',
-            fontStyle: 'bold'
-        }).setOrigin(0.5);
 
         boutonRegle.on('pointerdown', () => {
             this.scene.start('regles');
