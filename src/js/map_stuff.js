@@ -331,7 +331,7 @@ export default class map_stuff extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
-        this.input.keyboard.on('keydown-ENTER', () => {
+        this.input.keyboard.on('keydown-S', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
                 this.armeNearby.collectee = true;
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -343,9 +343,10 @@ export default class map_stuff extends Phaser.Scene {
                 this.armeNearby = null;
                 this.son_tkprime.play();
                 this.game.events.emit('armeRamassee');
-                return;
             }
+        });
 
+        this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
                 this.doorNearby.estSolide = false;
