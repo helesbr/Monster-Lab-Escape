@@ -238,6 +238,17 @@ export default class map_directeur extends Phaser.Scene {
         this.correctCode = '2845';
         this.porteFinOuverte = false;
 
+        // ✅ Tracker d'indices découverts + réponses du joueur
+        this.indicesDecouverts = { halteres: false, bench: false, echec: false, arthus: false };
+        this.reponsesJoueur = ['?', '?', '?', '?']; // Les chiffres tapés par le joueur
+
+        // Indicateur d'interaction (apparaît près du joueur)
+        this.interactionPrompt = this.add.text(0, 0, '⏎ ENTER', {
+            fontSize: '14px', fontStyle: 'bold', fill: '#ffd700',
+            stroke: '#000000', strokeThickness: 3,
+            backgroundColor: '#000000aa', padding: { x: 6, y: 3 }
+        }).setOrigin(0.5).setDepth(250).setVisible(false);
+
         // ✅ Minuteur de 2 minutes
         this.tempsRestant = 120;
         this.texteTimer = this.add.text(this.scale.width / 2, this.scale.height / 2, '4:00', {
@@ -390,88 +401,50 @@ export default class map_directeur extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
             if (this.halteresNearby && !this.halteresDialogueShowing) {
                 this.halteresDialogueShowing = true;
-                const dialogueHalteres = this.add.text(240, 100,
-                    "3 rangées, mais la rangée du milieu a disparu. Combien reste-t-il ?",
-                    {
-                        fontSize: '20px',
-                        fontStyle: 'bold',
-                        fill: '#ff0000',
-                        align: 'center',
-                        wordWrap: { width: 400 },
-                        stroke: '#000000',
-                        strokeThickness: 3
-                    }
-                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
-
-                this.time.delayedCall(5000, () => {
-                    dialogueHalteres.destroy();
-                    this.halteresDialogueShowing = false;
-                });
+                this.showEnigmePopup(
+                    '🏋️ HALTÈRES',
+                    "3 rangées, mais la rangée du milieu a disparu.\nCombien reste-t-il ?",
+                    '2',
+                    'halteres',
+                    0,
+                    () => { this.halteresDialogueShowing = false; }
+                );
             }
             else if (this.benchNearby && !this.benchDialogueShowing) {
                 this.benchDialogueShowing = true;
-                const dialogueBench = this.add.text(240, 100,
-                    "Le patron fait 4 séries de 2 exercices. Mais il dit que seul le total d'une série compte.",
-                    {
-                        fontSize: '20px',
-                        fontStyle: 'bold',
-                        fill: '#ff0000',
-                        align: 'center',
-                        wordWrap: { width: 400 },
-                        stroke: '#000000',
-                        strokeThickness: 3
-                    }
-                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
-
-                this.time.delayedCall(5000, () => {
-                    dialogueBench.destroy();
-                    this.benchDialogueShowing = false;
-                });
+                this.showEnigmePopup(
+                    '🪑 BENCH',
+                    "Le patron fait 4 séries de 2 exercices.\nMais il dit que seul le total d'une série compte.",
+                    '8',
+                    'bench',
+                    1,
+                    () => { this.benchDialogueShowing = false; }
+                );
             }
             else if (this.echecNearby && !this.echecDialogueShowing) {
                 this.echecDialogueShowing = true;
-                const dialogueEchec = this.add.text(240, 100,
-                    "Blanc a perdu toutes ses pièces sauf le double de 2. Noir n'a plus que la moitié de ça.",
-                    {
-                        fontSize: '20px',
-                        fontStyle: 'bold',
-                        fill: '#ff0000',
-                        align: 'center',
-                        wordWrap: { width: 400 },
-                        stroke: '#000000',
-                        strokeThickness: 3
-                    }
-                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
-
-                this.time.delayedCall(5000, () => {
-                    dialogueEchec.destroy();
-                    this.echecDialogueShowing = false;
-                });
+                this.showEnigmePopup(
+                    '♟️ ÉCHECS',
+                    "Blanc a perdu toutes ses pièces sauf le double de 2.\nNoir n'a plus que la moitié de ça.",
+                    '4',
+                    'echec',
+                    2,
+                    () => { this.echecDialogueShowing = false; }
+                );
             }
             else if (this.porteFinNearby && !this.codeInputActive && !this.porteFinOuverte) {
                 this.showCodeInput();
             }
             else if (this.arthusNearby && !this.arthusDialogueShowing) {
-                // Afficher le dialogue d'Arthus
                 this.arthusDialogueShowing = true;
-                const dialogue = this.add.text(240, 150,
-                    "Salam j'ai mal... le patron est obsédé par ses chiffres. Il dit toujours : 'l'ordre c'est la clé'. Commence par ce qui se soulève, puis où on s'allonge, puis le jeu du roi... et moi je suis le dernier.",
-                    {
-                        fontSize: '20px',
-                        fontStyle: 'bold',
-                        fill: '#ff0000',
-                        align: 'center',
-                        wordWrap: { width: 400 },
-                        stroke: '#000000',
-                        strokeThickness: 3
-                    }
-                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
-
-                // Fermer le dialogue après 5 secondes
-                this.time.delayedCall(5000, () => {
-                    dialogue.destroy();
-                    this.arthusDialogueShowing = false;
-                });
+                this.showEnigmePopup(
+                    '👤 ARTHUS',
+                    "Salam j'ai mal... le patron dit toujours :\n'l'ordre c'est la clé'.\nCommence par ce qui se soulève, puis où on s'allonge,\npuis le jeu du roi... et moi je suis le dernier.\nMon chiffre ? Regarde combien on est ici.",
+                    '5',
+                    'arthus',
+                    3,
+                    () => { this.arthusDialogueShowing = false; }
+                );
             }
         }
 
@@ -501,6 +474,182 @@ export default class map_directeur extends Phaser.Scene {
             player.setVelocityY(0);
         }
 
+        // ✅ Indicateur "ENTER" flottant au-dessus du joueur
+        const isNearSomething = this.halteresNearby || this.benchNearby || this.echecNearby || this.arthusNearby || this.porteFinNearby || this.doorNearby;
+        if (isNearSomething && this.interactionPrompt) {
+            this.interactionPrompt.setVisible(true);
+            this.interactionPrompt.setPosition(player.x, player.y - 35);
+        } else if (this.interactionPrompt) {
+            this.interactionPrompt.setVisible(false);
+        }
+
+    }
+
+    // ✅ Système de popup d'énigme avec saisie du chiffre par le joueur
+    showEnigmePopup(titre, texte, chiffre, clef, slotIndex, onClose) {
+        player.setVelocity(0, 0);
+        this.codeInputActive = true;
+
+        const overlay = this.add.rectangle(240, 240, 480, 480, 0x000000, 0.75)
+            .setDepth(300).setScrollFactor(0);
+
+        const panel = this.add.rectangle(240, 220, 430, 300, 0x1a1a2e, 0.95)
+            .setDepth(301).setScrollFactor(0).setStrokeStyle(3, 0xffd700);
+
+        const titreText = this.add.text(240, 95, titre, {
+            fontSize: '30px', fontStyle: 'bold', fill: '#ffd700',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        const ligne = this.add.rectangle(240, 120, 380, 2, 0xffd700, 0.6)
+            .setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        const enigmeText = this.add.text(240, 185, texte, {
+            fontSize: '22px', fill: '#ffffff', align: 'center',
+            wordWrap: { width: 380 }, lineSpacing: 8,
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        // Toujours permettre de saisir/changer un chiffre
+        const ancienChiffre = this.indicesDecouverts[clef] ? this.reponsesJoueur[slotIndex] : '';
+
+        const inputLabel = this.add.text(240, 270, 'Tape un chiffre (0-9) :', {
+            fontSize: '20px', fontStyle: 'bold', fill: '#ffd700',
+            stroke: '#000000', strokeThickness: 3
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        const reponseText = this.add.text(240, 310, ancienChiffre || '_', {
+            fontSize: '36px', fontStyle: 'bold', fill: '#00ff88',
+            fontFamily: 'monospace', stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        const instrText = this.add.text(240, 345, '⏎ ENTER valider  |  ECHAP annuler', {
+            fontSize: '14px', fill: '#888888',
+            stroke: '#000000', strokeThickness: 2
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        // Animation d'entrée
+        this.tweens.add({ targets: panel, scaleX: { from: 0, to: 1 }, scaleY: { from: 0, to: 1 }, duration: 300, ease: 'Back.easeOut' });
+        this.tweens.add({ targets: [titreText, ligne], alpha: 1, duration: 400, delay: 200 });
+        this.tweens.add({ targets: enigmeText, alpha: 1, duration: 400, delay: 400 });
+        this.tweens.add({ targets: [inputLabel, reponseText, instrText], alpha: 1, duration: 400, delay: 600 });
+
+        const allElements = [overlay, panel, titreText, ligne, enigmeText, inputLabel, reponseText, instrText];
+
+        let chiffreSaisi = ancienChiffre;
+        let popupFerme = false;
+
+        const cleanupAndClose = () => {
+            if (popupFerme) return;
+            popupFerme = true;
+            this.input.keyboard.off('keydown');
+            this.tweens.add({
+                targets: allElements,
+                alpha: 0, duration: 200,
+                onComplete: () => {
+                    allElements.forEach(el => { if (el && el.scene) el.destroy(); });
+                    this.codeInputActive = false;
+                    if (onClose) onClose();
+                }
+            });
+        };
+
+        // Attendre un peu pour ne pas capturer le ENTER qui a ouvert le popup
+        this.time.delayedCall(300, () => {
+            this.input.keyboard.on('keydown', (event) => {
+                if (popupFerme) return;
+
+                // Chiffres 0-9
+                if (event.keyCode >= 48 && event.keyCode <= 57) {
+                    chiffreSaisi = String(event.keyCode - 48);
+                    reponseText.setText(chiffreSaisi);
+                    reponseText.setFill('#00ff88');
+                }
+
+                // Backspace → effacer
+                if (event.keyCode === 8) {
+                    chiffreSaisi = '';
+                    reponseText.setText('_');
+                    reponseText.setFill('#00ff88');
+                }
+
+                // ENTER → valider si un chiffre est saisi
+                if (event.keyCode === 13 && chiffreSaisi !== '') {
+                    this.indicesDecouverts[clef] = true;
+                    this.reponsesJoueur[slotIndex] = chiffreSaisi;
+
+                    const tousDecouverts = Object.values(this.indicesDecouverts).every(v => v);
+                    cleanupAndClose();
+
+                    if (tousDecouverts) {
+                        this.time.delayedCall(500, () => this.showCodeReveal());
+                    }
+                }
+
+                // ECHAP → fermer sans sauvegarder
+                if (event.keyCode === 27) {
+                    cleanupAndClose();
+                }
+            });
+        });
+    }
+
+    // ✅ Afficher le code final composé des réponses du joueur
+    showCodeReveal() {
+        player.setVelocity(0, 0);
+        this.codeInputActive = true;
+
+        const codeJoueur = this.reponsesJoueur.join('');
+
+        const overlay = this.add.rectangle(240, 240, 480, 480, 0x000000, 0.8)
+            .setDepth(300).setScrollFactor(0);
+
+        const panel = this.add.rectangle(240, 220, 400, 250, 0x1a1a2e, 0.95)
+            .setDepth(301).setScrollFactor(0).setStrokeStyle(3, 0xffd700);
+
+        const titre = this.add.text(240, 130, '🔑 TON CODE', {
+            fontSize: '28px', fontStyle: 'bold', fill: '#ffd700',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+
+        const labels = ['Haltères', 'Bench', 'Échecs', 'Arthus'];
+        const detailTexts = [];
+        for (let i = 0; i < 4; i++) {
+            const t = this.add.text(240, 165 + i * 28, labels[i] + ' → ' + this.reponsesJoueur[i], {
+                fontSize: '20px', fill: '#ffffff',
+                stroke: '#000000', strokeThickness: 3
+            }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
+            detailTexts.push(t);
+        }
+
+        const codeFinal = this.add.text(240, 290, 'Code : ' + codeJoueur, {
+            fontSize: '34px', fontStyle: 'bold', fill: '#00ff88',
+            stroke: '#000000', strokeThickness: 4
+        }).setOrigin(0.5).setDepth(303).setScrollFactor(0).setAlpha(0).setScale(0.3);
+
+        // Animations
+        this.tweens.add({ targets: panel, scaleX: { from: 0, to: 1 }, scaleY: { from: 0, to: 1 }, duration: 300, ease: 'Back.easeOut' });
+        this.tweens.add({ targets: titre, alpha: 1, duration: 400, delay: 200 });
+        detailTexts.forEach((t, i) => {
+            this.tweens.add({ targets: t, alpha: 1, duration: 300, delay: 400 + i * 200 });
+        });
+        this.tweens.add({ targets: codeFinal, alpha: 1, scale: 1, duration: 500, delay: 1200, ease: 'Back.easeOut' });
+
+        this.cameras.main.flash(500, 255, 215, 0, false, null, this);
+
+        const allElements = [overlay, panel, titre, ...detailTexts, codeFinal];
+
+        // Auto-fermeture après 3 secondes
+        this.time.delayedCall(3000, () => {
+            this.tweens.add({
+                targets: allElements,
+                alpha: 0, duration: 300,
+                onComplete: () => {
+                    allElements.forEach(el => { if (el && el.scene) el.destroy(); });
+                    this.codeInputActive = false;
+                }
+            });
+        });
     }
 
     showCodeInput() {
