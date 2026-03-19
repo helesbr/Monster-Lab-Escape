@@ -63,6 +63,7 @@ export default class map_monstre extends Phaser.Scene {
         murLayer.setCollisionByProperty({ estSolide: true });
 
         this.physics.world.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
+        this.physics.world.OVERLAP_BIAS = 16;
         this.cameras.main.setBounds(0, 0, carteMonstreLab.widthInPixels, carteMonstreLab.heightInPixels);
 
         let zoomX = this.scale.width / carteMonstreLab.widthInPixels;
@@ -118,6 +119,8 @@ export default class map_monstre extends Phaser.Scene {
                     const porte = groupe_portes.create(point.x, point.y, 'doors');
                     porte.anims.play('door_closed');
                     porte.setAngle(90);
+                    porte.body.setSize(32, 64);
+                    porte.body.setOffset(16, -16);
                     porte.setDepth(40);
                     porte.doorName = point.name;
                     porte.body.setCollideWorldBounds(false);
