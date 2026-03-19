@@ -78,7 +78,7 @@ export default class menu extends Phaser.Scene {
             boutonRegle.setFillStyle(0x00aa00);
         });
 
-        this.add.text(240, 295, 'RÈGLES', {
+        this.add.text(240, 295, 'Touches', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
