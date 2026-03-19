@@ -7,6 +7,7 @@ import map_directeur from "./js/map_directeur.js";
 import map_stuff from "./js/map_stuff.js";
 import map_monstre from "./js/map_monstre.js";
 import HUD from './js/HUD.js';
+import fin from './js/fin.js';
 
 // configuration générale du jeu
 var config = {
@@ -27,7 +28,7 @@ var config = {
       debug: false
     }
   },
-  scene: [ map_directeur ,menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre, HUD]
+  scene: [ map_directeur ,menu, character_select,regles, selection, map_cuisine, map_stuff, map_monstre, HUD, fin]
 };
 
 // création et lancement du jeu
