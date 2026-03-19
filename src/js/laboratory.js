@@ -91,8 +91,8 @@ export default class laboratory extends Phaser.Scene {
     this.physics.add.collider(player, murLayer);
     this.physics.add.collider(player, objectLayer);
 
-    this.anims.create({ key: 'door_closed', frames: [{ key: 'porte', frame: 0 }], frameRate: 10 });
-    this.anims.create({ key: 'door_open', frames: [{ key: 'porte', frame: 1 }], frameRate: 10 });
+    if (!this.anims.exists('door_closed')) this.anims.create({ key: 'door_closed', frames: [{ key: 'porte', frame: 0 }], frameRate: 10 });
+    if (!this.anims.exists('door_open')) this.anims.create({ key: 'door_open', frames: [{ key: 'porte', frame: 1 }], frameRate: 10 });
 
     groupe_portes = this.physics.add.group();
     const doorsObjectsLayer = carteDuNiveau.getObjectLayer("doors");
@@ -159,9 +159,9 @@ export default class laboratory extends Phaser.Scene {
 
     this.isDude = this.game.config.personnageSelectionne !== 'helias';
     if (this.isDude) {
-      this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
-      this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
-      this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
+      if (!this.anims.exists("anim_tourne_gauche")) this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
+      if (!this.anims.exists("anim_tourne_droite")) this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
+      if (!this.anims.exists("anim_face")) this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
     }
 
     if (!this.anims.exists("gun_droite")) this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
