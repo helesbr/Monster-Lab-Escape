@@ -41,7 +41,7 @@ export default class menu extends Phaser.Scene {
             .setOrigin(0.5)
             .setDepth(1);
 
-        const boutonJouer = this.add.rectangle(240, 150, 200, 60, 0x00aa00);
+        const boutonJouer = this.add.rectangle(240, 215, 200, 60, 0x00aa00);
         boutonJouer.setInteractive();
         boutonJouer.on('pointerover', () => {
             boutonJouer.setFillStyle(0x00ff00);
@@ -50,7 +50,7 @@ export default class menu extends Phaser.Scene {
             boutonJouer.setFillStyle(0x00aa00);
         });
 
-        this.add.text(240, 150, 'JOUER', {
+        this.add.text(240, 215, 'JOUER', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'
@@ -69,7 +69,7 @@ export default class menu extends Phaser.Scene {
             this.scene.launch('HUD');
         });
 
-        const boutonRegle = this.add.rectangle(240, 330, 200, 60, 0x00aa00);
+        const boutonRegle = this.add.rectangle(240, 295, 200, 60, 0x00aa00);
         boutonRegle.setInteractive();
         boutonRegle.on('pointerover', () => {
             boutonRegle.setFillStyle(0x00ff00);
@@ -78,7 +78,7 @@ export default class menu extends Phaser.Scene {
             boutonRegle.setFillStyle(0x00aa00);
         });
 
-        this.add.text(240, 330, 'RÈGLES', {
+        this.add.text(240, 295, 'RÈGLES', {
             fontSize: '32px',
             fill: '#fff',
             fontStyle: 'bold'

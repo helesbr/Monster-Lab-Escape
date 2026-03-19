@@ -172,6 +172,11 @@ export default class map_directeur extends Phaser.Scene {
         }
 
         // ✅ Initialiser le clavier
+        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+
         this.cursors = this.input.keyboard.createCursorKeys();
         this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
         
@@ -179,9 +184,51 @@ export default class map_directeur extends Phaser.Scene {
         this.doorNearby = null;
         this.arthusNearby = null;
         this.arthusDialogueShowing = false;
+
+        // ✅ Minuteur de 2 minutes
+        this.tempsRestant = 120;
+        this.texteTimer = this.add.text(this.scale.width / 2, this.scale.height / 2, '2:00', {
+            fontSize: '40px',
+            fontStyle: 'bold',
+            fill: '#ff0000',
+            stroke: '#000000',
+            strokeThickness: 4
+        }).setOrigin(0.5, 0).setDepth(200).setScrollFactor(0);
+
+        this.timerCompteur = this.time.addEvent({
+            delay: 1000,
+            callback: function () {
+                this.tempsRestant--;
+                const minutes = Math.floor(this.tempsRestant / 60);
+                const secondes = this.tempsRestant % 60;
+                this.texteTimer.setText(minutes + ':' + (secondes < 10 ? '0' : '') + secondes);
+
+                if (this.tempsRestant <= 10) {
+                    this.texteTimer.setFill('#ff0000');
+                    this.tweens.add({
+                        targets: this.texteTimer,
+                        scale: 1.3,
+                        duration: 200,
+                        yoyo: true
+                    });
+                }
+
+                if (this.tempsRestant <= 0) {
+                    this.timerCompteur.remove();
+                    this.game.events.emit('resetVie');
+                    this.game.events.emit('resetArme');
+                    this.game.events.emit('resetMonstres');
+                    this.game.events.emit('resetBoost');
+                    this.game.events.emit('resetMoney');
+                    this.scene.stop('HUD');
+                    this.scene.start('menu');
+                }
+            },
+            callbackScope: this,
+            repeat: 119
+        });
     }
-    update() { 
-        const cursors = this.cursors;
+    update() {
 
         // ✅ vitesse avec boost preworkout
         const vitesse = player.vitesseBoost || player.vitesseBase || 160;
@@ -237,11 +284,11 @@ export default class map_directeur extends Phaser.Scene {
             }
         }
 
-        if (cursors.right.isDown) {
+        if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
-        } else if (cursors.left.isDown) {
+        } else if (this.keyQ.isDown) {
             player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
@@ -250,9 +297,9 @@ export default class map_directeur extends Phaser.Scene {
             player.anims.play('anim_face');
         }
 
-        if (cursors.up.isDown) {
+        if (this.keyZ.isDown) {
             player.setVelocityY(-vitesse);
-        } else if (cursors.down.isDown) {
+        } else if (this.keyS.isDown) {
             player.setVelocityY(vitesse);
         } else {
             player.setVelocityY(0);

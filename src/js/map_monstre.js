@@ -253,8 +253,11 @@ export default class map_monstre extends Phaser.Scene {
             if (this.groupeBullets.contains(objet)) objet.destroy();
         });
 
-        this.cursors = this.input.keyboard.createCursorKeys();
-        this.boutonFeu = this.input.keyboard.addKey('A');
+        this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+        this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+        this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
         this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {
@@ -327,7 +330,6 @@ export default class map_monstre extends Phaser.Scene {
     }
 
     update() {
-        const cursors = this.cursors;
 
         // ✅ MODIFICATION VITESSE : récupérer boost depuis HUD
         let vitesse = 160;
@@ -343,12 +345,12 @@ export default class map_monstre extends Phaser.Scene {
             });
         }
 
-        if (cursors.right.isDown) {
+        if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
-        } else if (cursors.left.isDown) {
+        } else if (this.keyQ.isDown) {
             player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
@@ -358,10 +360,10 @@ export default class map_monstre extends Phaser.Scene {
             player.anims.play('anim_face');
         }
 
-        if (cursors.up.isDown) {
+        if (this.keyZ.isDown) {
             player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
-        } else if (cursors.down.isDown) {
+        } else if (this.keyS.isDown) {
             player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {

@@ -34,6 +34,11 @@ export default class selection extends Phaser.Scene {
   }
 
   create() {
+    // Relancer le HUD s'il n'est pas actif
+    if (!this.scene.isActive('HUD')) {
+      this.scene.launch('HUD');
+    }
+
     this.son_laboratory = this.sound.add('laboratory');
     this.son_laboratory.play();
     this.events.on('shutdown', () => {
@@ -134,7 +139,10 @@ export default class selection extends Phaser.Scene {
     this.physics.add.collider(player, groupe_portes);
     this.cameras.main.startFollow(player);
 
-    clavier = this.input.keyboard.createCursorKeys();
+    this.keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+    this.keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    this.keyZ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+    this.keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
     this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 
     this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
@@ -205,12 +213,12 @@ export default class selection extends Phaser.Scene {
       if (boost) vitesse = boost;
     });
 
-    if (clavier.right.isDown) {
+    if (this.keyD.isDown) {
       player.setVelocityX(vitesse);
       player.setFlipX(false);
       player.anims.play('anim_tourne_droite', true);
       player.directionArme = 'droite';
-    } else if (clavier.left.isDown) {
+    } else if (this.keyQ.isDown) {
       player.setVelocityX(-vitesse);
       player.setFlipX(false);
       player.anims.play('anim_tourne_gauche', true);
@@ -221,10 +229,10 @@ export default class selection extends Phaser.Scene {
       player.anims.play('anim_face');
     }
 
-    if (clavier.up.isDown) {
+    if (this.keyZ.isDown) {
       player.setVelocityY(-vitesse);
       player.directionArme = 'haut';
-    } else if (clavier.down.isDown) {
+    } else if (this.keyS.isDown) {
       player.setVelocityY(vitesse);
       player.directionArme = 'bas';
     } else {
