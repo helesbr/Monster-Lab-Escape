@@ -145,6 +145,12 @@
                  "id":2,
                  "name":"arthus",
                  "point":true,
+                 "properties":[
+                        {
+                         "name":"estSolide",
+                         "type":"bool",
+                         "value":true
+                        }],
                  "rotation":0,
                  "type":"",
                  "visible":true,

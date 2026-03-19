@@ -32,6 +32,7 @@ export default class map_directeur extends Phaser.Scene {
         wallLayer.setCollisionByProperty({ estSolide: true });
         objectsLayer.setCollisionByProperty({ estSolide: true });
 
+
         this.physics.world.setBounds(0, 0, carteDirecteurLab.widthInPixels, carteDirecteurLab.heightInPixels);
         this.cameras.main.setBounds(0, 0, carteDirecteurLab.widthInPixels, carteDirecteurLab.heightInPixels);
 
@@ -39,7 +40,7 @@ export default class map_directeur extends Phaser.Scene {
         let zoomY = this.scale.height / carteDirecteurLab.heightInPixels;
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carteDirecteurLab.widthInPixels / 2, carteDirecteurLab.heightInPixels / 2);
-
+        
         // ✅ Créer la porte "door_retour"
         const groupe_portes = this.physics.add.group();
         const doorsObjectsLayer = carteDirecteurLab.getObjectLayer("door_retour");
@@ -65,11 +66,11 @@ export default class map_directeur extends Phaser.Scene {
         if (arthusObjectsLayer) {
             const obj = arthusObjectsLayer.objects[0];
             if (obj) {
-                const arthus = this.physics.add.sprite(obj.x, obj.y, 'arthus');
-                arthus.setCollideWorldBounds(true);
-                arthus.setDepth(50);
-                arthus.body.setImmovable(true);
-                arthus.body.moves = false;
+                this.arthus = this.physics.add.sprite(obj.x, obj.y, 'arthus');
+                this.arthus.setCollideWorldBounds(true);
+                this.arthus.setDepth(50);
+                this.arthus.body.setImmovable(true);
+                this.arthus.body.moves = false;
             }
         }
 
@@ -97,6 +98,7 @@ export default class map_directeur extends Phaser.Scene {
         
         if (wallLayer) this.physics.add.collider(player, wallLayer);
         if (objectsLayer) this.physics.add.collider(player, objectsLayer);
+        if (this.arthus) this.physics.add.collider(player, this.arthus);
 
         this.doorCollider = this.physics.add.collider(player, groupe_portes);
         this.groupe_portes = groupe_portes;

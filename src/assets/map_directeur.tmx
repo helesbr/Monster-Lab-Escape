@@ -74652,6 +74652,9 @@
  </layer>
  <objectgroup id="6" name="arthus" locked="1">
   <object id="2" name="arthus" x="490.909" y="809.091">
+   <properties>
+    <property name="estSolide" type="bool" value="true"/>
+   </properties>
    <point/>
   </object>
  </objectgroup>
