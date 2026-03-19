@@ -466,9 +466,10 @@ export default class map_cuisine extends Phaser.Scene {
 
     ouvrirMenuShop() {
         this.menuShopVisible = true;
+        this.physics.pause();
         this.son_tkprime2.setVolume(1.3);
         this.son_tkprime2.play();
-        this.son_cuisine.setVolume(0.3);
+        this.son_cuisine.setVolume(0.5);
 
         const fondMenu = this.add.rectangle(240, 240, 1050, 825, 0x000000, 0.7);
         fondMenu.setDepth(200);
@@ -575,6 +576,7 @@ export default class map_cuisine extends Phaser.Scene {
     fermerMenuShop() {
         if (this.son_tkprime2) this.son_tkprime2.stop();
         if (this.son_cuisine) this.son_cuisine.setVolume(1.0);
+        this.physics.resume();
         if (this.menuShop) {
             this.menuShop.fond.destroy();
             this.menuShop.titre.destroy();
