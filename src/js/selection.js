@@ -56,6 +56,7 @@ export default class selection extends Phaser.Scene {
     murLayer.setCollisionByProperty({ estSolide: true });
 
     this.physics.world.setBounds(0, 0, 960, 960);
+    this.physics.world.OVERLAP_BIAS = 16;
     this.cameras.main.setBounds(0, 0, 960, 960);
 
     const { porteDestination, offsetY = 0, offsetX = 0 } = this.scene.settings.data || {};
@@ -116,9 +117,15 @@ export default class selection extends Phaser.Scene {
             const hasHorizontal = obj.properties.some(prop =>
               prop.name === "horizontal" || prop.name === "orientation"
             );
-            if (!hasHorizontal) porte.setAngle(90);
+            if (!hasHorizontal) {
+              porte.setAngle(90);
+              porte.body.setSize(32, 64);
+              porte.body.setOffset(16, -16);
+            }
           } else {
             porte.setAngle(90);
+            porte.body.setSize(32, 64);
+            porte.body.setOffset(16, -16);
           }
         }
       });

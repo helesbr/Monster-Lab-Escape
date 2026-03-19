@@ -7,7 +7,6 @@ export default class map_stuff extends Phaser.Scene {
     preload() {
         this.load.tilemapTiledJSON("stuff", "src/assets/map_stuff.tmj");
         this.load.image('allTiles', 'src/tilesets/all_tilesets.png');
-        this.load.image('arme', 'src/assets/images/arme.png');
         this.load.image('ball', 'src/assets/images/ball.png');
         this.load.image('heart', 'src/assets/images/heart.png');
         this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
@@ -29,7 +28,7 @@ export default class map_stuff extends Phaser.Scene {
         this.load.audio('stuff', 'src/assets/son/stuff.mp3');
         this.load.audio('tkprime', 'src/assets/son/tkprime.mp3');
         this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
-        this.load.audio('gunshot', 'src/assets/son/gunshot.mp3');
+        this.load.audio('rage_quit', 'src/assets/son/rage_quite.m4a');
     }
 
     create() {
@@ -37,10 +36,12 @@ export default class map_stuff extends Phaser.Scene {
         this.son_stuff.play();
         this.son_tkprime = this.sound.add('tkprime');
         this.son_ronnie = this.sound.add('ronnie');
+        this.son_rage_quit = this.sound.add('rage_quit');
         this.events.on('shutdown', () => {
             if (this.son_stuff) this.son_stuff.stop();
             if (this.son_tkprime) this.son_tkprime.stop();
             if (this.son_ronnie) this.son_ronnie.stop();
+            if (this.son_rage_quit) this.son_rage_quit.stop();
         });
 
         const carte = this.add.tilemap("stuff");
@@ -59,6 +60,7 @@ export default class map_stuff extends Phaser.Scene {
         objetsLayer.setCollisionByExclusion([-1]);
 
         this.physics.world.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
+        this.physics.world.OVERLAP_BIAS = 16;
         this.cameras.main.setBounds(0, 0, carte.widthInPixels, carte.heightInPixels);
         let zoomX = this.scale.width / carte.widthInPixels;
         let zoomY = this.scale.height / carte.heightInPixels;
@@ -118,7 +120,11 @@ export default class map_stuff extends Phaser.Scene {
                 porte.estSolide = true;
                 if (point.properties) {
                     const hasVertical = point.properties.some(prop => prop.name === "verticale" && prop.value === true);
-                    if (hasVertical) porte.setAngle(90);
+                    if (hasVertical) {
+                        porte.setAngle(90);
+                        porte.body.setSize(32, 64);
+                        porte.body.setOffset(16, -16);
+                    }
                 }
             });
         }
@@ -302,7 +308,17 @@ export default class map_stuff extends Phaser.Scene {
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.scene.stop('HUD');
-                this.scene.start('menu');
+                
+                // Jouer le son et attendre sa fin
+                if (this.son_rage_quit) {
+                    this.son_rage_quit.play();
+                    this.son_rage_quit.once('complete', () => {
+                        this.scene.start('menu');
+                    });
+                } else {
+                    // Fallback si le son n'existe pas
+                    this.scene.start('menu');
+                }
             }
         });
 
@@ -315,7 +331,7 @@ export default class map_stuff extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
-        this.input.keyboard.on('keydown-ENTER', () => {
+        this.input.keyboard.on('keydown-S', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
                 this.armeNearby.collectee = true;
                 const armeSprite = this.add.sprite(player.x + 20, player.y, 'image_gun');
@@ -327,9 +343,10 @@ export default class map_stuff extends Phaser.Scene {
                 this.armeNearby = null;
                 this.son_tkprime.play();
                 this.game.events.emit('armeRamassee');
-                return;
             }
+        });
 
+        this.input.keyboard.on('keydown-ENTER', () => {
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
                 this.doorNearby.estSolide = false;
