@@ -13,10 +13,14 @@ export default class map_monstre extends Phaser.Scene {
             frameWidth: 44,
             frameHeight: 48
         });
-        this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
-            frameWidth: 44,
-            frameHeight: 48
-        });
+        if (this.game.config.personnageSelectionne === 'helias') {
+            this.load.image("img_perso", "src/assets/images/helias-perso.png");
+        } else {
+            this.load.spritesheet("img_perso", "src/assets/images/dude.png", {
+                frameWidth: 44,
+                frameHeight: 48
+            });
+        }
         this.load.spritesheet('doors', 'src/assets/images/doors_spritesheet.png', {
             frameWidth: 64,
             frameHeight: 80
@@ -193,9 +197,12 @@ export default class map_monstre extends Phaser.Scene {
         this.groupe_portes = groupe_portes;
         this.cameras.main.startFollow(player);
 
-        if (!this.anims.exists("anim_tourne_gauche")) this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
-        if (!this.anims.exists("anim_tourne_droite")) this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
-        if (!this.anims.exists("anim_face")) this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
+        this.isDude = this.game.config.personnageSelectionne !== 'helias';
+        if (this.isDude) {
+            if (!this.anims.exists("anim_tourne_gauche")) this.anims.create({ key: "anim_tourne_gauche", frames: this.anims.generateFrameNumbers("img_perso", { start: 4, end: 5 }), frameRate: 10, repeat: -1 });
+            if (!this.anims.exists("anim_tourne_droite")) this.anims.create({ key: "anim_tourne_droite", frames: this.anims.generateFrameNumbers("img_perso", { start: 6, end: 8 }), frameRate: 10, repeat: -1 });
+            if (!this.anims.exists("anim_face")) this.anims.create({ key: "anim_face", frames: [{ key: "img_perso", frame: 1 }], frameRate: 20 });
+        }
 
         this.groupeBullets = this.physics.add.group();
         this.physics.add.collider(this.groupeBullets, murLayer, (balle) => balle.destroy());
@@ -348,16 +355,16 @@ export default class map_monstre extends Phaser.Scene {
         if (this.keyD.isDown) {
             player.setVelocityX(vitesse);
             player.setFlipX(false);
-            player.anims.play('anim_tourne_droite', true);
+            if (this.isDude) player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (this.keyQ.isDown) {
             player.setVelocityX(-vitesse);
             player.setFlipX(false);
-            player.anims.play('anim_tourne_gauche', true);
+            if (this.isDude) player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
         } else {
             player.setVelocityX(0);
-            player.anims.play('anim_face');
+            if (this.isDude) player.anims.play('anim_face');
         }
 
         if (this.keyZ.isDown) {
