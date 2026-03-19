@@ -89,7 +89,6 @@ export default class map_cuisine extends Phaser.Scene {
             });
         }
 
-        // ✅ animations monstres selon direction
         if (!this.anims.exists("monstre_marche")) {
             this.anims.create({
                 key: "monstre_marche",
@@ -133,7 +132,7 @@ export default class map_cuisine extends Phaser.Scene {
                 const monstre = this.groupe_monstres.create(monstreObj.x, monstreObj.y, 'monstre', 0);
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
-                monstre.setDisplaySize(60, 60); // ✅ taille augmentée
+                monstre.setDisplaySize(60, 60);
                 monstre.setDepth(50);
                 monstre.pointsVie = Phaser.Math.Between(1, 3);
                 monstre.setVelocity(
@@ -249,7 +248,7 @@ export default class map_cuisine extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
-                this.game.events.emit(' addMoney', 10);
+                this.game.events.emit('addMoney', 10);
                 this.son_ronnie.play();
             }
         });
@@ -295,8 +294,9 @@ export default class map_cuisine extends Phaser.Scene {
             if (this.groupeBullets.contains(objet)) objet.destroy();
         });
 
+        // ✅ KeyCodes explicite pour éviter tout conflit
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.boutonFeu = this.input.keyboard.addKey('A');
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
         const calqueShops = carteCuisine.getObjectLayer("shops");
         this.shopNearby = null;
@@ -368,7 +368,7 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     tirer() {
-        if (!player.armeEquipee) return;
+        if (!player || !player.armeEquipee) return;
         let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
         switch (player.directionArme) {
@@ -387,12 +387,15 @@ export default class map_cuisine extends Phaser.Scene {
     }
 
     update() {
-        if (!this.cursors) {
+        // ✅ guard unifié cursors + boutonFeu
+        if (!this.cursors || !this.boutonFeu) {
             this.cursors = this.input.keyboard.createCursorKeys();
+            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            return;
         }
+
         const cursors = this.cursors;
 
-        // ✅ récupérer boost vitesse depuis HUD
         let vitesse = 160;
         this.game.events.emit('getBoostVitesse', (boost) => {
             if (boost) vitesse = boost;
@@ -439,7 +442,6 @@ export default class map_cuisine extends Phaser.Scene {
             if (distanceShop < 100) this.shopNearby = this.shop;
         }
 
-        // ✅ animation monstres selon direction
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
                 const vx = monstre.body.velocity.x;
@@ -447,8 +449,7 @@ export default class map_cuisine extends Phaser.Scene {
 
                 if (Math.abs(vx) > Math.abs(vy)) {
                     monstre.anims.play('monstre_cote', true);
-                    if (vx < 0) monstre.setFlipX(true);
-                    else monstre.setFlipX(false);
+                    monstre.setFlipX(vx < 0);
                 } else if (vy < 0) {
                     monstre.anims.play('monstre_dos', true);
                     monstre.setFlipX(false);
@@ -554,8 +555,14 @@ export default class map_cuisine extends Phaser.Scene {
                     if (type === 'prewarkout') {
                         this.game.events.emit('setBoostVitesse', 160 * 2.5, 90000);
                     } else if (type === 'creatine') {
-                        player.pointsVie = Math.min(player.pointsVie + 3, 6);
-                        this.game.events.emit('setVieMax', 6, player.pointsVie);
+                        this.game.events.emit('getVie', (vieActuelle) => {
+                            this.game.events.emit('getVieMax', (vieMax) => {
+                                const nouveauMax = Math.min(vieMax + 3, 9);
+                                const nouvelleVie = Math.min(vieActuelle + 3, nouveauMax);
+                                player.pointsVie = nouvelleVie;
+                                this.game.events.emit('setVieMax', nouveauMax, nouvelleVie);
+                            });
+                        });
                     }
                     objet.destroy();
                 });
