@@ -173,7 +173,12 @@ export default class map_directeur extends Phaser.Scene {
 
         // ✅ Initialiser le clavier
         this.cursors = this.input.keyboard.createCursorKeys();
-
+        this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
+        
+        // ✅ Variables d'interaction
+        this.doorNearby = null;
+        this.arthusNearby = null;
+        this.arthusDialogueShowing = false;
     }
     update() { 
         const cursors = this.cursors;
@@ -181,6 +186,7 @@ export default class map_directeur extends Phaser.Scene {
         // ✅ vitesse avec boost preworkout
         const vitesse = player.vitesseBoost || player.vitesseBase || 160;
 
+        // ✅ Détection de proximité avec les portes
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
@@ -192,6 +198,43 @@ export default class map_directeur extends Phaser.Scene {
                     this.doorNearby = door;
                 }
             });
+        }
+
+        // ✅ Détection de proximité avec Arthus
+        this.arthusNearby = null;
+        if (this.arthus) {
+            const distance = Phaser.Math.Distance.Between(
+                player.x, player.y,
+                this.arthus.x, this.arthus.y
+            );
+            if (distance < 100) {
+                this.arthusNearby = this.arthus;
+            }
+        }
+
+        // ✅ Gestion des interactions au ENTER
+        if (Phaser.Input.Keyboard.JustDown(this.enterKey)) {
+            if (this.arthusNearby && !this.arthusDialogueShowing) {
+                // Afficher le dialogue d'Arthus
+                this.arthusDialogueShowing = true;
+                const dialogue = this.add.text(240, 150, 
+                    "salam j'ai mal",
+                    {
+                        fontSize: '20px',
+                        fill: '#ffffff',
+                        align: 'center',
+                        wordWrap: { width: 400 },
+                        stroke: '#000000',
+                        strokeThickness: 3
+                    }
+                ).setOrigin(0.5).setDepth(200).setScrollFactor(0);
+
+                // Fermer le dialogue après 4 secondes
+                this.time.delayedCall(4000, () => {
+                    dialogue.destroy();
+                    this.arthusDialogueShowing = false;
+                });
+            }
         }
 
         if (cursors.right.isDown) {
