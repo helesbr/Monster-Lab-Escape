@@ -229,6 +229,53 @@
          "y":0
         }, 
         {
+         "draworder":"topdown",
+         "id":9,
+         "name":"objets",
+         "objects":[
+                {
+                 "height":0,
+                 "id":5,
+                 "name":"bench",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":832,
+                 "y":481.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":6,
+                 "name":"echec",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":78.6666666666667,
+                 "y":137.333333333333
+                }, 
+                {
+                 "height":0,
+                 "id":7,
+                 "name":"halteres",
+                 "point":true,
+                 "rotation":0,
+                 "type":"",
+                 "visible":true,
+                 "width":0,
+                 "x":145.333333333333,
+                 "y":785.333333333333
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "x":0,
+         "y":0
+        }, 
+        {
          "data":[0, 0, 0, 0, 12866, 12867, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13860, 13861, 13861, 0, 0, 14460, 14461, 0, 0, 0, 0, 13570, 0,
             0, 0, 0, 0, 12916, 12917, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13622, 13623, 13624, 0, 0, 14510, 14511, 0, 0, 0, 0, 13620, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 13672, 13673, 13674, 0, 0, 0, 0, 0, 0, 0, 0, 13670, 0,
@@ -300,8 +347,8 @@
          "x":0,
          "y":0
         }],
- "nextlayerid":9,
- "nextobjectid":5,
+ "nextlayerid":10,
+ "nextobjectid":8,
  "orientation":"orthogonal",
  "renderorder":"right-down",
  "tiledversion":"1.11.2",
