@@ -9,25 +9,23 @@ export default class HUD extends Phaser.Scene {
         this.aArme = false;
         this.money = 0;
         this.monstresMorts = [];
+        this.vitesseBoost = null;
+        this.timerBoost = null;
 
-        // ✅ tableau de 6 coeurs
         this.coeurs = [];
-        for (let i = 0; i < 6; i++) {
-            const ligne = Math.floor(i / 3); // 0 ou 1
-            const colonne = i % 3; // 0, 1 ou 2
+        for (let i = 0; i < 9; i++) {
+            const ligne = Math.floor(i / 3);
+            const colonne = i % 3;
             const coeur = this.add.image(this.scale.width - 150 + (colonne * 36), 20 + (ligne * 36), 'heart', 0)
                 .setOrigin(0, 0)
                 .setDisplaySize(32, 32)
                 .setScrollFactor(0)
                 .setDepth(200);
-
-            // ✅ cacher les 3 derniers au départ
-            if (i >= 3) coeur.setVisible(false);
-
+            coeur.setVisible(false);
             this.coeurs.push(coeur);
         }
+        for (let i = 0; i < 3; i++) this.coeurs[i].setVisible(true);
 
-        // ✅ texte money
         this.texteMoney = this.add.text(20, 20, 'Money: 0', {
             fontSize: '16px',
             fill: '#FFD700',
@@ -45,28 +43,19 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetVie', () => {
             this.pointsVie = 3;
             this.vieMax = 3;
-            // ✅ recacher les 3 derniers coeurs
-            for (let i = 3; i < 6; i++) {
-                this.coeurs[i].setVisible(false);
-            }
             this.updateCoeurs();
         });
         this.game.events.on('getVie', (callback) => {
             callback(this.pointsVie);
         });
+        this.game.events.on('getVieMax', (callback) => {
+            callback(this.vieMax);
+        });
 
-        // ✅ creatine → afficher les 3 coeurs supplémentaires
+        // creatine
         this.game.events.on('setVieMax', (max, actuelle) => {
-            this.vieMax = max;
-            this.pointsVie = actuelle;
-            // afficher tous les coeurs jusqu'à vieMax
-            for (let i = 0; i < 6; i++) {
-                if (i < max) {
-                    this.coeurs[i].setVisible(true);
-                } else {
-                    this.coeurs[i].setVisible(false);
-                }
-            }
+            this.vieMax = Math.min(max, 9);
+            this.pointsVie = Math.min(actuelle, this.vieMax);
             this.updateCoeurs();
         });
 
@@ -110,7 +99,7 @@ export default class HUD extends Phaser.Scene {
 
         // money
         this.game.events.on('addMoney', (montant) => {
-            this.money += montant;
+            this.money = Math.max(0, this.money + montant);
             this.texteMoney.setText('Money: ' + this.money);
         });
         this.game.events.on('getMoney', (callback) => {
@@ -131,18 +120,32 @@ export default class HUD extends Phaser.Scene {
         this.game.events.on('resetMonstres', () => {
             this.monstresMorts = [];
         });
+
+        // boost vitesse
+        this.game.events.on('setBoostVitesse', (vitesse, duree) => {
+            this.vitesseBoost = vitesse;
+            if (this.timerBoost) this.timerBoost.remove();
+            this.timerBoost = this.time.delayedCall(duree, () => {
+                this.vitesseBoost = null;
+            });
+        });
+        this.game.events.on('getBoostVitesse', (callback) => {
+            callback(this.vitesseBoost);
+        });
+        this.game.events.on('resetBoost', () => {
+            this.vitesseBoost = null;
+            if (this.timerBoost) this.timerBoost.remove();
+        });
     }
 
     updateCoeurs() {
-        for (let i = 0; i < this.vieMax; i++) {
-            if (i < this.pointsVie) {
-                // ✅ coeur plein → frame 0
+        for (let i = 0; i < this.coeurs.length; i++) {
+            if (i < this.vieMax) {
+                this.coeurs[i].setVisible(true);
                 this.coeurs[i].setFrame(0);
-                this.coeurs[i].setAlpha(1);
+                this.coeurs[i].setAlpha(i < this.pointsVie ? 1 : 0.3);
             } else {
-                // ✅ coeur vide → grisé
-                this.coeurs[i].setFrame(0);
-                this.coeurs[i].setAlpha(0.3);
+                this.coeurs[i].setVisible(false);
             }
         }
     }

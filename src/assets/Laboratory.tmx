@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="9" nextobjectid="8">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="32" tileheight="32" infinite="0" nextlayerid="10" nextobjectid="9">
+ <editorsettings>
+  <export target="Laboratory.tmj" format="json"/>
+ </editorsettings>
  <tileset firstgid="1" name="all_tilset" tilewidth="32" tileheight="32" tilecount="14900" columns="50">
   <image source="../tilesets/all_tilesets.png" width="1600" height="9536"/>
   <tile id="0">

@@ -26,33 +26,30 @@ export default class map_stuff extends Phaser.Scene {
             frameWidth: 64,
             frameHeight: 80
         });
-        // Chargement du son stuff
         this.load.audio('stuff', 'src/assets/son/stuff.mp3');
+        this.load.audio('tkprime', 'src/assets/son/tkprime.mp3');
+        this.load.audio('ronnie', 'src/assets/son/yeah_buddy.m4a');
+        this.load.audio('gunshot', 'src/assets/son/gunshot.mp3');
     }
 
     create() {
-        // Lancer le son de stuff
         this.son_stuff = this.sound.add('stuff');
         this.son_stuff.play();
-
-        // Arrêter la musique quand on quitte la scène
+        this.son_tkprime = this.sound.add('tkprime');
+        this.son_ronnie = this.sound.add('ronnie');
         this.events.on('shutdown', () => {
-            if (this.son_stuff) {
-                this.son_stuff.stop();
-            }
+            if (this.son_stuff) this.son_stuff.stop();
+            if (this.son_tkprime) this.son_tkprime.stop();
+            if (this.son_ronnie) this.son_ronnie.stop();
         });
 
         const carte = this.add.tilemap("stuff");
         const tileset = carte.addTilesetImage("all_tileset", "allTiles");
-        this.game.config.aPistole = false; // initialisation
+        this.game.config.aPistole = false;
 
-        // Pour lire la money au démarrage de la scène si besoin :
         this.game.events.emit('getMoney', (money) => {
             console.log('Money actuelle:', money);
         });
-
-        // Pour ajouter de la money (ex: quand un monstre meurt) :
-        // this.game.events.emit('addMoney', 10);
 
         const solLayer = carte.createLayer("Floor", tileset, 0, 0);
         const wallLayer = carte.createLayer("Mur", tileset, 0, 0);
@@ -68,12 +65,30 @@ export default class map_stuff extends Phaser.Scene {
         this.cameras.main.setZoom(Math.min(zoomX, zoomY));
         this.cameras.main.centerOn(carte.widthInPixels / 2, carte.heightInPixels / 2);
 
-        this.anims.create({
-            key: "monstre_marche",
-            frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 3 }),
-            frameRate: 8,
-            repeat: -1
-        });
+        if (!this.anims.exists("monstre_marche")) {
+            this.anims.create({
+                key: "monstre_marche",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 0, end: 2 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        if (!this.anims.exists("monstre_dos")) {
+            this.anims.create({
+                key: "monstre_dos",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 3, end: 5 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
+        if (!this.anims.exists("monstre_cote")) {
+            this.anims.create({
+                key: "monstre_cote",
+                frames: this.anims.generateFrameNumbers("monstre", { start: 6, end: 8 }),
+                frameRate: 6,
+                repeat: -1
+            });
+        }
 
         if (!this.anims.exists("door_closed")) {
             this.anims.create({
@@ -118,7 +133,7 @@ export default class map_stuff extends Phaser.Scene {
                 playerSpawnY = porteArrivee.y;
             }
         }
-        // Seulement si le joueur n'a pas déjà le pistolet
+
         if (!this.game.config.aPistole) {
             this.game.config.aPistole = false;
         }
@@ -132,12 +147,10 @@ export default class map_stuff extends Phaser.Scene {
         player.pointsVie = 3;
         this.invincible = false;
 
-        // ✅ récupérer les vies depuis le HUD
         this.game.events.emit('getVie', (vie) => {
             player.pointsVie = vie;
         });
 
-        // ✅ récupérer si le joueur a déjà l'arme
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
                 if (!this.anims.exists("gun_droite")) {
@@ -181,7 +194,6 @@ export default class map_stuff extends Phaser.Scene {
                 frameRate: 20
             });
         }
-
         if (!this.anims.exists("gun_droite")) {
             this.anims.create({ key: "gun_droite", frames: [{ key: "image_gun", frame: 0 }], frameRate: 10 });
         }
@@ -203,7 +215,7 @@ export default class map_stuff extends Phaser.Scene {
                 const monstre = this.groupe_monstres.create(monstreObj.x, monstreObj.y, 'monstre', 0);
                 monstre.setBounce(1, 1);
                 monstre.setCollideWorldBounds(true);
-                monstre.setDisplaySize(40, 40);
+                monstre.setDisplaySize(60, 60);
                 monstre.setDepth(50);
                 monstre.pointsVie = Phaser.Math.Between(1, 3);
                 monstre.setVelocity(
@@ -242,26 +254,19 @@ export default class map_stuff extends Phaser.Scene {
             });
         }
 
-        // ✅ si le joueur a déjà l'arme, cacher les armes au sol
         this.game.events.emit('getArme', (aArme) => {
             if (aArme) {
-                this.groupe_armes.children.entries.forEach(arme => {
-                    arme.destroy();
-                });
+                this.groupe_armes.children.entries.forEach(arme => arme.destroy());
             }
         });
 
         this.groupeBullets = this.physics.add.group();
 
         if (wallLayer) {
-            this.physics.add.collider(this.groupeBullets, wallLayer, (balle) => {
-                balle.destroy();
-            });
+            this.physics.add.collider(this.groupeBullets, wallLayer, (balle) => balle.destroy());
         }
         if (objetsLayer) {
-            this.physics.add.collider(this.groupeBullets, objetsLayer, (balle) => {
-                balle.destroy();
-            });
+            this.physics.add.collider(this.groupeBullets, objetsLayer, (balle) => balle.destroy());
         }
 
         this.physics.add.overlap(this.groupeBullets, this.groupe_monstres, (balle, monstre) => {
@@ -270,13 +275,13 @@ export default class map_stuff extends Phaser.Scene {
             if (monstre.pointsVie <= 0) {
                 if (monstre.moveEvent) monstre.moveEvent.remove();
                 monstre.destroy();
-                this.game.events.emit('addMoney', 10); // ✅ +10 à la mort du monstre
+                this.game.events.emit('addMoney', 10);
+                this.son_ronnie.play();
             }
         });
 
         this.physics.add.overlap(player, this.groupe_monstres, () => {
             if (this.invincible) return;
-
             this.invincible = true;
             this.game.events.emit('playerHit');
             player.pointsVie--;
@@ -303,13 +308,12 @@ export default class map_stuff extends Phaser.Scene {
 
         this.physics.world.on("worldbounds", (body) => {
             const objet = body.gameObject;
-            if (this.groupeBullets.contains(objet)) {
-                objet.destroy();
-            }
+            if (this.groupeBullets.contains(objet)) objet.destroy();
         });
 
+        // ✅ KeyCodes explicite pour éviter tout conflit
         this.cursors = this.input.keyboard.createCursorKeys();
-        this.boutonFeu = this.input.keyboard.addKey('A');
+        this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 
         this.input.keyboard.on('keydown-ENTER', () => {
             if (this.armeNearby && !this.armeNearby.collectee && !player.armeEquipee) {
@@ -321,11 +325,10 @@ export default class map_stuff extends Phaser.Scene {
                 player.armeEquipee = armeSprite;
                 this.armeNearby.destroy();
                 this.armeNearby = null;
-                // ✅ signaler au HUD que l'arme est ramassée
+                this.son_tkprime.play();
                 this.game.events.emit('armeRamassee');
                 return;
             }
-
 
             if (this.doorNearby && this.doorNearby.estSolide) {
                 const doorName = this.doorNearby.doorName;
@@ -335,6 +338,7 @@ export default class map_stuff extends Phaser.Scene {
                 this.time.delayedCall(500, () => {
                     let destination = 'selection';
                     let porteDestination = 'door3';
+                    let offsetX = 0;
                     let offsetY = 0;
                     if (doorName === 'door_retour1') {
                         destination = 'selection';
@@ -343,16 +347,18 @@ export default class map_stuff extends Phaser.Scene {
                     } else if (doorName === 'door_retour2') {
                         destination = 'selection';
                         porteDestination = 'door31';
+                        offsetX = 50;
                     }
-                    this.scene.start(destination, { porteDestination, offsetY });
+                    this.cameras.main.fade(500, 0, 0, 0);
+                    this.time.delayedCall(500, () => {
+                        this.scene.start(destination, { porteDestination, offsetX, offsetY });
+                    });
                 });
             }
         });
 
-        // ✅ immunité de 3 secondes à l'entrée dans la scène
         this.invincible = true;
-        player.setAlpha(0.5); // effet visuel semi-transparent
-
+        player.setAlpha(0.5);
         this.time.delayedCall(1000, () => {
             this.invincible = false;
             player.setAlpha(1);
@@ -360,26 +366,16 @@ export default class map_stuff extends Phaser.Scene {
     }
 
     tirer() {
-        if (!player.armeEquipee) return;
-
-        let vx = 0;
-        let vy = 0;
-        let offsetX = 0;
-        let offsetY = 0;
+        if (!player || !player.armeEquipee) return;
+        let vx = 0, vy = 0, offsetX = 0, offsetY = 0;
         const vitesse = 600;
-
         switch (player.directionArme) {
             case 'droite': vx = vitesse; offsetX = 30; break;
             case 'gauche': vx = -vitesse; offsetX = -30; break;
             case 'haut': vy = -vitesse; offsetY = -30; break;
             case 'bas': vy = vitesse; offsetY = 30; break;
         }
-
-        const balle = this.groupeBullets.create(
-            player.x + offsetX,
-            player.y + offsetY,
-            'ball'
-        );
+        const balle = this.groupeBullets.create(player.x + offsetX, player.y + offsetY, 'ball');
         balle.setDisplaySize(12, 12);
         balle.setDepth(90);
         balle.setCollideWorldBounds(true);
@@ -389,16 +385,27 @@ export default class map_stuff extends Phaser.Scene {
     }
 
     update() {
-        const vitesse = player.vitesseBoost || player.vitesseBase || 160;
+        // ✅ guard unifié cursors + boutonFeu
+        if (!this.cursors || !this.boutonFeu) {
+            this.cursors = this.input.keyboard.createCursorKeys();
+            this.boutonFeu = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+            return;
+        }
+
         const cursors = this.cursors;
 
+        let vitesse = 160;
+        this.game.events.emit('getBoostVitesse', (boost) => {
+            if (boost) vitesse = boost;
+        });
+
         if (cursors.right.isDown) {
-            player.setVelocityX(160);
+            player.setVelocityX(vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_droite', true);
             player.directionArme = 'droite';
         } else if (cursors.left.isDown) {
-            player.setVelocityX(-160);
+            player.setVelocityX(-vitesse);
             player.setFlipX(false);
             player.anims.play('anim_tourne_gauche', true);
             player.directionArme = 'gauche';
@@ -408,71 +415,58 @@ export default class map_stuff extends Phaser.Scene {
         }
 
         if (cursors.up.isDown) {
-            player.setVelocityY(-160);
+            player.setVelocityY(-vitesse);
             player.directionArme = 'haut';
         } else if (cursors.down.isDown) {
-            player.setVelocityY(160);
+            player.setVelocityY(vitesse);
             player.directionArme = 'bas';
         } else {
             player.setVelocityY(0);
         }
 
-        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) {
-            this.tirer();
-        }
+        if (Phaser.Input.Keyboard.JustDown(this.boutonFeu)) this.tirer();
 
         this.armeNearby = null;
         if (this.groupe_armes) {
             this.groupe_armes.children.entries.forEach((arme) => {
                 if (arme.collectee) return;
-                const distance = Phaser.Math.Distance.Between(
-                    player.x, player.y,
-                    arme.x, arme.y
-                );
-                if (distance < 60) {
-                    this.armeNearby = arme;
-                }
+                const distance = Phaser.Math.Distance.Between(player.x, player.y, arme.x, arme.y);
+                if (distance < 60) this.armeNearby = arme;
             });
         }
 
         this.doorNearby = null;
         if (this.groupe_portes) {
             this.groupe_portes.children.entries.forEach((door) => {
-                const distance = Phaser.Math.Distance.Between(
-                    player.x, player.y,
-                    door.x, door.y
-                );
-                if (distance < 100 && door.estSolide) {
-                    this.doorNearby = door;
-                }
+                const distance = Phaser.Math.Distance.Between(player.x, player.y, door.x, door.y);
+                if (distance < 100 && door.estSolide) this.doorNearby = door;
             });
         }
 
         if (this.groupe_monstres) {
             this.groupe_monstres.children.entries.forEach((monstre) => {
-                if (monstre.body.velocity.x > 0) monstre.setFlipX(false);
-                else if (monstre.body.velocity.x < 0) monstre.setFlipX(true);
+                const vx = monstre.body.velocity.x;
+                const vy = monstre.body.velocity.y;
+
+                if (Math.abs(vx) > Math.abs(vy)) {
+                    monstre.anims.play('monstre_cote', true);
+                    monstre.setFlipX(vx < 0);
+                } else if (vy < 0) {
+                    monstre.anims.play('monstre_dos', true);
+                    monstre.setFlipX(false);
+                } else {
+                    monstre.anims.play('monstre_marche', true);
+                    monstre.setFlipX(false);
+                }
             });
         }
 
         if (player.armeEquipee) {
             switch (player.directionArme) {
-                case 'droite':
-                    player.armeEquipee.anims.play('gun_droite', true);
-                    player.armeEquipee.setPosition(player.x + 30, player.y);
-                    break;
-                case 'gauche':
-                    player.armeEquipee.anims.play('gun_gauche', true);
-                    player.armeEquipee.setPosition(player.x - 20, player.y);
-                    break;
-                case 'haut':
-                    player.armeEquipee.anims.play('gun_haut', true);
-                    player.armeEquipee.setPosition(player.x, player.y - 30);
-                    break;
-                case 'bas':
-                    player.armeEquipee.anims.play('gun_bas', true);
-                    player.armeEquipee.setPosition(player.x, player.y + 30);
-                    break;
+                case 'droite': player.armeEquipee.anims.play('gun_droite', true); player.armeEquipee.setPosition(player.x + 30, player.y); break;
+                case 'gauche': player.armeEquipee.anims.play('gun_gauche', true); player.armeEquipee.setPosition(player.x - 20, player.y); break;
+                case 'haut': player.armeEquipee.anims.play('gun_haut', true); player.armeEquipee.setPosition(player.x, player.y - 30); break;
+                case 'bas': player.armeEquipee.anims.play('gun_bas', true); player.armeEquipee.setPosition(player.x, player.y + 30); break;
             }
         }
     }
