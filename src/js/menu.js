@@ -46,10 +46,13 @@ export default class menu extends Phaser.Scene {
 
         const boutonJouer = this.add.image(240, 215, 'boutonjouer');
         boutonJouer.setDisplaySize(430, 200);
-        boutonJouer.setInteractive();
-        boutonJouer.setDepth(1);
+        boutonJouer.setInteractive({ useHandCursor: true });
+        boutonJouer.setDepth(2);
+        // Réduire la hitbox pour éviter le chevauchement avec le bouton Règles
+        const hjJ = boutonJouer.input.hitArea;
+        hjJ.height = hjJ.height * 0.7;
         boutonJouer.on('pointerover', () => {
-            boutonJouer.setDisplaySize(450, 258);
+            boutonJouer.setDisplaySize(450, 210);
         });
         boutonJouer.on('pointerout', () => {
             boutonJouer.setDisplaySize(430, 200);
@@ -70,8 +73,13 @@ export default class menu extends Phaser.Scene {
 
         const boutonRegle = this.add.image(240, 310, 'boutontouche');
         boutonRegle.setDisplaySize(450, 200);
-        boutonRegle.setInteractive();
-        boutonRegle.setDepth(1);
+        boutonRegle.setInteractive({ useHandCursor: true });
+        boutonRegle.setDepth(2);
+        // Réduire la hitbox du haut pour éviter le chevauchement avec le bouton Jouer
+        const hjR = boutonRegle.input.hitArea;
+        const trimTop = hjR.height * 0.3;
+        hjR.y += trimTop;
+        hjR.height -= trimTop;
         boutonRegle.on('pointerover', () => {
             boutonRegle.setDisplaySize(470, 210);
         });
