@@ -236,7 +236,7 @@ export default class map_directeur extends Phaser.Scene {
         this.porteFinNearby = false;
         this.codeInputActive = false;
         this.codeEntered = '';
-        this.correctCode = '2845';
+        this.correctCode = '2846';
         this.porteFinOuverte = false;
 
         // ✅ Tracker d'indices découverts + réponses du joueur
@@ -404,7 +404,7 @@ export default class map_directeur extends Phaser.Scene {
                 this.halteresDialogueShowing = true;
                 this.showEnigmePopup(
                     '🏋️ HALTÈRES',
-                    "3 rangées, mais la rangée du milieu a disparu.\nCombien reste-t-il ?",
+                    "Il y avait 3 rangées, mais la rangée du milieu a disparu.\nCombien en reste-t-il ?",
                     '2',
                     'halteres',
                     0,
@@ -415,7 +415,7 @@ export default class map_directeur extends Phaser.Scene {
                 this.benchDialogueShowing = true;
                 this.showEnigmePopup(
                     '🪑 BENCH',
-                    "Le patron fait 4 séries de 2 exercices.\nMais il dit que seul le total d'une série compte.",
+                    "Le patron enchaine 2 séries de 4 reps .\nMais il dit que seul les reps compte.",
                     '8',
                     'bench',
                     1,
@@ -426,7 +426,7 @@ export default class map_directeur extends Phaser.Scene {
                 this.echecDialogueShowing = true;
                 this.showEnigmePopup(
                     '♟️ ÉCHECS',
-                    "Blanc a perdu toutes ses pièces sauf le double de 2.\nNoir n'a plus que la moitié de ça.",
+                    "Blanc a presque perdu toutes ses pièces sauf le double de 2.\nNoir n'a plus que la moitié de ça. \n Combien de noir a de pièces ?",
                     '4',
                     'echec',
                     2,
@@ -440,8 +440,8 @@ export default class map_directeur extends Phaser.Scene {
                 this.arthusDialogueShowing = true;
                 this.showEnigmePopup(
                     '👤 ARTHUS',
-                    "J'ai compté ses pompes ce matin... il s'est arrêté à 10. Mais il en avait déjà fait la moitié avant ma pause.",
-                    '5',
+                    "J'ai battu mon record de 3 pompes ce matin. J'en ai fait le double ! \nCombien de pompes j'ai fait ?",
+                    '6',
                     'arthus',
                     3,
                     () => { this.arthusDialogueShowing = false; }
@@ -494,37 +494,37 @@ export default class map_directeur extends Phaser.Scene {
         const overlay = this.add.rectangle(240, 240, 480, 480, 0x000000, 0.75)
             .setDepth(300).setScrollFactor(0);
 
-        const panel = this.add.rectangle(240, 220, 430, 300, 0x1a1a2e, 0.95)
+        const panel = this.add.rectangle(240, 240, 460, 400, 0x1a1a2e, 0.95)
             .setDepth(301).setScrollFactor(0).setStrokeStyle(3, 0xffd700);
 
-        const titreText = this.add.text(240, 95, titre, {
+        const titreText = this.add.text(240, 65, titre, {
             fontSize: '30px', fontStyle: 'bold', fill: '#ffd700',
             stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
 
-        const ligne = this.add.rectangle(240, 120, 380, 2, 0xffd700, 0.6)
+        const ligne = this.add.rectangle(240, 95, 420, 2, 0xffd700, 0.6)
             .setDepth(302).setScrollFactor(0).setAlpha(0);
 
-        const enigmeText = this.add.text(240, 185, texte, {
+        const enigmeText = this.add.text(240, 190, texte, {
             fontSize: '22px', fill: '#ffffff', align: 'center',
-            wordWrap: { width: 380 }, lineSpacing: 8,
+            wordWrap: { width: 420 }, lineSpacing: 10,
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
 
         // Toujours permettre de saisir/changer un chiffre
         const ancienChiffre = this.indicesDecouverts[clef] ? this.reponsesJoueur[slotIndex] : '';
 
-        const inputLabel = this.add.text(240, 270, 'Tape un chiffre (0-9) :', {
+        const inputLabel = this.add.text(240, 300, 'Tape un chiffre (0-9) :', {
             fontSize: '20px', fontStyle: 'bold', fill: '#ffd700',
             stroke: '#000000', strokeThickness: 3
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
 
-        const reponseText = this.add.text(240, 310, ancienChiffre || '_', {
+        const reponseText = this.add.text(240, 345, ancienChiffre || '_', {
             fontSize: '36px', fontStyle: 'bold', fill: '#00ff88',
             fontFamily: 'monospace', stroke: '#000000', strokeThickness: 4
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
 
-        const instrText = this.add.text(240, 345, '⏎ ENTER valider  |  ECHAP annuler', {
+        const instrText = this.add.text(240, 390, '⏎ ENTER valider  |  ECHAP annuler', {
             fontSize: '14px', fill: '#888888',
             stroke: '#000000', strokeThickness: 2
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0).setAlpha(0);
