@@ -684,41 +684,28 @@ export default class map_directeur extends Phaser.Scene {
             stroke: '#000000', strokeThickness: 2
         }).setOrigin(0.5).setDepth(302).setScrollFactor(0);
 
-        // Écouter les touches numériques
-        this.codeKeys = [];
-        for (let i = 0; i <= 9; i++) {
-            const key = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ZERO + i);
-            this.codeKeys.push(key);
-        }
-        this.codeKeyBackspace = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.BACKSPACE);
-        this.codeKeyEsc = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-
-        this.codeInputHandler = this.time.addEvent({
-            delay: 100,
-            loop: true,
-            callback: () => {
-                // Chiffres 0-9
-                for (let i = 0; i <= 9; i++) {
-                    if (Phaser.Input.Keyboard.JustDown(this.codeKeys[i]) && this.codeEntered.length < 4) {
-                        this.codeEntered += i.toString();
-                        this.updateCodeDisplay();
-                    }
-                }
-                // Backspace
-                if (Phaser.Input.Keyboard.JustDown(this.codeKeyBackspace) && this.codeEntered.length > 0) {
-                    this.codeEntered = this.codeEntered.slice(0, -1);
-                    this.updateCodeDisplay();
-                }
-                // Echap → fermer
-                if (Phaser.Input.Keyboard.JustDown(this.codeKeyEsc)) {
-                    this.closeCodeInput();
-                }
-                // Enter → valider
-                if (Phaser.Input.Keyboard.JustDown(this.enterKey) && this.codeEntered.length === 4) {
-                    this.validateCode();
-                }
+        // Écouter les touches via event listener direct
+        this.codeInputListener = (event) => {
+            // Chiffres 0-9
+            if (event.keyCode >= 48 && event.keyCode <= 57 && this.codeEntered.length < 4) {
+                this.codeEntered += String(event.keyCode - 48);
+                this.updateCodeDisplay();
             }
-        });
+            // Backspace
+            if (event.keyCode === 8 && this.codeEntered.length > 0) {
+                this.codeEntered = this.codeEntered.slice(0, -1);
+                this.updateCodeDisplay();
+            }
+            // Echap → fermer
+            if (event.keyCode === 27) {
+                this.closeCodeInput();
+            }
+            // Enter → valider
+            if (event.keyCode === 13 && this.codeEntered.length === 4) {
+                this.validateCode();
+            }
+        };
+        this.input.keyboard.on('keydown', this.codeInputListener);
     }
 
     updateCodeDisplay() {
@@ -731,21 +718,16 @@ export default class map_directeur extends Phaser.Scene {
     }
 
     closeCodeInput() {
-        if (this.codeInputHandler) this.codeInputHandler.remove();
+        if (this.codeInputListener) {
+            this.input.keyboard.off('keydown', this.codeInputListener);
+            this.codeInputListener = null;
+        }
         if (this.codeOverlay) this.codeOverlay.destroy();
         if (this.codePanel) this.codePanel.destroy();
         if (this.codeTitle) this.codeTitle.destroy();
         if (this.codeDisplay) this.codeDisplay.destroy();
         if (this.codeHint) this.codeHint.destroy();
         if (this.codeResultText) { this.codeResultText.destroy(); this.codeResultText = null; }
-
-        // Supprimer les listeners de touches
-        if (this.codeKeys) {
-            this.codeKeys.forEach(k => k.destroy());
-            this.codeKeys = null;
-        }
-        if (this.codeKeyBackspace) { this.codeKeyBackspace.destroy(); this.codeKeyBackspace = null; }
-        if (this.codeKeyEsc) { this.codeKeyEsc.destroy(); this.codeKeyEsc = null; }
 
         this.codeInputActive = false;
     }
