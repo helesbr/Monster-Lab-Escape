@@ -252,7 +252,7 @@ export default class map_directeur extends Phaser.Scene {
 
         // ✅ Minuteur de 2 minutes
         this.tempsRestant = 120;
-        this.texteTimer = this.add.text(this.scale.width / 2, this.scale.height / 2, '4:00', {
+        this.texteTimer = this.add.text(this.scale.width / 2, this.scale.height / 2, '2:00', {
             fontSize: '40px',
             fontStyle: 'bold',
             fill: '#ff0000',

@@ -227,7 +227,7 @@ export default class map_monstre extends Phaser.Scene {
         });
 
         this.physics.add.overlap(player, this.groupe_monstres, () => {
-            if (this.invincible) return;
+            if (this.invincible || this.playerDead) return;
             this.invincible = true;
             this.game.events.emit('playerHit');
             player.pointsVie--;
@@ -238,6 +238,8 @@ export default class map_monstre extends Phaser.Scene {
             });
 
             if (player.pointsVie <= 0) {
+                this.playerDead = true;
+                this.physics.pause();
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
@@ -320,6 +322,7 @@ export default class map_monstre extends Phaser.Scene {
         this.groupe_boss = this.physics.add.group();
         this.groupeBossBullets = this.physics.add.group();
         this.bossPhaseActive = false;
+        this.playerDead = false;
     }
 
     spawnBosses() {
@@ -362,7 +365,7 @@ export default class map_monstre extends Phaser.Scene {
             boss.shootEvent = this.time.addEvent({
                 delay: Phaser.Math.Between(2000, 3500),
                 callback: () => {
-                    if (boss.active && player.active) this.bossTirer(boss);
+                    if (boss.active && player.active && !this.playerDead) this.bossTirer(boss);
                 },
                 loop: true
             });
@@ -406,7 +409,7 @@ export default class map_monstre extends Phaser.Scene {
         // Balles boss vs joueur
         this.physics.add.overlap(player, this.groupeBossBullets, (p, balle) => {
             balle.destroy();
-            if (this.invincible) return;
+            if (this.invincible || this.playerDead) return;
             this.invincible = true;
             this.game.events.emit('playerHit');
             player.pointsVie--;
@@ -417,6 +420,8 @@ export default class map_monstre extends Phaser.Scene {
             });
 
             if (player.pointsVie <= 0) {
+                this.playerDead = true;
+                this.physics.pause();
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
@@ -432,7 +437,7 @@ export default class map_monstre extends Phaser.Scene {
 
         // Contact direct boss vs joueur
         this.physics.add.overlap(player, this.groupe_boss, () => {
-            if (this.invincible) return;
+            if (this.invincible || this.playerDead) return;
             this.invincible = true;
             this.game.events.emit('playerHit');
             player.pointsVie--;
@@ -443,6 +448,8 @@ export default class map_monstre extends Phaser.Scene {
             });
 
             if (player.pointsVie <= 0) {
+                this.playerDead = true;
+                this.physics.pause();
                 this.game.events.emit('resetVie');
                 this.game.events.emit('resetArme');
                 this.game.events.emit('resetMonstres');
@@ -492,6 +499,7 @@ export default class map_monstre extends Phaser.Scene {
     }
 
     update() {
+        if (this.playerDead) return;
 
         // ✅ MODIFICATION VITESSE : récupérer boost depuis HUD
         let vitesse = 160;
