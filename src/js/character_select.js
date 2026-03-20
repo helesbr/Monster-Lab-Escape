@@ -77,7 +77,7 @@ export default class character_select extends Phaser.Scene {
 
         dudeFrame.on('pointerdown', () => {
             this.game.config.personnageSelectionne = 'dude';
-            this.scene.start('laboratory');
+            this.scene.start('laboratory',{});
         });
 
         // Personnage 2: Helias
