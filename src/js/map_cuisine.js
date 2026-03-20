@@ -320,15 +320,16 @@ export default class map_cuisine extends Phaser.Scene {
             this.shop = { x: shopObj.x, y: shopObj.y, name: shopObj.name || "shop" };
         }
 
-        this.objetsDisponibles = { preworkout: [], creatine: [] };
+        this.positionsSpawn = { preworkout: null, creatine: null };
+        this.objetEnAttente = { preworkout: false, creatine: false };
 
         const calqueProduit = carteCuisine.getObjectLayer("Calque Produit");
         if (calqueProduit) {
             calqueProduit.objects.forEach((produitObj) => {
                 if (produitObj.name === 'creatine') {
-                    this.objetsDisponibles.creatine.push({ x: produitObj.x, y: produitObj.y });
+                    this.positionsSpawn.creatine = { x: produitObj.x, y: produitObj.y };
                 } else if (produitObj.name === 'prewarkout' || produitObj.name === 'preworkout') {
-                    this.objetsDisponibles.preworkout.push({ x: produitObj.x, y: produitObj.y });
+                    this.positionsSpawn.preworkout = { x: produitObj.x, y: produitObj.y };
                 }
             });
         }
@@ -336,7 +337,9 @@ export default class map_cuisine extends Phaser.Scene {
         const calqueCreatine = carteCuisine.getObjectLayer("calque crea");
         if (calqueCreatine) {
             calqueCreatine.objects.forEach((creatineObj) => {
-                this.objetsDisponibles.creatine.push({ x: creatineObj.x, y: creatineObj.y });
+                if (!this.positionsSpawn.creatine) {
+                    this.positionsSpawn.creatine = { x: creatineObj.x, y: creatineObj.y };
+                }
             });
         }
 
@@ -546,27 +549,55 @@ export default class map_cuisine extends Phaser.Scene {
 
     spawnObjet(type) {
         this.game.events.emit('getMoney', (money) => {
-            if (money < 30) {
-                if (this.texteErreur) {
-                    this.texteErreur.setText("Pas assez d'argent ! (30 💰 requis)");
-                    this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
+            this.game.events.emit('getAchatsShop', (achatsTotal) => {
+                if (achatsTotal[type] >= 2) {
+                    if (this.texteErreur) {
+                        this.texteErreur.setText('Maximum 2 achats atteint !');
+                        this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
+                    }
+                    return;
                 }
-                return;
-            }
 
-            this.game.events.emit('addMoney', -30);
-            if (this.texteMoneyShop) {
-                this.texteMoneyShop.setText('Ton argent : ' + (money - 30) + ' 💰');
-            }
+                if (this.objetEnAttente[type]) {
+                    if (this.texteErreur) {
+                        this.texteErreur.setText('Récupère l\'objet avant d\'en racheter !');
+                        this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
+                    }
+                    return;
+                }
 
-            if (this.objetsDisponibles[type] && this.objetsDisponibles[type].length > 0) {
-                const position = this.objetsDisponibles[type].shift();
+                if (money < 30) {
+                    if (this.texteErreur) {
+                        this.texteErreur.setText("Pas assez d'argent ! (30 💰 requis)");
+                        this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
+                    }
+                    return;
+                }
+
+                if (!this.positionsSpawn[type]) {
+                    if (this.texteErreur) {
+                        this.texteErreur.setText('Aucun emplacement disponible !');
+                        this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
+                    }
+                    return;
+                }
+
+                this.game.events.emit('addMoney', -30);
+                if (this.texteMoneyShop) {
+                    this.texteMoneyShop.setText('Ton argent : ' + (money - 30) + ' 💰');
+                }
+
+                this.game.events.emit('addAchatShop', type);
+                this.objetEnAttente[type] = true;
+
+                const position = this.positionsSpawn[type];
                 const objet = this.physics.add.sprite(position.x, position.y, type);
                 objet.setDisplaySize(30, 30).setDepth(45);
                 objet.body.setImmovable(true);
                 objet.body.moves = false;
 
                 this.physics.add.overlap(player, objet, () => {
+                    if (!objet.active) return;
                     if (type === 'preworkout') {
                         this.game.events.emit('setBoostVitesse', 160 * 2.5, 90000);
                     } else if (type === 'creatine') {
@@ -580,13 +611,9 @@ export default class map_cuisine extends Phaser.Scene {
                         });
                     }
                     objet.destroy();
+                    this.objetEnAttente[type] = false;
                 });
-            } else {
-                if (this.texteErreur) {
-                    this.texteErreur.setText('Stock épuisé !');
-                    this.time.delayedCall(2000, () => { if (this.texteErreur) this.texteErreur.setText(''); });
-                }
-            }
+            });
         });
     }
 

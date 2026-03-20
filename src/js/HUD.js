@@ -11,6 +11,7 @@ export default class HUD extends Phaser.Scene {
         this.monstresMorts = [];
         this.vitesseBoost = null;
         this.timerBoost = null;
+        this.achatsShop = { preworkout: 0, creatine: 0 };
 
         // Supprimer tous les anciens listeners pour éviter les doublons
         this.game.events.off('playerHit');
@@ -32,6 +33,9 @@ export default class HUD extends Phaser.Scene {
         this.game.events.off('resetMonstres');
         this.game.events.off('resetBoost');
         this.game.events.off('tousMonstresMorts');
+        this.game.events.off('getAchatsShop');
+        this.game.events.off('addAchatShop');
+        this.game.events.off('resetAchatsShop');
 
         this.coeurs = [];
         for (let i = 0; i < 9; i++) {
@@ -149,6 +153,17 @@ export default class HUD extends Phaser.Scene {
             this.boostVitesse = false;
             this.boostVitesseExpire = 0;
             if (this.timerBoost) this.timerBoost.remove();
+        });
+
+        // achats shop
+        this.game.events.on('getAchatsShop', (callback) => {
+            callback(this.achatsShop);
+        });
+        this.game.events.on('addAchatShop', (type) => {
+            this.achatsShop[type]++;
+        });
+        this.game.events.on('resetAchatsShop', () => {
+            this.achatsShop = { preworkout: 0, creatine: 0 };
         });
     }
 
